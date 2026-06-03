@@ -1,4 +1,4 @@
-﻿/*
+/*
  * GeoRestrict - High-performance geographic access control.
  * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
  *
@@ -11,7 +11,6 @@ package zip.linuxaddict.georestrict;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 
@@ -19,20 +18,13 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Silent Modrinth update checker.
- * Queries the Modrinth API for the latest featured version of the project
- * and compares it against the currently running version.
- *
- * On ANY failure (network, parse, etc.) the checker stays completely silent â€”
- * no errors are logged and the future resolves to null.
- */
 public class UpdateChecker {
 
     private static final String MODRINTH_API =
-            "https://api.modrinth.com/v2/project/%s/version?loaders=[\"paper\",\"bukkit\",\"spigot\"]&featured=true";
+        "https://api.modrinth.com/v2/project/%s/version?loaders=[\"paper\",\"bukkit\",\"spigot\"]";
 
     private final String currentVersion;
     private final String projectSlug;
@@ -47,114 +39,129 @@ public class UpdateChecker {
         this.logger = logger;
     }
 
-    /**
-     * Asynchronously checks Modrinth for a newer version.
-     *
-     * @return a future that resolves to the latest version string if an update
-     *         is available, or null if the current version is up-to-date or
-     *         if the check failed for any reason.
-     */
     public CompletableFuture<String> checkForUpdate() {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 String urlString = String.format(MODRINTH_API, projectSlug);
-                URL url = new URL(urlString);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                HttpURLConnection conn = (HttpURLConnection) new URL(urlString).openConnection();
                 conn.setRequestMethod("GET");
-                conn.setRequestProperty("User-Agent", "GeoRestrict/" + currentVersion);
+                conn.setRequestProperty("User-Agent", PluginInfo.USER_AGENT);
+                conn.setRequestProperty("Accept", "application/json");
                 conn.setConnectTimeout(5000);
                 conn.setReadTimeout(5000);
+                if (conn.getResponseCode() != 200) return null;
 
-                if (conn.getResponseCode() != 200) {
-                    return null;
-                }
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
+                try (BufferedReader r = new BufferedReader(
+                        new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                    char[] buf = new char[1024];
+                    int n;
+                    while ((n = r.read(buf)) > 0) sb.append(buf, 0, n);
                 }
-                reader.close();
 
                 JsonArray versions = gson.fromJson(sb.toString(), JsonArray.class);
-                if (versions == null || versions.isEmpty()) {
-                    return null;
-                }
+                if (versions == null || versions.isEmpty()) return null;
 
-                JsonObject first = versions.get(0).getAsJsonObject();
-                JsonElement versionElement = first.get("version_number");
-                if (versionElement == null) {
-                    return null;
-                }
-
-                String remote = versionElement.getAsString();
+                String remote = pickNewest(versions);
+                if (remote == null) return null;
                 latestVersion = remote;
-
-                if (isNewer(remote, currentVersion)) {
-                    return remote;
-                }
-                return null;
+                return isNewer(remote, currentVersion) ? remote : null;
             } catch (Exception e) {
-                // Completely silent â€” never log update-check failures
                 return null;
             }
         });
     }
 
-    /**
-     * Returns the latest version string from the last successful check,
-     * or null if no check has been performed or it failed.
-     */
-    public String getLatestVersion() {
-        return latestVersion;
+    private String pickNewest(JsonArray versions) {
+        String newest = null;
+        int[] newestNums = null;
+        for (int i = 0; i < versions.size(); i++) {
+            JsonObject v = versions.get(i).getAsJsonObject();
+            if (!v.has("version_number") || v.get("version_number").isJsonNull()) continue;
+            String num = v.get("version_number").getAsString();
+            int[] nums = parseVersion(num);
+            if (nums == null) continue;
+            if (newest == null || compare(nums, newestNums) > 0) {
+                newest = num;
+                newestNums = nums;
+            }
+        }
+        return newest;
     }
 
-    /**
-     * Returns true if a newer version is available based on the last check.
-     */
+    public String getLatestVersion() { return latestVersion; }
+
     public boolean isUpdateAvailable() {
         return latestVersion != null && isNewer(latestVersion, currentVersion);
     }
 
-    // ------------------------------------------------------------- Helpers
+    private static boolean isNewer(String remote, String current) {
+        int[] r = parseVersion(remote);
+        int[] c = parseVersion(current);
+        if (r != null && c != null) return compare(r, c) > 0;
+        return numericAwareCompare(remote, current) > 0;
+    }
+
+    private static int compare(int[] a, int[] b) {
+        int len = Math.max(a.length, b.length);
+        for (int i = 0; i < len; i++) {
+            int ai = i < a.length ? a[i] : 0;
+            int bi = i < b.length ? b[i] : 0;
+            if (ai != bi) return Integer.compare(ai, bi);
+        }
+        return 0;
+    }
 
     /**
-     * Simple semantic-version comparison.
-     * Returns true if {@code remote} is strictly newer than {@code current}.
-     * Falls back to lexicographic comparison if versions don't parse cleanly.
+     * Parse a version like "v2.3.1-rc.2" into [2, 3, 1, -1] where the
+     * trailing -1 marks "has a pre-release suffix". A release with the
+     * same numeric base is treated as newer than a pre-release.
      */
-    private static boolean isNewer(String remote, String current) {
-        try {
-            int[] r = parseVersion(remote);
-            int[] c = parseVersion(current);
-            for (int i = 0; i < Math.max(r.length, c.length); i++) {
-                int rv = i < r.length ? r[i] : 0;
-                int cv = i < c.length ? c[i] : 0;
-                if (rv > cv) return true;
-                if (rv < cv) return false;
-            }
-            return false; // Equal
-        } catch (NumberFormatException e) {
-            // Fallback: lexicographic
-            return remote.compareTo(current) > 0;
-        }
-    }
-
     private static int[] parseVersion(String version) {
-        // Strip leading 'v' if present
-        String v = version.startsWith("v") ? version.substring(1) : version;
-        // Strip any pre-release suffix (e.g. "-beta.1")
+        if (version == null) return null;
+        String v = version.trim();
+        if (v.isEmpty()) return null;
+        if (v.charAt(0) == 'v' || v.charAt(0) == 'V') v = v.substring(1);
+        boolean preRelease = false;
         int dash = v.indexOf('-');
         if (dash != -1) {
+            preRelease = true;
             v = v.substring(0, dash);
         }
+        if (v.isEmpty()) return null;
         String[] parts = v.split("\\.");
-        int[] nums = new int[parts.length];
+        int[] nums = new int[parts.length + (preRelease ? 1 : 0)];
         for (int i = 0; i < parts.length; i++) {
-            nums[i] = Integer.parseInt(parts[i]);
+            try {
+                nums[i] = Integer.parseInt(parts[i]);
+            } catch (NumberFormatException e) {
+                return null;
+            }
         }
+        if (preRelease) nums[nums.length - 1] = -1;
         return nums;
     }
-}
 
+    private static int numericAwareCompare(String a, String b) {
+        String[] ap = a.split("\\.");
+        String[] bp = b.split("\\.");
+        int len = Math.max(ap.length, bp.length);
+        for (int i = 0; i < len; i++) {
+            String as = i < ap.length ? ap[i] : "0";
+            String bs = i < bp.length ? bp[i] : "0";
+            Integer ai = tryParse(as);
+            Integer bi = tryParse(bs);
+            if (ai != null && bi != null) {
+                if (!ai.equals(bi)) return ai.compareTo(bi);
+            } else {
+                int c = as.compareTo(bs);
+                if (c != 0) return c;
+            }
+        }
+        return 0;
+    }
+
+    private static Integer tryParse(String s) {
+        try { return Integer.parseInt(s); } catch (NumberFormatException e) { return null; }
+    }
+}

@@ -1,19 +1,19 @@
 <!--
- * GeoRestrict - High-performance geographic access control.
- * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
--->
+  ~ GeoRestrict - High-performance geographic access control.
+  ~ Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How It Works - GeoRestrict Docs</title>
-    <meta name="description" content="Learn how GeoRestrict processes player connections, caches data, and evaluates geographic rules.">
+    <title>How it works - GeoRestrict</title>
+    <meta name="description" content="Data flow, cache lifecycle, and what the Cloudflare Worker actually does.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -44,61 +44,67 @@
         </div>
     </nav>
 
-
     <main class="main-content">
         <div class="content-inner">
 
             <div class="page-header">
-                <h1><span class="header-icon">🔧</span> How It Works</h1>
-                <p>A detailed look at how GeoRestrict processes every player connection.</p>
+                <h1><span class="header-icon">🔧</span> How it works</h1>
+                <p>Three moving parts: your server, the Worker, and the upstream provider. The data path is short.</p>
             </div>
 
-            <!-- Connection flow -->
-            <h2 class="fade-in">Connection Flow</h2>
-            <div class="section-divider fade-in"></div>
+            <h2 class="fade-in">The short version</h2>
+            <p class="fade-in">Player connects. Plugin checks <code>geo_cache.json</code> on disk. If there's a fresh entry, the rules run locally — no network. If there isn't, the plugin sends one HTTPS request to the Worker. The Worker queries the geolocation provider, returns the result, the plugin caches it, and evaluates.</p>
 
-            <ol class="steps fade-in">
-                <li><strong>Player connects</strong> — A player attempts to join your server. GeoRestrict hooks into the login event.</li>
-                <li><strong>Check local cache</strong> — The plugin first checks its local IP cache for a previous lookup result.</li>
-                <li><strong>Cache hit</strong> — If a valid cached result exists, rules are evaluated instantly with zero network latency.</li>
-                <li><strong>Cache miss</strong> — If no cache entry is found (or it has expired), the plugin queries the Cloudflare Worker gateway.</li>
-                <li><strong>API lookup</strong> — The gateway tries <code>ip-api.com</code> as the primary source and automatically falls back to <code>ipinfo.io</code> if needed.</li>
-                <li><strong>Cache the response</strong> — The lookup result is stored locally on your server for the configured TTL period, preserving player privacy.</li>
-                <li><strong>Evaluate rules</strong> — Rules are checked in order: <strong>Country</strong> → <strong>ASN/ISP</strong> → <strong>VPN/Proxy</strong>. The first matching rule determines the outcome.</li>
-                <li><strong>Allow or kick</strong> — If a restriction matches, the player is kicked with the configured message. Otherwise, they join normally.</li>
-                <li><strong>Discord notification</strong> — If a webhook is configured, a rich embed is sent to your Discord channel with connection details.</li>
+            <h2 class="fade-in">Detailed flow</h2>
+
+            <h3 class="fade-in">1. Plugin receives a login</h3>
+            <p class="fade-in">The plugin listens to the platform's pre-login event. On Bukkit that's <code>AsyncPlayerPreLoginEvent</code>. On BungeeCord it's <code>LoginEvent</code>. On Velocity it's <code>LoginEvent</code> with the async continuation API. The event gives us the connection IP, the player's name, and (sometimes) their UUID. The plugin then submits the IP to its internal <code>GeoRestrictService.checkIp(...)</code> on a background thread.</p>
+
+            <h3 class="fade-in">2. Cache check</h3>
+            <p class="fade-in">The cache is a <code>ConcurrentHashMap</code> in memory, mirrored to <code>geo_cache.json</code> on disk via a debounced async save (5s window). Saves are atomic: write to <code>.tmp</code>, then <code>Files.move(... ATOMIC_MOVE)</code>, with a non-atomic fallback for filesystems that don't support it.</p>
+            <p class="fade-in">A cache hit short-circuits the entire network path. The cached <code>GeoResponse</code> is fed straight into the rule evaluator. A cache miss goes to step 3.</p>
+
+            <h3 class="fade-in">3. Worker query</h3>
+            <p class="fade-in">Single HTTPS request:</p>
+            <div class="code-block-wrapper fade-in">
+                <span class="code-label">HTTP</span>
+<pre><code>GET /?ip=1.2.3.4 HTTP/1.1
+Host: geoprotect.demonzdev.workers.dev
+User-Agent: GeoRestrict/2.1.0
+Authorization: Bearer &lt;token&gt;        <span class="syn-cmt"># only if gatewayToken is set</span>
+</code></pre>
+            </div>
+            <p class="fade-in">The plugin hands the IP, the timeout from <code>connectionTimeoutMs</code>, and the optional bearer token. The Worker is the only thing that knows your provider credentials. The plugin itself never speaks to <code>ip-api.com</code> or <code>ipinfo.io</code> directly — that's the Worker's job.</p>
+
+            <h3 class="fade-in">4. Worker → provider</h3>
+            <p class="fade-in">Inside the Worker, the provider order from <code>PROVIDER_ORDER</code> is walked. For each provider, the Worker picks a random endpoint and (if configured) a random key from the pool. The first non-error response wins. Results are stored in <code>caches.default</code> for <code>CACHE_TTL_SECONDS</code> (default 86400s = 24h).</p>
+            <p class="fade-in">If every provider fails, the Worker returns HTTP 502 with an <code>all_providers_failed</code> body. The plugin treats this as a lookup failure and runs the lookup-failure policy.</p>
+
+            <h3 class="fade-in">5. Rule evaluation</h3>
+            <p class="fade-in">Three rules, in order. First match wins:</p>
+            <ol class="fade-in">
+                <li><strong>Country</strong> — list match against <code>countryCode</code> in the configured mode (ALLOWLIST / BLOCKLIST).</li>
+                <li><strong>ASN</strong> — same logic for AS numbers.</li>
+                <li><strong>VPN</strong> — boolean flags (<code>isVpn</code>, <code>isHosting</code>, <code>isProxy</code>) plus a case-insensitive keyword scan of the AS name.</li>
             </ol>
 
-            <!-- Privacy -->
-            <h2 class="fade-in">Privacy</h2>
-            <div class="section-divider fade-in"></div>
+            <h3 class="fade-in">6. Result</h3>
+            <p class="fade-in">If a rule matches, the event is denied with the configured kick message. If nothing matches, the player proceeds normally. In both cases the Discord webhook fires if configured.</p>
 
-            <div class="glass-card fade-in">
-                <p>GeoRestrict is designed with <strong>privacy first</strong>. All IP lookup data is stored exclusively on <strong>your</strong> server in a local cache file. No player data is ever sent to, or stored on, any third-party cloud service or database.</p>
-                <p>The only external requests made are to the IP geolocation APIs during a cache miss — and even those go through a privacy-respecting Cloudflare Worker gateway.</p>
-            </div>
+            <h2 class="fade-in">Privacy boundary</h2>
+            <p class="fade-in">The only thing that leaves your server is the player's IP, and only on a cache miss. The Worker forwards it to a provider, gets a country/ASN back, returns it. The provider keeps its own logs according to their own policy — that's outside our control. The plugin itself writes nothing to disk except the cache, the config, and (if you set one) the Modrinth hit. The Worker can be configured to <em>not</em> cache anything (set <code>CACHE_TTL_SECONDS=0</code>) if you don't want even short-lived retention at the edge.</p>
 
-            <div class="callout callout-info fade-in">
-                <span class="callout-icon">🔒</span>
-                <p>Enable <code>discord.maskIp</code> in your config to partially redact player IP addresses in Discord webhook messages (e.g. <code>192.168.***. ***</code>).</p>
-            </div>
+            <h2 class="fade-in">Caching details</h2>
+            <ul class="fade-in">
+                <li>Cache file: <code>plugins/GeoRestrict/geo_cache.json</code> on the server where the plugin runs.</li>
+                <li>Loaded on startup, written on a 5s debounce after the last change, written synchronously on shutdown.</li>
+                <li>Old entries are purged every 6h via a scheduled task (configurable TTL).</li>
+                <li>Hard cap of <code>maxCacheEntries</code>; oldest entries are evicted in order when exceeded.</li>
+                <li>On load, entries older than 365 days are dropped silently — that's your upper bound for "stale data after a long offline period".</li>
+            </ul>
 
-            <!-- Folia -->
-            <h2 class="fade-in">Folia Support</h2>
-            <div class="section-divider fade-in"></div>
-
-            <div class="glass-card fade-in">
-                <p><strong>Folia</strong> uses a region-aware multi-threaded scheduling model instead of a single main thread. GeoRestrict <strong>auto-detects</strong> Folia at startup and switches to region-aware task scheduling automatically.</p>
-                <p>No extra configuration is required — just drop the plugin into your Folia server's <code>plugins/</code> folder and it will work correctly.</p>
-            </div>
-
-            <!-- Private subnet bypass -->
-            <h2 class="fade-in">Private Subnet Bypass</h2>
-            <div class="section-divider fade-in"></div>
-
-            <div class="glass-card fade-in">
-                <p>Connections from private / local IP ranges (e.g. <code>127.0.0.1</code>, <code>192.168.x.x</code>, <code>10.x.x.x</code>) are automatically <strong>bypassed</strong> — they are never sent to the API and are always allowed. This ensures localhost and LAN connections are never blocked.</p>
-            </div>
+            <h2 class="fade-in">Folia-specific note</h2>
+            <p class="fade-in">The plugin detects Folia at startup (<code>Class.forName("io.papermc.paper.threadedregions.RegionizedServer")</code>) and switches to a Folia scheduler adapter. The adapter uses the global region scheduler for sync tasks and the async scheduler for everything else. The plugin itself doesn't touch world state, so region locality only matters for the configuration-watcher task, which is fine to run on the global region.</p>
 
         </div>
     </main>

@@ -1,32 +1,30 @@
 <!--
- * GeoRestrict - High-performance geographic access control.
- * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
--->
+  ~ GeoRestrict - High-performance geographic access control.
+  ~ Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - GeoRestrict Docs</title>
-    <meta name="description" content="GeoRestrict — Geographic restriction plugin for Minecraft servers. Block countries, detect VPNs, filter ASNs, and more.">
+    <title>GeoRestrict — geographic access control for Minecraft</title>
+    <meta name="description" content="Drop-in country, ASN and VPN blocking for Bukkit, Paper, Folia, BungeeCord, Waterfall and Velocity. Local cache, Discord webhooks, Cloudflare Worker gateway.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- Mobile hamburger -->
     <button class="hamburger" aria-label="Toggle sidebar">
         <span></span><span></span><span></span>
     </button>
     <div class="sidebar-overlay"></div>
 
-    <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
@@ -46,68 +44,66 @@
         </div>
     </nav>
 
-
-    <!-- Main -->
     <main class="main-content">
         <div class="content-inner">
+            <div class="page-header">
+                <h1><span class="header-icon">🛡️</span> GeoRestrict</h1>
+                <p>Country, ASN and VPN blocking for Minecraft servers. Drop the jar in, set a blocklist, done.</p>
+            </div>
 
-            <!-- Hero -->
-            <section class="hero">
-                <h1 class="hero-title">GeoRestrict</h1>
-                <p class="hero-tagline">Geographic restriction plugin for Minecraft servers</p>
-                <p class="hero-credit">Developed by <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a></p>
-                <div class="section-divider"></div>
+            <div class="alert alert-info fade-in">
+                <strong>v2.1.0 shipped.</strong> Fail-closed by default, dedup'd config migration, gateway token required when configured, real unit tests. See the <a href="changelog.html">changelog</a> for the full list.
+            </div>
 
-                <!-- Platform badges -->
-                <div class="platform-badges">
-                    <span class="badge">Bukkit</span>
-                    <span class="badge">Paper</span>
-                    <span class="badge">Spigot</span>
-                    <span class="badge">BungeeCord</span>
-                    <span class="badge">Waterfall</span>
-                    <span class="badge">Velocity</span>
-                    <span class="badge">Folia</span>
+            <div class="feature-grid fade-in">
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Country blocklists</h3>
+                    <p>ALLOWLIST or BLOCKLIST mode. ISO-3166 codes. Mixed v4/v6 supported.</p>
                 </div>
-                <p class="version-badge">Supports Minecraft 1.16 — 1.26.x</p>
-            </section>
-
-            <!-- Features -->
-            <h2 class="fade-in">Features</h2>
-            <div class="section-divider fade-in"></div>
-
-            <div class="features-grid">
-                <div class="feature-card fade-in">
-                    <span class="feature-icon">🌍</span>
-                    <h3>Country Blocking</h3>
-                    <p>Allowlist or blocklist entire countries. Control exactly which regions can access your server with flexible country-code rules.</p>
+                <div class="feature-card">
+                    <div class="feature-icon">📡</div>
+                    <h3>ASN filtering</h3>
+                    <p>Block specific ISPs/hosters (e.g. AS16276 for OVH) without blocking entire countries.</p>
                 </div>
-                <div class="feature-card fade-in">
-                    <span class="feature-icon">🛡️</span>
-                    <h3>VPN &amp; Proxy Detection</h3>
-                    <p>Detect VPNs, proxies, and hosting providers automatically. Keep your server safe from anonymous connections.</p>
+                <div class="feature-card">
+                    <div class="feature-icon">🕵️</div>
+                    <h3>VPN detection</h3>
+                    <p>Boolean flags from the lookup + ISP keyword fallback for when they lie.</p>
                 </div>
-                <div class="feature-card fade-in">
-                    <span class="feature-icon">📡</span>
-                    <h3>ASN / ISP Filtering</h3>
-                    <p>Block or allow specific ISPs and ASNs. Fine-grained control over which networks can reach your server.</p>
+                <div class="feature-card">
+                    <div class="feature-icon">💾</div>
+                    <h3>Local cache</h3>
+                    <p>Results cached in <code>geo_cache.json</code>. 30-day default TTL, atomic writes, size-capped.</p>
                 </div>
-                <div class="feature-card fade-in">
-                    <span class="feature-icon">💬</span>
-                    <h3>Discord Webhooks</h3>
-                    <p>Get notified instantly when players are blocked. Rich Discord embeds with player info, IP, country, and reason.</p>
+                <div class="feature-card">
+                    <div class="feature-icon">📨</div>
+                    <h3>Discord webhooks</h3>
+                    <p>Get notified on block/allow. Field list is configurable. IP is masked by default.</p>
                 </div>
-                <div class="feature-card fade-in">
-                    <span class="feature-icon">⚡</span>
-                    <h3>Local Privacy Cache</h3>
-                    <p>Cache lookup results locally on your server. No data is sent to or stored on any third-party cloud service.</p>
-                </div>
-                <div class="feature-card fade-in">
-                    <span class="feature-icon">🔄</span>
-                    <h3>Auto Updates</h3>
-                    <p>Silent update checking via Modrinth. Stay up to date without any manual effort — get notified of new releases.</p>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Multi-platform</h3>
+                    <p>One jar. Works on Bukkit, Paper, Folia, Spigot, BungeeCord, Waterfall, Velocity.</p>
                 </div>
             </div>
 
+            <h2 class="fade-in">How a connection gets checked</h2>
+            <ol class="fade-in">
+                <li>Player connects.</li>
+                <li>Local cache hit? <em>Done.</em></li>
+                <li>Cache miss. Plugin asks the Worker for <code>?ip=&lt;addr&gt;</code>.</li>
+                <li>Worker tries providers in the order you configured, returns the first hit.</li>
+                <li>Result is cached and the rule list (country → ASN → VPN) is evaluated.</li>
+                <li>First match wins. Otherwise the player joins.</li>
+            </ol>
+
+            <p class="fade-in">No telemetry, no analytics on your players. The Worker only sees an IP, and only when there's a cache miss. See <a href="how-it-works.html">How it works</a> for the full data flow.</p>
+
+            <h2 class="fade-in">Get started</h2>
+            <p class="fade-in">Grab the latest <code>georestrict-2.1.0.jar</code> from the releases page, drop it into <code>plugins/</code>, restart, and edit <code>plugins/GeoRestrict/config.yml</code>. The default config blocks CN, RU, KP and IR with fail-closed behavior on lookup failure.</p>
+
+            <p class="fade-in">Need help? Read the <a href="troubleshooting.html">troubleshooting guide</a> or the <a href="faq.html">FAQ</a>.</p>
         </div>
     </main>
 

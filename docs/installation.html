@@ -1,19 +1,19 @@
 <!--
- * GeoRestrict - High-performance geographic access control.
- * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
--->
+  ~ GeoRestrict - High-performance geographic access control.
+  ~ Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Installation - GeoRestrict Docs</title>
-    <meta name="description" content="How to install GeoRestrict on Bukkit, Paper, Spigot, BungeeCord, Waterfall, and Velocity servers.">
+    <title>Installation - GeoRestrict</title>
+    <meta name="description" content="How to install GeoRestrict on Bukkit, Paper, Folia, BungeeCord, Waterfall or Velocity.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -44,64 +44,85 @@
         </div>
     </nav>
 
-
     <main class="main-content">
         <div class="content-inner">
 
             <div class="page-header">
                 <h1><span class="header-icon">📦</span> Installation</h1>
-                <p>Get GeoRestrict up and running on your Minecraft server in minutes.</p>
+                <p>Drop-in install for any of the six supported platforms. Same jar, different entrypoints.</p>
             </div>
 
-            <!-- Requirements -->
-            <h2 class="fade-in">Requirements</h2>
-            <div class="section-divider fade-in"></div>
+            <h2 class="fade-in">1. Pick the right jar</h2>
+            <p class="fade-in">There's only one jar, <code>georestrict-2.1.0.jar</code>. The same file works on:</p>
+            <ul class="fade-in">
+                <li>Bukkit 1.16+ (Spigot, Paper, Purpur, ...)</li>
+                <li>Folia 1.20+ — detected at runtime, region-aware scheduler is used automatically</li>
+                <li>BungeeCord, Waterfall</li>
+                <li>Velocity 3.2.0+</li>
+            </ul>
 
-            <div class="glass-card fade-in">
-                <ul>
-                    <li><strong>Java 17</strong> or newer</li>
-                    <li><strong>Minecraft 1.16</strong> or newer (up to 1.26.x)</li>
-                </ul>
+            <div class="alert alert-warning fade-in">
+                <strong>Where to put it depends on your topology.</strong> If you have a proxy, install on the <em>proxy</em>. The plugin blocks at the network edge, which is the only place to actually reject a connection. Installing on backend servers is a fallback for direct-connect servers.
             </div>
 
-            <!-- Bukkit / Paper / Spigot -->
-            <h2 class="fade-in">Bukkit / Paper / Spigot</h2>
-            <div class="section-divider fade-in"></div>
+            <h2 class="fade-in">2. Install</h2>
 
-            <ol class="steps fade-in">
-                <li><strong>Download</strong> the latest <code>GeoRestrict.jar</code> from the <a href="https://modrinth.com/" target="_blank">Modrinth page</a> or the official release channel.</li>
-                <li><strong>Place</strong> the <code>.jar</code> file into your server's <code>plugins/</code> folder.</li>
-                <li><strong>Restart</strong> the server. GeoRestrict will generate a default <code>config.yml</code> on first launch.</li>
-                <li><strong>Configure</strong> the plugin by editing <code>plugins/GeoRestrict/config.yml</code> to match your needs.</li>
-            </ol>
-
-            <!-- BungeeCord / Waterfall -->
-            <h2 class="fade-in">BungeeCord / Waterfall</h2>
-            <div class="section-divider fade-in"></div>
-
-            <ol class="steps fade-in">
-                <li><strong>Download</strong> the latest <code>GeoRestrict.jar</code> from the official release channel.</li>
-                <li><strong>Place</strong> the <code>.jar</code> file into your proxy's <code>plugins/</code> folder.</li>
-                <li><strong>Restart</strong> the proxy. The default configuration will be generated automatically.</li>
-                <li><strong>Configure</strong> the plugin by editing <code>plugins/GeoRestrict/config.yml</code>.</li>
-            </ol>
-
-            <!-- Velocity -->
-            <h2 class="fade-in">Velocity</h2>
-            <div class="section-divider fade-in"></div>
-
-            <ol class="steps fade-in">
-                <li><strong>Download</strong> the latest <code>GeoRestrict.jar</code> from the official release channel.</li>
-                <li><strong>Place</strong> the <code>.jar</code> file into Velocity's <code>plugins/</code> folder.</li>
-                <li><strong>Restart</strong> the Velocity proxy. Configuration files will be created automatically.</li>
-                <li><strong>Configure</strong> the plugin by editing <code>plugins/georestrict/config.yml</code>.</li>
-            </ol>
-
-            <!-- Folia note -->
-            <div class="callout callout-info fade-in">
-                <span class="callout-icon">ℹ️</span>
-                <p><strong>Folia support</strong> is auto-detected at startup. No extra configuration is needed — GeoRestrict will automatically use region-aware scheduling when running on a Folia server.</p>
+            <h3 class="fade-in">Bukkit / Paper / Folia / Spigot</h3>
+            <div class="code-block-wrapper fade-in">
+                <span class="code-label">shell</span>
+<pre><code>cd /path/to/server
+cp georestrict-2.1.0.jar plugins/
+./start.sh   # or systemctl restart minecraft
+</code></pre>
             </div>
+
+            <h3 class="fade-in">BungeeCord / Waterfall</h3>
+            <div class="code-block-wrapper fade-in">
+                <span class="code-label">shell</span>
+<pre><code>cd /path/to/proxy
+cp georestrict-2.1.0.jar plugins/
+./start.sh
+</code></pre>
+            </div>
+
+            <h3 class="fade-in">Velocity</h3>
+            <div class="code-block-wrapper fade-in">
+                <span class="code-label">shell</span>
+<pre><code>cd /path/to/velocity
+cp georestrict-2.1.0.jar plugins/
+./start.sh
+</code></pre>
+            </div>
+
+            <h2 class="fade-in">3. Verify the install</h2>
+            <p class="fade-in">On startup you should see this in the console:</p>
+            <div class="code-block-wrapper fade-in">
+                <span class="code-label">console</span>
+<pre><code>[GeoRestrict] GeoRestrict v2.1.0 starting...
+[GeoRestrict] GeoRestrict enabled.
+</code></pre>
+            </div>
+
+            <p class="fade-in">And a config file at <code>plugins/GeoRestrict/config.yml</code> (Bukkit) or <code>plugins/GeoRestrict/config.yml</code> (Bungee/Velocity).</p>
+
+            <h2 class="fade-in">4. Set up the Worker (recommended)</h2>
+            <p class="fade-in">The plugin talks to a Cloudflare Worker. Out of the box it points at the public one at <code>geoprotect.demonzdev.workers.dev</code>, which works but is shared. If you'd rather not share IPs with the rest of the internet:</p>
+            <ol class="fade-in">
+                <li>Fork or copy <code>worker/src/index.js</code> from this repo.</li>
+                <li>Deploy it: <code>npx wrangler deploy</code> in the <code>worker/</code> directory.</li>
+                <li>Set <code>GATEWAY_TOKENS</code> as a Worker secret.</li>
+                <li>Update <code>gatewayUrl</code> and <code>gatewayToken</code> in your plugin config.</li>
+            </ol>
+
+            <div class="alert alert-info fade-in">
+                If you set <code>GATEWAY_TOKENS</code> on the Worker, requests without a matching <code>gatewayToken</code> are rejected with HTTP 401. The default config has an empty token — leave it that way when using the public Worker, or set one to lock down your private one.
+            </div>
+
+            <h2 class="fade-in">Updating</h2>
+            <p class="fade-in">Replace the jar, restart, done. Config keys you don't have are added with sane defaults. Keys you have are kept. <code>configVersion</code> tracks schema version, not plugin version, and bumps only when the file layout changes.</p>
+
+            <h2 class="fade-in">Uninstalling</h2>
+            <p class="fade-in">Delete the jar, delete <code>plugins/GeoRestrict/</code>, restart. Nothing is written outside that directory.</p>
 
         </div>
     </main>

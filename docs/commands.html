@@ -1,19 +1,19 @@
 <!--
- * GeoRestrict - High-performance geographic access control.
- * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
--->
+  ~ GeoRestrict - High-performance geographic access control.
+  ~ Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Commands &amp; Permissions - GeoRestrict Docs</title>
-    <meta name="description" content="All GeoRestrict commands and permissions explained. Admin commands for checking, caching, and reloading.">
+    <title>Commands - GeoRestrict</title>
+    <meta name="description" content="All /georestrict subcommands: check, purgecache, cachestats, reload.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -44,89 +44,71 @@
         </div>
     </nav>
 
-
     <main class="main-content">
         <div class="content-inner">
 
             <div class="page-header">
-                <h1><span class="header-icon">💻</span> Commands &amp; Permissions</h1>
-                <p>All available commands and their required permissions.</p>
+                <h1><span class="header-icon">💻</span> Commands</h1>
+                <p>One root command, four subcommands. <code>georestrict.admin</code> permission on all of them.</p>
             </div>
 
-            <!-- Commands -->
-            <h2 class="fade-in">Commands</h2>
-            <div class="section-divider fade-in"></div>
-
-            <div class="table-wrapper fade-in">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Command</th>
-                            <th>Permission</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>/georestrict</code></td>
-                            <td>—</td>
-                            <td>Show plugin info &amp; credits</td>
-                        </tr>
-                        <tr>
-                            <td><code>/georestrict check &lt;ip|player&gt;</code></td>
-                            <td><code>georestrict.admin</code></td>
-                            <td>Look up geographic and network data for an IP or online player</td>
-                        </tr>
-                        <tr>
-                            <td><code>/georestrict purgecache</code></td>
-                            <td><code>georestrict.admin</code></td>
-                            <td>Clear the entire local IP lookup cache</td>
-                        </tr>
-                        <tr>
-                            <td><code>/georestrict cachestats</code></td>
-                            <td><code>georestrict.admin</code></td>
-                            <td>Show cache statistics (entries, hit rate, size)</td>
-                        </tr>
-                        <tr>
-                            <td><code>/georestrict reload</code></td>
-                            <td><code>georestrict.admin</code></td>
-                            <td>Reload <code>config.yml</code> without restarting the server</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <h2 class="fade-in">/georestrict</h2>
+            <p class="fade-in">No args. Prints the version and a link.</p>
+            <div class="code-block-wrapper fade-in">
+                <span class="code-label">in-game</span>
+<pre><code>/georestrict
+<span class="syn-cmt"># → GeoRestrict v2.1.0</span>
+<span class="syn-cmt">#   By Demonz Development</span>
+<span class="syn-cmt">#   https://demonzdevelopment.online/</span>
+</code></pre>
             </div>
 
-            <!-- Permissions -->
+            <h2 class="fade-in">/georestrict check &lt;ip|player&gt;</h2>
+            <p class="fade-in">Looks up an IP or online player's address and shows the rule outcome. Bypasses the cache and runs the rule list immediately.</p>
+            <div class="code-block-wrapper fade-in">
+                <span class="code-label">in-game</span>
+<pre><code>/georestrict check 8.8.8.8
+/georestrict check Notch
+<span class="syn-cmt"># → Checking IP: 8.8.8.8...</span>
+<span class="syn-cmt">#   Result for 8.8.8.8:</span>
+<span class="syn-cmt">#   Allowed: Yes</span>
+<span class="syn-cmt">#   Country: US</span>
+<span class="syn-cmt">#   ASN:     AS15169</span>
+<span class="syn-cmt">#   ISP:     GOOGLE</span>
+</code></pre>
+            </div>
+
+            <p class="fade-in">If you pass a player name and they're online, the plugin grabs their actual connection IP. Otherwise the argument is treated as a literal IP string.</p>
+
+            <h2 class="fade-in">/georestrict purgecache</h2>
+            <p class="fade-in">Drops the in-memory cache and deletes <code>geo_cache.json</code>. The next connection will hit the Worker again. Useful when you've changed <code>vpnKeywords</code> or the Worker is misbehaving and you want to flush stale entries.</p>
+
+            <h2 class="fade-in">/georestrict cachestats</h2>
+            <p class="fade-in">Prints entry count, file size, and the age of the oldest entry.</p>
+            <div class="code-block-wrapper fade-in">
+                <span class="code-label">in-game</span>
+<pre><code>/georestrict cachestats
+<span class="syn-cmt"># → GeoRestrict Cache Stats</span>
+<span class="syn-cmt">#   Entries: 4123</span>
+<span class="syn-cmt">#   File size: 482.31 KB</span>
+<span class="syn-cmt">#   Oldest entry: 12d 4h ago</span>
+</code></pre>
+            </div>
+
+            <h2 class="fade-in">/georestrict reload</h2>
+            <p class="fade-in">Re-reads <code>config.yml</code> from disk and swaps it in live. No restart, no reconnect. Safe to run while players are online.</p>
+
             <h2 class="fade-in">Permissions</h2>
-            <div class="section-divider fade-in"></div>
-
             <div class="table-wrapper fade-in">
                 <table>
                     <thead>
-                        <tr>
-                            <th>Permission</th>
-                            <th>Default</th>
-                            <th>Description</th>
-                        </tr>
+                        <tr><th>Permission</th><th>Default</th><th>What it does</th></tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><code>georestrict.admin</code></td>
-                            <td><code>OP</code></td>
-                            <td>Grants access to all admin sub-commands (<code>check</code>, <code>purgecache</code>, <code>cachestats</code>, <code>reload</code>)</td>
-                        </tr>
-                        <tr>
-                            <td><code>georestrict.bypass</code></td>
-                            <td><code>false</code></td>
-                            <td>Bypass all geographic, ASN, and VPN checks. The player will never be kicked by GeoRestrict.</td>
-                        </tr>
+                        <tr><td><code>georestrict.admin</code></td><td>op</td><td>All subcommands.</td></tr>
+                        <tr><td><code>georestrict.bypass</code></td><td>false</td><td>Skip the country/ASN/VPN check. On Bukkit it's enforced after login (permission metadata isn't reliably available pre-login). On Bungee/Velocity, install on the backend to use it.</td></tr>
                     </tbody>
                 </table>
-            </div>
-
-            <div class="callout callout-tip fade-in">
-                <span class="callout-icon">💡</span>
-                <p>Give the <code>georestrict.bypass</code> permission to trusted staff or whitelisted players who may connect from restricted regions or through VPNs.</p>
             </div>
 
         </div>

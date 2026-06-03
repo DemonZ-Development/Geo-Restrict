@@ -1,4 +1,4 @@
-﻿/*
+/*
  * GeoRestrict - High-performance geographic access control.
  * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
  *
@@ -16,287 +16,194 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-public class ConfigLoader {
+public final class ConfigLoader {
 
-    /** Current config schema version. Bump this when adding new fields. */
-    private static final int CURRENT_CONFIG_VERSION = 2;
+    private ConfigLoader() {}
 
     public static GeoConfig load(File file) {
         if (!file.exists()) {
             saveDefault(file);
         }
 
-        try (FileInputStream inputStream = new FileInputStream(file)) {
+        GeoConfig config;
+        try (FileInputStream in = new FileInputStream(file)) {
             LoaderOptions options = new LoaderOptions();
+            options.setCodePointLimit(2_000_000);
             Yaml yaml = new Yaml(new Constructor(GeoConfig.class, options));
             yaml.setBeanAccess(BeanAccess.FIELD);
-            GeoConfig config = yaml.load(inputStream);
-            if (config == null) {
-                config = new GeoConfig();
-            }
+            config = yaml.load(in);
+        } catch (Exception e) {
+            System.err.println("[GeoRestrict] Failed to read " + file + ": " + e.getMessage());
+            System.err.println("[GeoRestrict] Falling back to defaults.");
+            config = new GeoConfig();
+        }
+        if (config == null) {
+            config = new GeoConfig();
+        }
 
-            // Migrate config if needed
-            if (config.configVersion < CURRENT_CONFIG_VERSION) {
-                migrateConfig(file, config);
-            }
+        normalize(config);
+        ensureMigrated(file, config);
+        return config;
+    }
 
-            return config;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new GeoConfig(); 
+    private static void normalize(GeoConfig c) {
+        if (c.configVersion <= 0) c.configVersion = GeoConfigConstants.CURRENT_VERSION;
+        c.cacheTtlDays = clamp(c.cacheTtlDays, 1, 365);
+        c.connectionTimeoutMs = clamp(c.connectionTimeoutMs, 500, 30_000);
+        c.lookupThreads = clamp(c.lookupThreads, 1, 32);
+        c.maxCacheEntries = clamp(c.maxCacheEntries, 0, 10_000_000);
+
+        c.gatewayUrl = isBlank(c.gatewayUrl) ? GeoConfigConstants.DEFAULT_GATEWAY_URL : c.gatewayUrl.trim();
+        if (!c.gatewayUrl.startsWith("https://") && !c.gatewayUrl.startsWith("http://")) {
+            c.gatewayUrl = "https://" + c.gatewayUrl;
+        }
+        c.gatewayToken = c.gatewayToken == null ? "" : c.gatewayToken.trim();
+
+        if (c.countryMode == null) c.countryMode = GeoConfig.RestrictionMode.BLOCKLIST;
+        if (c.asnMode == null) c.asnMode = GeoConfig.RestrictionMode.DISABLED;
+        if (c.asnMode != GeoConfig.RestrictionMode.DISABLED && (c.asns == null || c.asns.isEmpty())) {
+            c.asnMode = GeoConfig.RestrictionMode.DISABLED;
+        }
+
+        c.countries = normalizeList(c.countries, true);
+        c.asns = normalizeList(c.asns, true);
+        c.vpnKeywords = normalizeList(c.vpnKeywords, false);
+
+        if (isBlank(c.kickMessageCountry)) c.kickMessageCountry = "Your country is not allowed on this server.";
+        if (isBlank(c.kickMessageAsn)) c.kickMessageAsn = "Your ISP/ASN is not allowed on this server.";
+        if (isBlank(c.kickMessageVpn)) c.kickMessageVpn = "VPN or proxy connections are not allowed.";
+        if (isBlank(c.kickMessageLookupFailure)) c.kickMessageLookupFailure = "Geo verification is temporarily unavailable.";
+
+        if (c.discord == null) c.discord = new GeoConfig.DiscordSettings();
+        if (c.discord.webhook == null) c.discord.webhook = "";
+        else c.discord.webhook = c.discord.webhook.trim();
+        if (isBlank(c.discord.title)) c.discord.title = "GeoRestrict";
+        if (c.discord.fields == null || c.discord.fields.isEmpty()) {
+            c.discord.fields = new GeoConfig().discord.fields;
+        } else {
+            List<GeoConfig.EmbedField> cleaned = new ArrayList<>();
+            for (GeoConfig.EmbedField f : c.discord.fields) {
+                if (f == null || isBlank(f.name)) continue;
+                if (f.value == null) f.value = "";
+                cleaned.add(f);
+            }
+            if (cleaned.isEmpty()) cleaned = new GeoConfig().discord.fields;
+            c.discord.fields = cleaned;
         }
     }
 
-    /**
-     * Appends any missing fields introduced in newer config versions
-     * and bumps the configVersion marker in the YAML file.
-     */
-    private static void migrateConfig(File file, GeoConfig config) {
-        try {
-            String content = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
-            StringBuilder additions = new StringBuilder();
-
-            // Fields added in config version 2
-            if (config.configVersion < 2) {
-                additions.append("\n# --- Added by GeoRestrict auto-migration ---\n");
-                if (!content.contains("configVersion:")) {
-                    additions.append("configVersion: ").append(CURRENT_CONFIG_VERSION).append("\n");
-                }
-                if (!content.contains("cacheTtlDays:")) {
-                    additions.append("cacheTtlDays: 30\n");
-                }
-                if (!content.contains("updateCheck:")) {
-                    additions.append("updateCheck: true\n");
-                }
-                if (!content.contains("connectionTimeoutMs:")) {
-                    additions.append("connectionTimeoutMs: 3000\n");
-                }
-            }
-
-            if (additions.length() > 0) {
-                // Update in-memory version
-                config.configVersion = CURRENT_CONFIG_VERSION;
-
-                // If configVersion line already exists, update it; otherwise it was appended above
-                if (content.contains("configVersion:")) {
-                    content = content.replaceFirst(
-                        "configVersion:\\s*\\d+",
-                        "configVersion: " + CURRENT_CONFIG_VERSION
-                    );
-                }
-
-                try (FileWriter writer = new FileWriter(file)) {
-                    writer.write(content);
-                    writer.write(additions.toString());
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    private static void ensureMigrated(File file, GeoConfig config) {
+        if (config.configVersion >= GeoConfigConstants.CURRENT_VERSION) {
+            return;
         }
+        try {
+            String content = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+            Map<String, Object> yamlMap = new LinkedHashMap<>();
+            Yaml yaml = new Yaml();
+            Object loaded = yaml.load(content);
+            if (loaded instanceof Map) {
+                yamlMap.putAll((Map<String, Object>) loaded);
+            }
+            Map<String, Object> defaults = yaml.load(GeoConfigConstants.DEFAULT_CONFIG_YAML);
+            mergeDefaults(yamlMap, defaults);
+            yamlMap.put("configVersion", GeoConfigConstants.CURRENT_VERSION);
+
+            StringBuilder out = new StringBuilder("# GeoRestrict configuration (migrated to v")
+                .append(GeoConfigConstants.CURRENT_VERSION).append(")\n");
+            for (Map.Entry<String, Object> e : yamlMap.entrySet()) {
+                dumpYaml(out, e.getKey(), e.getValue(), 0);
+            }
+            Files.writeString(file.toPath(), out.toString(), StandardCharsets.UTF_8);
+            System.out.println("[GeoRestrict] Migrated config to v" + GeoConfigConstants.CURRENT_VERSION);
+        } catch (IOException e) {
+            System.err.println("[GeoRestrict] Migration failed: " + e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void mergeDefaults(Map<String, Object> target, Map<String, Object> defaults) {
+        for (Map.Entry<String, Object> e : defaults.entrySet()) {
+            if (!target.containsKey(e.getKey())) {
+                target.put(e.getKey(), e.getValue());
+            } else if (e.getValue() instanceof Map && target.get(e.getKey()) instanceof Map) {
+                mergeDefaults((Map<String, Object>) target.get(e.getKey()), (Map<String, Object>) e.getValue());
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void dumpYaml(StringBuilder sb, String key, Object value, int indent) {
+        String pad = "  ".repeat(indent);
+        if (value instanceof Map) {
+            sb.append(pad).append(key).append(":\n");
+            for (Map.Entry<String, Object> e : ((Map<String, Object>) value).entrySet()) {
+                dumpYaml(sb, e.getKey(), e.getValue(), indent + 1);
+            }
+        } else if (value instanceof List) {
+            sb.append(pad).append(key).append(":\n");
+            for (Object item : (List<Object>) value) {
+                sb.append(pad).append("  - ");
+                if (item instanceof Map) {
+                    sb.append("{ ");
+                    boolean first = true;
+                    for (Map.Entry<String, Object> e : ((Map<String, Object>) item).entrySet()) {
+                        if (!first) sb.append(", ");
+                        sb.append(e.getKey()).append(": ").append(formatScalar(e.getValue()));
+                        first = false;
+                    }
+                    sb.append(" }\n");
+                } else {
+                    sb.append(formatScalar(item)).append("\n");
+                }
+            }
+        } else {
+            sb.append(pad).append(key).append(": ").append(formatScalar(value)).append("\n");
+        }
+    }
+
+    private static String formatScalar(Object v) {
+        if (v == null) return "\"\"";
+        String s = v.toString();
+        if (s.matches("[A-Za-z0-9_./:-]+")) return s;
+        return "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
     }
 
     public static void saveDefault(File file) {
         if (file.exists()) return;
-        
-        if (file.getParentFile() != null) {
-            file.getParentFile().mkdirs();
-        }
-        
-        String yamlContent = 
-            "# ============================================\n" +
-            "#        GeoRestrict Configuration\n" +
-            "#    Developed by Demonz Development\n" +
-            "#  https://demonzdevelopment.online/\n" +
-            "# ============================================\n" +
-            "\n" +
-            "# Config version â€” do not edit manually\n" +
-            "configVersion: 2\n" +
-            "\n" +
-            "# Modes: ALLOWLIST, BLOCKLIST, DISABLED\n" +
-            "\n" +
-            "# Country Restriction Settings\n" +
-            "# If mode is ALLOWLIST, only countries in the list are allowed.\n" +
-            "# If mode is BLOCKLIST, countries in the list are blocked.\n" +
-            "countryMode: BLOCKLIST\n" +
-            "countries:\n" +
-            "  - CN\n" +
-            "  - RU\n" +
-            "  - KP\n" +
-            "\n" +
-            "# ASN Restriction Settings\n" +
-            "# Same logic as countries.\n" +
-            "asnMode: DISABLED\n" +
-            "asns:\n" +
-            "  - AS12345\n" +
-            "\n" +
-            "# VPN / Proxy Detection Settings\n" +
-            "vpnCheckEnabled: true\n" +
-            "vpnKeywords:\n" +
-            "  - vpn\n" +
-            "  - proxy\n" +
-            "  - tunnel\n" +
-            "  - socks\n" +
-            "  - shadowsocks\n" +
-            "  - wireguard\n" +
-            "  - openvpn\n" +
-            "  - hosting\n" +
-            "  - datacenter\n" +
-            "  - \"data center\"\n" +
-            "  - colocation\n" +
-            "  - colo\n" +
-            "  - cloud\n" +
-            "  - vps\n" +
-            "  - \"virtual private server\"\n" +
-            "  - \"dedicated server\"\n" +
-            "  - amazon\n" +
-            "  - aws\n" +
-            "  - azure\n" +
-            "  - \"google cloud\"\n" +
-            "  - gcp\n" +
-            "  - digitalocean\n" +
-            "  - linode\n" +
-            "  - vultr\n" +
-            "  - hetzner\n" +
-            "  - ovh\n" +
-            "  - scaleway\n" +
-            "  - contabo\n" +
-            "  - hostinger\n" +
-            "  - godaddy\n" +
-            "  - namecheap\n" +
-            "  - bluehost\n" +
-            "  - dreamhost\n" +
-            "  - hostgator\n" +
-            "  - nordvpn\n" +
-            "  - expressvpn\n" +
-            "  - surfshark\n" +
-            "  - protonvpn\n" +
-            "  - mullvad\n" +
-            "  - privateinternetaccess\n" +
-            "  - pia\n" +
-            "  - cyberghost\n" +
-            "  - relay\n" +
-            "  - tor\n" +
-            "  - \"exit node\"\n" +
-            "  - \"residential proxy\"\n" +
-            "  - \"mobile proxy\"\n" +
-            "  - rackspace\n" +
-            "  - cloudflare\n" +
-            "  - fastly\n" +
-            "  - akamai\n" +
-            "  - ionos\n" +
-            "  - liquidweb\n" +
-            "  - interserver\n" +
-            "  - a2hosting\n" +
-            "  - siteground\n" +
-            "  - inmotion\n" +
-            "  - nexcess\n" +
-            "  - wpengine\n" +
-            "  - kinsta\n" +
-            "  - serverspace\n" +
-            "  - kamatera\n" +
-            "  - \"atlantic.net\"\n" +
-            "  - phoenixnap\n" +
-            "  - \"cherry servers\"\n" +
-            "  - serverhub\n" +
-            "  - quadranet\n" +
-            "  - choopa\n" +
-            "  - ramnode\n" +
-            "  - buyvm\n" +
-            "  - frantech\n" +
-            "  - incognet\n" +
-            "  - m247\n" +
-            "  - psychz\n" +
-            "  - coresite\n" +
-            "  - equinix\n" +
-            "  - \"ip address\"\n" +
-            "  - anonymous\n" +
-            "  - \"vpn server\"\n" +
-            "  - \"proxy server\"\n" +
-            "  - \"hide ip\"\n" +
-            "  - \"mask ip\"\n" +
-            "  - \"vpn tunnel\"\n" +
-            "  - \"encrypted connection\"\n" +
-            "  - \"no-log\"\n" +
-            "  - \"private network\"\n" +
-            "  - \"secure connection\"\n" +
-            "  - unblock\n" +
-            "  - bypass\n" +
-            "  - geolocation\n" +
-            "  - \"ip masking\"\n" +
-            "  - anonymizer\n" +
-            "  - hidemyass\n" +
-            "  - windscribe\n" +
-            "  - ipvanish\n" +
-            "  - vyprvpn\n" +
-            "  - \"hotspot shield\"\n" +
-            "  - tunnelbear\n" +
-            "  - zenmate\n" +
-            "  - \"hide.me\"\n" +
-            "  - \"perfect privacy\"\n" +
-            "  - airvpn\n" +
-            "  - ivpn\n" +
-            "  - \"trust.zone\"\n" +
-            "  - purevpn\n" +
-            "  - safervpn\n" +
-            "  - astrill\n" +
-            "  - \"goose vpn\"\n" +
-            "\n" +
-            "# Messages\n" +
-            "kickMessageCountry: \"Your country is not allowed.\"\n" +
-            "kickMessageASN: \"Your ISP/ASN is not allowed.\"\n" +
-            "kickMessageVPN: \"VPN or Proxy detected.\"\n" +
-            "\n" +
-            "# Cache Settings\n" +
-            "# How many days to keep cached geo lookups before re-querying\n" +
-            "cacheTtlDays: 30\n" +
-            "\n" +
-            "# Update Checker\n" +
-            "# Set to false to disable automatic update checks on startup\n" +
-            "updateCheck: true\n" +
-            "\n" +
-            "# Connection timeout in milliseconds for geo API requests\n" +
-            "connectionTimeoutMs: 3000\n" +
-            "\n" +
-            "# Discord Webhook Settings\n" +
-            "discord:\n" +
-            "  webhook: \"\"\n" +
-            "  maskIp: true\n" +
-            "  title: \"GeoRestrict\"\n" +
-            "  colorAllowed: 65280\n" +
-            "  colorDenied: 16711680\n" +
-            "  fields:\n" +
-            "    - name: \"Player\"\n" +
-            "      value: \"%player%\"\n" +
-            "      inline: true\n" +
-            "    - name: \"Status\"\n" +
-            "      value: \"%status%\"\n" +
-            "      inline: true\n" +
-            "    - name: \"IP\"\n" +
-            "      value: \"%ip%\"\n" +
-            "      inline: true\n" +
-            "    - name: \"Country\"\n" +
-            "      value: \"%country%\"\n" +
-            "      inline: true\n" +
-            "    - name: \"ASN\"\n" +
-            "      value: \"%asn%\"\n" +
-            "      inline: true\n" +
-            "    - name: \"ISP\"\n" +
-            "      value: \"%isp%\"\n" +
-            "      inline: false\n" +
-            "    - name: \"Reason\"\n" +
-            "      value: \"%reason%\"\n" +
-            "      inline: false\n";
-
-        try (FileWriter writer = new FileWriter(file)) {
-            writer.write(yamlContent);
+        if (file.getParentFile() != null) file.getParentFile().mkdirs();
+        try {
+            Files.writeString(file.toPath(), GeoConfigConstants.DEFAULT_CONFIG_YAML, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("[GeoRestrict] Failed to write default config: " + e.getMessage());
         }
     }
-}
 
+    private static List<String> normalizeList(List<String> values, boolean uppercase) {
+        List<String> out = new ArrayList<>();
+        if (values == null) return out;
+        for (String v : values) {
+            if (v == null) continue;
+            String t = v.trim();
+            if (t.isEmpty()) continue;
+            out.add(uppercase ? t.toUpperCase(Locale.ROOT) : t);
+        }
+        return out;
+    }
+
+    private static int clamp(int v, int min, int max) {
+        return Math.max(min, Math.min(max, v));
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+}

@@ -1,19 +1,19 @@
 <!--
- * GeoRestrict - High-performance geographic access control.
- * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
--->
+  ~ GeoRestrict - High-performance geographic access control.
+  ~ Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Changelog - GeoRestrict Docs</title>
-    <meta name="description" content="GeoRestrict version history. See what's new, fixed, and improved in every release.">
+    <title>Changelog - GeoRestrict</title>
+    <meta name="description" content="Version history for GeoRestrict.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -44,44 +44,65 @@
         </div>
     </nav>
 
-
     <main class="main-content">
         <div class="content-inner">
 
             <div class="page-header">
                 <h1><span class="header-icon">📋</span> Changelog</h1>
-                <p>Version history and release notes for GeoRestrict.</p>
+                <p>What changed, in what version.</p>
             </div>
 
-            <!-- v2.0.0 -->
             <div class="changelog-version fade-in">
-                <h2>v2.0.0 <span class="changelog-tag tag-latest">Latest</span></h2>
+                <h2>v2.1.0 <span class="changelog-tag tag-latest">Latest</span></h2>
+                <p class="release-date">2026-06-03</p>
                 <ul class="changelog-list">
-
-                    <li class="added">Local IP cache for enhanced privacy — lookup results stored only on your server</li>
-                    <li class="added">Cloudflare Worker gateway with automatic failover (<code>ip-api.com</code> → <code>ipinfo.io</code>)</li>
-                    <li class="added">Folia scheduler support — auto-detected region-aware task scheduling</li>
-                    <li class="added">Modrinth update checker — silent version check on startup</li>
-                    <li class="added">Config migration system — automatic upgrades between config versions</li>
-                    <li class="added">New commands: <code>/georestrict purgecache</code>, <code>cachestats</code>, <code>reload</code></li>
-                    <li class="added"><code>georestrict.bypass</code> permission — skip all geographic checks</li>
-                    <li class="added">Private subnet bypass — localhost and LAN connections always allowed</li>
-                    <li class="fixed">Discord webhook JSON formatting issue resolved</li>
-                    <li class="improved">Compatibility range expanded to Minecraft 1.16 — 1.26.x</li>
+                    <li class="changed"><strong>Default is now fail-closed.</strong> <code>blockOnLookupFailure</code> flipped from <code>false</code> to <code>true</code>. If every lookup path dies, players get kicked with <code>kickMessageLookupFailure</code>. Flip back if you really want fail-open.</li>
+                    <li class="changed"><strong>Config migration no longer mangles your file.</strong> Old versions appended new keys at the bottom of the YAML, producing ugly diffs. The new migrator merges defaults into your existing structure and rewrites in place.</li>
+                    <li class="changed"><strong>Worker requires auth when configured.</strong> If you set <code>GATEWAY_TOKENS</code> on the Worker, unauthenticated requests now get HTTP 401. Previously they were silently allowed.</li>
+                    <li class="changed"><strong>Default fallback URL is <code>https://</code>.</strong> The previous default was <code>http://</code> — your players' IPs were going in cleartext if the Worker was down.</li>
+                    <li class="added">Cache size cap (<code>maxCacheEntries</code>, default 100k). Oldest entries are evicted past the limit. Set to 0 to disable.</li>
+                    <li class="added">Scheduled cache purge every 6h. Expired entries are removed even if they're never read again.</li>
+                    <li class="added">Folia region scheduler used for sync work. Previously sync work silently ran async.</li>
+                    <li class="added">IPv4 CGNAT, TEST-NETs, IPv4-mapped IPv6, documentation prefix <code>2001:db8::/32</code> now treated as private.</li>
+                    <li class="added">Update checker compares versions numerically — <code>1.10</code> is now correctly newer than <code>1.9</code>. The lexicographic fallback was a bug.</li>
+                    <li class="added">19 unit tests covering private IP detection, version comparison, config loading, cache eviction, and the rule evaluator.</li>
+                    <li class="added">Single <code>PluginInfo.VERSION</code> constant. No more hardcoded <code>"2.0.0"</code> scattered across five files.</li>
+                    <li class="added">Per-platform bStats IDs (28563 / 28564 / 28565).</li>
+                    <li class="fixed">Bungee login event no longer pretends to do permission lookups that always return false.</li>
+                    <li class="fixed">Worker IPv6 validation is now strict. Previously <code>?ip=::::xxx</code> would pass.</li>
+                    <li class="fixed">Discord webhook body now sets <code>Content-Length</code> correctly via <code>setFixedLengthStreamingMode</code>.</li>
+                    <li class="removed">"Connection rejected:" prefix stripping — that was a Velocity 1.x leftover. Modern Velocity doesn't add it.</li>
+                    <li class="removed">Committed IDE state (IntelliJ <code>.idea/</code>), <code>target/</code>, and a stray <code>georestrict.rar</code> from the repo.</li>
                 </ul>
             </div>
 
-            <!-- v1.0.0 -->
+            <div class="changelog-version fade-in">
+                <h2>v2.0.0 <span class="changelog-tag tag-major">Rewrite</span></h2>
+                <p class="release-date">2026-06-03</p>
+                <ul class="changelog-list">
+                    <li class="added">Local <code>geo_cache.json</code> for privacy — lookup results stay on your server.</li>
+                    <li class="added">Cloudflare Worker gateway with provider failover (ip-api.com → ipinfo.io).</li>
+                    <li class="added">Folia scheduler support via reflection-based adapter.</li>
+                    <li class="added">Modrinth update checker on a 6h timer.</li>
+                    <li class="added">Config migration with a schema version field.</li>
+                    <li class="added">Subcommands: <code>check</code>, <code>purgecache</code>, <code>cachestats</code>, <code>reload</code>.</li>
+                    <li class="added"><code>georestrict.bypass</code> permission for trusted players.</li>
+                    <li class="added">Private subnet bypass for LAN/loopback.</li>
+                    <li class="improved">Compatibility range expanded to MC 1.16 – 1.26.x.</li>
+                </ul>
+            </div>
+
             <div class="changelog-version fade-in">
                 <h2>v1.0.0 <span class="changelog-tag tag-initial">Initial</span></h2>
+                <p class="release-date">2024</p>
                 <ul class="changelog-list">
-                    <li class="added">Initial release of GeoRestrict</li>
-                    <li class="added">Country blocking with allowlist / blocklist modes</li>
-                    <li class="added">ASN / ISP filtering</li>
-                    <li class="added">VPN and proxy detection</li>
-                    <li class="added">Discord webhook notifications</li>
-                    <li class="added">Customizable kick messages</li>
-                    <li class="added">Multi-platform support: Bukkit, Paper, Spigot, BungeeCord, Waterfall, Velocity</li>
+                    <li class="added">Initial release of GeoRestrict.</li>
+                    <li class="added">Country blocklist / allowlist.</li>
+                    <li class="added">ASN filtering.</li>
+                    <li class="added">VPN/proxy detection via ISP keyword.</li>
+                    <li class="added">Discord webhook notifications.</li>
+                    <li class="added">Configurable kick messages.</li>
+                    <li class="added">Bukkit, Paper, Spigot, BungeeCord, Waterfall, Velocity support.</li>
                 </ul>
             </div>
 

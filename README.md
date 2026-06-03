@@ -9,6 +9,7 @@
 - **Country Blocking** — Block or allow players based on their country of origin
 - **ASN Blocking** — Restrict access by Autonomous System Number (ISP/network level)
 - **VPN/Proxy Detection** — Detect and block VPN, proxy, and hosting connections
+- **Worker Gateway** — Route lookups through `https://geoprotect.demonzdev.workers.dev/`
 - **Discord Webhooks** — Get real-time notifications when players are blocked
 - **Local Caching** — High-performance local IP cache to minimize API lookups
 - **Auto-Updates** — Automatic plugin update checks and notifications
@@ -35,6 +36,30 @@
 | `/georestrict reload` | Reload configuration from disk |
 | `/georestrict` | Show plugin info and version |
 
+## ⚙️ Gateway Configuration
+
+The plugin defaults to:
+
+```yaml
+gatewayUrl: "https://geoprotect.demonzdev.workers.dev/"
+gatewayToken: ""
+directFallbackEnabled: false
+blockOnLookupFailure: false
+```
+
+The Worker supports multiple provider accounts through environment variables or secrets:
+
+```text
+IPINFO_TOKENS       token-one,token-two
+IPINFO_TOKEN_1      token-one
+IPINFO_TOKEN_2      token-two
+IP_API_KEYS         key-one,key-two
+IP_API_KEY_1        key-one
+GATEWAY_TOKENS      shared-plugin-token
+```
+
+Use Worker secrets for tokens. Do not commit provider keys or gateway tokens.
+
 ## 🔑 Permissions
 
 | Permission | Description |
@@ -45,7 +70,12 @@
 
 This project is licensed under the [GNU GPL v3 License](LICENSE).
 
+## 👥 Credits
 
-## 💜 Credits
+GeoRestrict was originally written by **linuxaddict** and released on Modrinth. The first versions lived under his account for years before he passed the project along.
 
-Developed by [Demonz Development](https://demonzdevelopment.online/)
+Maintenance and the v2.x rewrite are now handled by [Demonz Development](https://demonzdevelopment.online/). If you hit a bug, want a feature, or are just trying to figure out why your config isn't loading, the [issue tracker](https://github.com/DemonZ-Development/Geo-Restrict/issues) is the right place.
+
+- Original author: [linuxaddict on Modrinth](https://modrinth.com/user/linuxaddict)
+- Current maintainer: [Demonz Development](https://demonzdevelopment.online/)
+- Repository: [DemonZ-Development/Geo-Restrict](https://github.com/DemonZ-Development/Geo-Restrict)

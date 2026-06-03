@@ -1,4 +1,4 @@
-﻿/*
+/*
  * GeoRestrict - High-performance geographic access control.
  * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
  *
@@ -9,113 +9,86 @@
  */
 package zip.linuxaddict.georestrict;
 
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-/**
- * Utility class for private/reserved IP detection.
- */
-public class NetworkUtils {
+public final class NetworkUtils {
 
-    private NetworkUtils() {
-        // Utility class â€” no instantiation
-    }
+    private NetworkUtils() {}
 
-    /**
-     * Checks whether the given IP address is a private, loopback, or link-local address.
-     *
-     * Covers:
-     *   IPv4: 127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16, 0.0.0.0
-     *   IPv6: ::1, fe80::/10, fc00::/7, 0:0:0:0:0:0:0:1
-     *
-     * @param ip the IP address string to check
-     * @return true if the IP is private/reserved, false otherwise
-     */
     public static boolean isPrivateIp(String ip) {
-        if (ip == null || ip.isEmpty()) {
-            return false;
-        }
-
-        // Quick literal checks before parsing
-        if (ip.equals("0.0.0.0")) {
-            return true;
-        }
-
+        if (ip == null || ip.isEmpty()) return false;
         try {
             InetAddress addr = InetAddress.getByName(ip);
-            byte[] bytes = addr.getAddress();
-
-            if (bytes.length == 4) {
-                // IPv4
-                return isPrivateIpv4(bytes);
-            } else if (bytes.length == 16) {
-                // IPv6
-                return isPrivateIpv6(bytes, addr);
+            if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()
+                    || addr.isLinkLocalAddress() || addr.isSiteLocalAddress()
+                    || addr.isMulticastAddress()) {
+                return true;
             }
+            if (addr instanceof Inet4Address) return isPrivateIpv4(addr.getAddress());
+            if (addr instanceof Inet6Address) return isPrivateIpv6((Inet6Address) addr);
+        } catch (UnknownHostException ignored) {
+        }
+        return false;
+    }
+
+    public static boolean isValidPublicIp(String ip) {
+        if (ip == null || ip.isEmpty()) return false;
+        try {
+            InetAddress addr = InetAddress.getByName(ip);
+            if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()
+                    || addr.isLinkLocalAddress() || addr.isSiteLocalAddress()
+                    || addr.isMulticastAddress()) {
+                return false;
+            }
+            return addr instanceof Inet4Address || addr instanceof Inet6Address;
         } catch (UnknownHostException e) {
-            // If we can't parse it, treat it as non-private
             return false;
         }
-
-        return false;
     }
 
-    private static boolean isPrivateIpv4(byte[] bytes) {
-        int b0 = bytes[0] & 0xFF;
-        int b1 = bytes[1] & 0xFF;
+    private static boolean isPrivateIpv4(byte[] b) {
+        int a = b[0] & 0xFF;
+        int c = b[1] & 0xFF;
+        int d = b[2] & 0xFF;
 
-        // 127.0.0.0/8 â€” Loopback
-        if (b0 == 127) {
-            return true;
-        }
-
-        // 10.0.0.0/8 â€” Private
-        if (b0 == 10) {
-            return true;
-        }
-
-        // 172.16.0.0/12 â€” Private (172.16.x.x â€“ 172.31.x.x)
-        if (b0 == 172 && b1 >= 16 && b1 <= 31) {
-            return true;
-        }
-
-        // 192.168.0.0/16 â€” Private
-        if (b0 == 192 && b1 == 168) {
-            return true;
-        }
-
-        // 169.254.0.0/16 â€” Link-local
-        if (b0 == 169 && b1 == 254) {
-            return true;
-        }
-
-        // 0.0.0.0
-        if (b0 == 0 && b1 == 0 && (bytes[2] & 0xFF) == 0 && (bytes[3] & 0xFF) == 0) {
-            return true;
-        }
-
-        return false;
+        if (a == 10 || a == 127 || a == 0) return true;
+        if (a == 172 && c >= 16 && c <= 31) return true;
+        if (a == 192 && c == 168) return true;
+        if (a == 169 && c == 254) return true;
+        if (a == 100 && c >= 64 && c <= 127) return true;
+        if (a == 192 && c == 0 && d == 0) return true;
+        if (a == 192 && c == 0 && d == 2) return true;
+        if (a == 198 && c == 18 && d <= 1) return true;
+        if (a == 198 && c == 51 && d == 100) return true;
+        if (a == 203 && c == 0 && d == 113) return true;
+        return a >= 224;
     }
 
-    private static boolean isPrivateIpv6(byte[] bytes, InetAddress addr) {
-        // ::1 (loopback)
-        if (addr.isLoopbackAddress()) {
-            return true;
+    private static boolean isPrivateIpv6(Inet6Address addr) {
+        byte[] b = addr.getAddress();
+        int a = b[0] & 0xFF;
+        // ULA fc00::/7
+        if ((a & 0xFE) == 0xFC) return true;
+        // Link-local fe80::/10
+        if (a == 0xFE && (b[1] & 0xC0) == 0x80) return true;
+        // 2001:db8::/32 documentation
+        if (a == 0x20 && b[1] == 0x01 && b[2] == 0x0d && b[3] == 0xb8) return true;
+        // Teredo 2001::/32
+        if (a == 0x20 && b[1] == 0x01 && b[2] == 0x00 && b[3] == 0x00) return true;
+        // IPv4-mapped ::ffff:x.x.x.x -> recurse on the v4 part
+        for (int i = 0; i < 10; i++) {
+            if (b[i] != 0) return false;
         }
-
-        // fe80::/10 â€” Link-local
-        if (addr.isLinkLocalAddress()) {
-            return true;
+        if ((b[10] & 0xFF) == 0xFF && (b[11] & 0xFF) == 0xFF) {
+            try {
+                return isPrivateIpv4(new byte[]{b[12], b[13], b[14], b[15]});
+            } catch (Exception e) {
+                return false;
+            }
         }
-
-        // fc00::/7 â€” Unique local address (ULA)
-        // First byte: fc (11111100) or fd (11111101), i.e. top 7 bits = 1111110
-        int firstByte = bytes[0] & 0xFF;
-        if ((firstByte & 0xFE) == 0xFC) {
-            return true;
-        }
-
         return false;
     }
 }
-

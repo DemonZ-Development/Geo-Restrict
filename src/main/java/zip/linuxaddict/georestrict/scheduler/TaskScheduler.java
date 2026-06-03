@@ -1,4 +1,4 @@
-﻿/*
+/*
  * GeoRestrict - High-performance geographic access control.
  * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
  *

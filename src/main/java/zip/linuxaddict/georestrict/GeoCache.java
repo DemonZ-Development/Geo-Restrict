@@ -1,4 +1,4 @@
-﻿/*
+/*
  * GeoRestrict - High-performance geographic access control.
  * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
  *
@@ -14,35 +14,27 @@ import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * Local, privacy-first geolocation cache backed by a ConcurrentHashMap
- * and persisted to a JSON file on disk.
- *
- * Saves are debounced â€” at most one write every 5 seconds â€” to avoid
- * excessive disk I/O when many IPs are cached in quick succession.
- */
 public class GeoCache {
 
-    private static final long SAVE_DEBOUNCE_MS = 5_000;
+    private static final long SAVE_DEBOUNCE_MS = 5_000L;
 
     private final ConcurrentHashMap<String, CacheEntry> cache = new ConcurrentHashMap<>();
     private final File cacheFile;
     private final Gson gson;
     private final Logger logger;
-
+    private final Object ioLock = new Object();
     private final AtomicBoolean savePending = new AtomicBoolean(false);
-    private final AtomicLong lastSaveScheduled = new AtomicLong(0);
 
     public GeoCache(File cacheFile, Gson gson, Logger logger) {
         this.cacheFile = cacheFile;
@@ -50,168 +42,130 @@ public class GeoCache {
         this.logger = logger;
     }
 
-    // ------------------------------------------------------------------ I/O
-
-    /**
-     * Loads the cache from disk. Handles missing or corrupt files gracefully.
-     */
     public void load() {
-        if (!cacheFile.exists()) {
-            return;
-        }
-
-        try (FileReader reader = new FileReader(cacheFile)) {
+        if (!cacheFile.exists()) return;
+        try (var reader = Files.newBufferedReader(cacheFile.toPath(), StandardCharsets.UTF_8)) {
             Type type = new TypeToken<ConcurrentHashMap<String, CacheEntry>>() {}.getType();
             ConcurrentHashMap<String, CacheEntry> loaded = gson.fromJson(reader, type);
             if (loaded != null) {
-                cache.putAll(loaded);
+                long cutoff = System.currentTimeMillis() - 365L * 24 * 60 * 60 * 1000;
+                for (Map.Entry<String, CacheEntry> e : loaded.entrySet()) {
+                    if (e.getValue() != null && e.getValue().timestamp > cutoff) {
+                        cache.put(e.getKey(), e.getValue());
+                    }
+                }
             }
         } catch (Exception e) {
-            logger.warn("Failed to load cache file, starting fresh: {}", e.getMessage());
+            logger.warn("Cache file unreadable, starting fresh: {}", e.getMessage());
         }
     }
 
-    /**
-     * Writes the full cache to disk asynchronously.
-     */
     public void save() {
-        CompletableFuture.runAsync(() -> {
+        synchronized (ioLock) {
             try {
-                if (cacheFile.getParentFile() != null) {
-                    cacheFile.getParentFile().mkdirs();
+                File parent = cacheFile.getParentFile();
+                if (parent != null) parent.mkdirs();
+                if (cache.isEmpty()) {
+                    Files.deleteIfExists(cacheFile.toPath());
+                    return;
                 }
-                try (FileWriter writer = new FileWriter(cacheFile)) {
-                    gson.toJson(cache, writer);
+                File tmp = new File(parent, cacheFile.getName() + ".tmp");
+                Files.writeString(tmp.toPath(), gson.toJson(cache), StandardCharsets.UTF_8);
+                try {
+                    Files.move(tmp.toPath(), cacheFile.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+                } catch (IOException ignored) {
+                    Files.move(tmp.toPath(), cacheFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
             } catch (IOException e) {
-                logger.warn("Failed to save cache file: {}", e.getMessage());
+                logger.warn("Cache save failed: {}", e.getMessage());
             }
-        });
+        }
     }
 
-    // --------------------------------------------------------- Cache access
-
-    /**
-     * Returns the cached GeoResponse for the given IP if it exists and has not expired.
-     *
-     * @param ip      the IP address key
-     * @param ttlDays time-to-live in days
-     * @return the cached response, or null if missing/expired
-     */
     public GeoResponse get(String ip, int ttlDays) {
         CacheEntry entry = cache.get(ip);
-        if (entry == null) {
-            return null;
-        }
-
-        long ageMs = System.currentTimeMillis() - entry.timestamp;
-        long ttlMs = (long) ttlDays * 24 * 60 * 60 * 1000;
-        if (ageMs > ttlMs) {
-            cache.remove(ip);
+        if (entry == null) return null;
+        long ttlMs = Math.max(1, ttlDays) * 24L * 60 * 60 * 1000;
+        if (System.currentTimeMillis() - entry.timestamp > ttlMs) {
+            cache.remove(ip, entry);
             return null;
         }
         return entry.data;
     }
 
-    /**
-     * Stores a GeoResponse for the given IP and schedules an async save
-     * (debounced to avoid writes on every single put).
-     */
-    public void put(String ip, GeoResponse response) {
+    public void put(String ip, GeoResponse response, int maxEntries) {
+        if (response == null) return;
         cache.put(ip, new CacheEntry(response, System.currentTimeMillis()));
+        if (maxEntries > 0 && cache.size() > maxEntries) {
+            evictOldest(maxEntries);
+        }
         scheduleSave();
     }
 
-    // ------------------------------------------------------------ Purge ops
-
-    /**
-     * Clears all cached entries and deletes the cache file.
-     */
     public void purgeAll() {
         cache.clear();
-        if (cacheFile.exists()) {
-            cacheFile.delete();
+        try {
+            Files.deleteIfExists(cacheFile.toPath());
+        } catch (IOException e) {
+            logger.warn("Cache delete failed: {}", e.getMessage());
         }
     }
 
-    /**
-     * Removes entries that are older than the specified TTL.
-     *
-     * @param ttlDays time-to-live in days
-     */
     public void purgeExpired(int ttlDays) {
-        long ttlMs = (long) ttlDays * 24 * 60 * 60 * 1000;
+        long ttlMs = Math.max(1, ttlDays) * 24L * 60 * 60 * 1000;
         long now = System.currentTimeMillis();
-
         Iterator<Map.Entry<String, CacheEntry>> it = cache.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<String, CacheEntry> entry = it.next();
-            if (now - entry.getValue().timestamp > ttlMs) {
-                it.remove();
-            }
+            Map.Entry<String, CacheEntry> e = it.next();
+            if (now - e.getValue().timestamp > ttlMs) it.remove();
         }
         scheduleSave();
     }
 
-    // --------------------------------------------------------------- Stats
-
-    /**
-     * Returns current cache statistics.
-     */
     public CacheStats getStats() {
-        int entryCount = cache.size();
-        long fileSizeBytes = cacheFile.exists() ? cacheFile.length() : 0;
-        long oldestTimestamp = Long.MAX_VALUE;
-        for (CacheEntry entry : cache.values()) {
-            if (entry.timestamp < oldestTimestamp) {
-                oldestTimestamp = entry.timestamp;
-            }
+        long oldest = Long.MAX_VALUE;
+        for (CacheEntry e : cache.values()) {
+            if (e.timestamp < oldest) oldest = e.timestamp;
         }
-        if (oldestTimestamp == Long.MAX_VALUE) {
-            oldestTimestamp = 0;
-        }
-        return new CacheStats(entryCount, fileSizeBytes, oldestTimestamp);
+        return new CacheStats(
+            cache.size(),
+            cacheFile.exists() ? cacheFile.length() : 0,
+            oldest == Long.MAX_VALUE ? 0 : oldest
+        );
     }
 
-    // --------------------------------------------------- Debounced save
+    private void evictOldest(int target) {
+        if (cache.size() <= target) return;
+        int toRemove = cache.size() - target;
+        cache.entrySet().stream()
+            .sorted((a, b) -> Long.compare(a.getValue().timestamp, b.getValue().timestamp))
+            .limit(toRemove)
+            .map(Map.Entry::getKey)
+            .forEach(cache::remove);
+    }
 
     private void scheduleSave() {
-        long now = System.currentTimeMillis();
-        lastSaveScheduled.set(now);
-
         if (savePending.compareAndSet(false, true)) {
             CompletableFuture.runAsync(() -> {
-                try {
-                    Thread.sleep(SAVE_DEBOUNCE_MS);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+                try { Thread.sleep(SAVE_DEBOUNCE_MS); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
                 savePending.set(false);
                 save();
             });
         }
     }
 
-    // -------------------------------------------------- Inner classes
-
-    /**
-     * A single cache entry: the geo data and a timestamp of when it was stored.
-     */
     public static class CacheEntry {
         public GeoResponse data;
         public long timestamp;
 
         public CacheEntry() {}
-
         public CacheEntry(GeoResponse data, long timestamp) {
             this.data = data;
             this.timestamp = timestamp;
         }
     }
 
-    /**
-     * Snapshot of cache statistics.
-     */
     public static class CacheStats {
         public final int entryCount;
         public final long fileSizeBytes;
@@ -224,4 +178,3 @@ public class GeoCache {
         }
     }
 }
-

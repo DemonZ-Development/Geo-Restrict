@@ -21,10 +21,12 @@ import net.md_5.bungee.event.EventHandler;
 import org.bstats.bungeecord.Metrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import zip.linuxaddict.georestrict.CommandHandler;
 import zip.linuxaddict.georestrict.ConfigLoader;
 import zip.linuxaddict.georestrict.GeoCache;
 import zip.linuxaddict.georestrict.GeoConfig;
 import zip.linuxaddict.georestrict.GeoRestrictService;
+import zip.linuxaddict.georestrict.PluginInfo;
 import zip.linuxaddict.georestrict.UpdateChecker;
 
 import java.io.File;
@@ -35,26 +37,19 @@ public class GeoRestrictBungeePlugin extends Plugin implements Listener {
     private GeoConfig config;
     private GeoCache cache;
     private UpdateChecker updateChecker;
+    private CommandHandler command;
     private Logger log;
 
     @Override
     public void onEnable() {
         log = LoggerFactory.getLogger("GeoRestrict");
+        log.info("GeoRestrict v{} starting...", PluginInfo.VERSION);
 
-        // Startup banner
-        log.info("╔═══════════════════════════════════════╗");
-        log.info("║         GeoRestrict v2.0.0           ║");
-        log.info("║      By Demonz Development           ║");
-        log.info("║  https://demonzdevelopment.online/    ║");
-        log.info("╚═══════════════════════════════════════╝");
-
-        // bStats metrics
-        new Metrics(this, 28563);
+        new Metrics(this, PluginInfo.BSTATS_BUNGEE);
 
         File configFile = new File(getDataFolder(), "config.yml");
         config = ConfigLoader.load(configFile);
 
-        // Create cache
         File cacheFile = new File(getDataFolder(), "geo_cache.json");
         cache = new GeoCache(cacheFile, new com.google.gson.Gson(), log);
         cache.load();
@@ -62,120 +57,78 @@ public class GeoRestrictBungeePlugin extends Plugin implements Listener {
         service = new GeoRestrictService(config, log, cache);
         getProxy().getPluginManager().registerListener(this, this);
 
-        // Config watcher using BungeeCord scheduler
-        getProxy().getScheduler().schedule(this, new Runnable() {
-            private long lastModified = configFile.lastModified();
+        command = new CommandHandler(service, cache, configFile, this::applyConfig, () -> {});
+        registerCommand();
+        startConfigWatcher(configFile);
+        startUpdateChecker();
+        startCacheMaintenance();
+        log.info("GeoRestrict enabled.");
+    }
 
-            @Override
-            public void run() {
-                if (configFile.lastModified() > lastModified) {
-                    lastModified = configFile.lastModified();
-                    log.info("Config change detected, reloading...");
-                    config = ConfigLoader.load(configFile);
-                    service.setConfig(config);
-                    log.info("Config reloaded.");
-                }
-            }
-        }, 5, 5, TimeUnit.SECONDS);
+    private void applyConfig(GeoConfig fresh, Runnable done) {
+        this.config = fresh;
+        service.setConfig(fresh);
+        done.run();
+    }
 
-        // Update checker
-        if (config.updateCheck) {
-            updateChecker = new UpdateChecker("2.0.0", "georestrict", log);
-
-            // Check immediately then every 6 hours
-            getProxy().getScheduler().schedule(this, () -> {
-                updateChecker.checkForUpdate();
-            }, 5, 6 * 60 * 60, TimeUnit.SECONDS);
-        }
-
-        // Command handler
+    private void registerCommand() {
         getProxy().getPluginManager().registerCommand(this, new Command("georestrict", "georestrict.admin") {
             @Override
             public void execute(CommandSender sender, String[] args) {
-                if (args.length == 0) {
-                    // No args — show version + credits
-                    sender.sendMessage(TextComponent.fromLegacyText("§b§lGeoRestrict §7v2.0.0"));
-                    sender.sendMessage(TextComponent.fromLegacyText("§7By §bDemonz Development"));
-                    sender.sendMessage(TextComponent.fromLegacyText("§7https://demonzdevelopment.online/"));
-                    return;
-                }
-
-
-                String subCommand = args[0].toLowerCase();
-
-                switch (subCommand) {
-                    case "check": {
-                        if (args.length < 2) {
-                            sender.sendMessage(TextComponent.fromLegacyText("Â§cUsage: /georestrict check <ip|player>"));
-                            return;
+                String[] a = args == null ? new String[0] : args;
+                command.execute(
+                    new CommandHandler.Sender() {
+                        @Override public boolean hasPermission(String p) { return sender.hasPermission(p); }
+                        @Override public void sendMessage(String m) {
+                            sender.sendMessage(TextComponent.fromLegacyText(CommandHandler.legacy(m)));
                         }
-
-                        String target = args[1];
-                        ProxiedPlayer targetPlayer = getProxy().getPlayer(target);
-                        String ipToCheck = (targetPlayer != null) ? targetPlayer.getAddress().getAddress().getHostAddress() : target;
-
-                        sender.sendMessage(TextComponent.fromLegacyText("Â§7Checking IP: " + ipToCheck + "..."));
-                        service.checkIp(ipToCheck, target).thenAccept(result -> {
-                            sender.sendMessage(TextComponent.fromLegacyText("Â§7Result for " + ipToCheck + ":"));
-                            sender.sendMessage(TextComponent.fromLegacyText("Â§7Allowed: " + (result.allowed ? "Â§aYes" : "Â§cNo")));
-                            if (!result.allowed) {
-                                sender.sendMessage(TextComponent.fromLegacyText("Â§7Reason: " + result.reason));
-                            }
-
-                            if (result.info != null) {
-                                sender.sendMessage(TextComponent.fromLegacyText("Â§7Country: " + result.info.countryCode));
-                                sender.sendMessage(TextComponent.fromLegacyText("Â§7ASN: " + result.info.asn));
-                                sender.sendMessage(TextComponent.fromLegacyText("Â§7ISP: " + result.info.asName));
-                            }
-                        });
-                        break;
-                    }
-
-                    case "purgecache": {
-                        cache.purgeAll();
-                        sender.sendMessage(TextComponent.fromLegacyText("Â§aGeoRestrict cache purged successfully."));
-                        break;
-                    }
-
-                    case "cachestats": {
-                        GeoCache.CacheStats stats = cache.getStats();
-                        sender.sendMessage(TextComponent.fromLegacyText("Â§bÂ§lGeoRestrict Cache Stats"));
-                        sender.sendMessage(TextComponent.fromLegacyText("Â§7Entries: Â§f" + stats.entryCount));
-                        sender.sendMessage(TextComponent.fromLegacyText("Â§7File size: Â§f" + String.format("%.2f", stats.fileSizeBytes / 1024.0) + " KB"));
-                        if (stats.oldestEntryTimestamp > 0) {
-                            long ageMs = System.currentTimeMillis() - stats.oldestEntryTimestamp;
-                            long ageDays = ageMs / (1000L * 60 * 60 * 24);
-                            long ageHours = (ageMs / (1000L * 60 * 60)) % 24;
-                            sender.sendMessage(TextComponent.fromLegacyText("Â§7Oldest entry: Â§f" + ageDays + "d " + ageHours + "h ago"));
-                        } else {
-                            sender.sendMessage(TextComponent.fromLegacyText("Â§7Oldest entry: Â§fN/A"));
-                        }
-                        break;
-                    }
-
-                    case "reload": {
-                        config = ConfigLoader.load(configFile);
-                        service.setConfig(config);
-                        sender.sendMessage(TextComponent.fromLegacyText("Â§aGeoRestrict config reloaded."));
-                        break;
-                    }
-
-                    default:
-                        sender.sendMessage(TextComponent.fromLegacyText("Â§cUsage: /georestrict <check|purgecache|cachestats|reload>"));
-                        break;
-                }
+                    },
+                    name -> {
+                        ProxiedPlayer online = getProxy().getPlayer(name);
+                        return online == null ? null : online.getAddress().getAddress().getHostAddress();
+                    },
+                    a
+                );
             }
         });
+    }
 
-        log.info("GeoRestrict enabled");
+    private void startConfigWatcher(File configFile) {
+        getProxy().getScheduler().schedule(this, new Runnable() {
+            private long lastModified = configFile.lastModified();
+            @Override public void run() {
+                long now = configFile.lastModified();
+                if (now > lastModified) {
+                    lastModified = now;
+                    log.info("Config changed, reloading...");
+                    GeoConfig fresh = ConfigLoader.load(configFile);
+                    applyConfig(fresh, () -> log.info("Config reloaded."));
+                }
+            }
+        }, 5, 5, TimeUnit.SECONDS);
+    }
+
+    private void startUpdateChecker() {
+        if (!config.updateCheck) return;
+        updateChecker = new UpdateChecker(PluginInfo.VERSION, PluginInfo.MODRINTH_PROJECT, log);
+        getProxy().getScheduler().schedule(this, () ->
+            updateChecker.checkForUpdate().thenAccept(latest -> {
+                if (latest != null) log.info("Update available: {}", latest);
+            }), 5, 6 * 60 * 60, TimeUnit.SECONDS);
+    }
+
+    private void startCacheMaintenance() {
+        getProxy().getScheduler().schedule(this,
+            () -> cache.purgeExpired(config.cacheTtlDays),
+            5 * 60, 6 * 60 * 60, TimeUnit.SECONDS);
     }
 
     @Override
     public void onDisable() {
-        if (cache != null) {
-            cache.save();
-        }
-        log.info("GeoRestrict disabled");
+        getProxy().getScheduler().cancel(this);
+        if (service != null) service.shutdown();
+        if (cache != null) cache.save();
+        if (log != null) log.info("GeoRestrict disabled.");
     }
 
     @EventHandler
@@ -183,27 +136,42 @@ public class GeoRestrictBungeePlugin extends Plugin implements Listener {
         event.registerIntent(this);
         String ip = event.getConnection().getAddress().getAddress().getHostAddress();
         String name = event.getConnection().getName();
-        // Note: On BungeeCord LoginEvent, the player object doesn't exist yet,
-        // so we can't check georestrict.bypass permission here.
-        // Bypass is handled at PostLogin for re-check if needed.
-        service.checkIp(ip, name, false).thenAccept(result -> {
-            if (!result.allowed) {
-                event.setCancelled(true);
-                event.setCancelReason(TextComponent.fromLegacyText(result.reason));
-            }
+        // Bungee has no permission lookup at the LoginEvent stage, so bypass
+        // is not enforceable here. Backend Bukkit servers re-check via the
+        // georestrict.bypass permission after the player is fully online.
+        try {
+            service.checkIp(ip, name, false).whenComplete((result, error) -> {
+                try {
+                    if (error != null) {
+                        log.error("Lookup error for {}: {}", name, error.getMessage());
+                        if (config.blockOnLookupFailure) {
+                            event.setCancelled(true);
+                            event.setCancelReason(TextComponent.fromLegacyText(
+                                CommandHandler.legacy(config.kickMessageLookupFailure)));
+                        }
+                        return;
+                    }
+                    if (!result.allowed) {
+                        event.setCancelled(true);
+                        event.setCancelReason(TextComponent.fromLegacyText(
+                            CommandHandler.legacy(result.reason == null ? "Connection rejected." : result.reason)));
+                    }
+                } finally {
+                    event.completeIntent(this);
+                }
+            });
+        } catch (Exception e) {
+            log.error("Lookup failed for {}", name, e);
             event.completeIntent(this);
-        });
+        }
     }
 
     @EventHandler
     public void onPostLogin(PostLoginEvent event) {
-        // Notify admins of available updates
-        if (updateChecker != null && updateChecker.isUpdateAvailable()) {
-            ProxiedPlayer player = event.getPlayer();
-            if (player.hasPermission("georestrict.admin")) {
-                player.sendMessage(TextComponent.fromLegacyText("Â§7[Â§bGeoRestrictÂ§7] A new version is available: Â§b" + updateChecker.getLatestVersion()));
-            }
+        if (updateChecker != null && updateChecker.isUpdateAvailable()
+            && event.getPlayer().hasPermission("georestrict.admin")) {
+            event.getPlayer().sendMessage(TextComponent.fromLegacyText(CommandHandler.legacy(
+                "&7[&bGeoRestrict&7] Update available: &b" + updateChecker.getLatestVersion())));
         }
     }
 }
-

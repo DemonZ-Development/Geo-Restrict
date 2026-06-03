@@ -1,3 +1,21 @@
 name = "georestrict-gateway"
 main = "src/index.js"
 compatibility_date = "2024-03-01"
+
+[vars]
+PROVIDER_ORDER = "ip-api,ipinfo"
+IP_API_ENDPOINTS = "http://ip-api.com/json/"
+IPINFO_ENDPOINTS = "https://ipinfo.io/{ip}"
+REQUEST_TIMEOUT_MS = "3000"
+CACHE_TTL_SECONDS = "86400"
+ALLOWED_ORIGINS = "*"
+
+# Configure secrets with wrangler, not in this file:
+#   wrangler secret put GATEWAY_TOKENS
+#   wrangler secret put IPINFO_TOKENS
+#   wrangler secret put IP_API_KEYS
+#
+# For multiple accounts, store comma-separated, newline-separated, or JSON arrays:
+#   ["token-one","token-two"]
+# Numbered secrets are also supported: IPINFO_TOKEN_1, IPINFO_TOKEN_2,
+# IP_API_KEY_1, IP_API_KEY_2, GATEWAY_TOKEN_1, GATEWAY_TOKEN_2.

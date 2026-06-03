@@ -1,4 +1,4 @@
-﻿/*
+/*
  * GeoRestrict - High-performance geographic access control.
  * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
  *
@@ -10,8 +10,8 @@
 package zip.linuxaddict.georestrict;
 
 /**
- * Unified geolocation response model.
- * Replaces the old IpInfoResponse with a richer, provider-agnostic structure.
+ * Provider-agnostic geolocation result. All string fields are
+ * nullable; the service normalizes them after deserialization.
  */
 public class GeoResponse {
     public String ip;
@@ -19,23 +19,11 @@ public class GeoResponse {
     public String countryName;
     public String asn;
     public String asName;
+    public String provider;
     public boolean isVpn;
     public boolean isHosting;
     public boolean isProxy;
     public boolean isMobile;
 
     public GeoResponse() {}
-
-    /**
-     * Backward-compatibility helper: maps old IpInfoResponse field names
-     * to this unified model so existing evaluate() logic continues to work.
-     *
-     * Old field â†’ New field:
-     *   country_code â†’ countryCode
-     *   country      â†’ countryName
-     *   as_name      â†’ asName
-     *   asn          â†’ asn
-     *   ip           â†’ ip
-     */
 }
-

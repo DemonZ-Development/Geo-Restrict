@@ -1,19 +1,19 @@
 <!--
- * GeoRestrict - High-performance geographic access control.
- * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
--->
+  ~ GeoRestrict - High-performance geographic access control.
+  ~ Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Troubleshooting - GeoRestrict Docs</title>
-    <meta name="description" content="Troubleshooting guide for GeoRestrict. Resolve common issues, check API logs, and debug configuration problems.">
+    <title>Troubleshooting - GeoRestrict</title>
+    <meta name="description" content="Diagnose and fix common GeoRestrict issues: cache, gateway, false positives, BungeeCord permissions.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -49,65 +49,78 @@
 
             <div class="page-header">
                 <h1><span class="header-icon">🛠️</span> Troubleshooting</h1>
-                <p>Diagnostic tips and solutions for common GeoRestrict issues.</p>
+                <p>Real problems, with the actual fix.</p>
             </div>
 
-            <!-- Issue 1 -->
-            <section class="trouble-item fade-in">
-                <h2>1. Players Bypassing Restrictions (LAN/Localhost)</h2>
-                <div class="section-divider"></div>
-                <p>If you or your team connect to the server and do not get blocked, even when connecting from a blocked country, check the following:</p>
-                <ul>
-                    <li><strong>Private Subnet Exemption:</strong> GeoRestrict has built-in subnet filtering. Any IPv4 range under RFC 1918 (such as <code>192.168.x.x</code>, <code>10.x.x.x</code>, <code>172.16.x.x</code>) and IPv6 loopback (<code>::1</code>) are automatically allowed through without a geo-lookup to prevent locking out local connections.</li>
-                    <li><strong>Bypass Permissions:</strong> Verify if the player has the <code>georestrict.bypass</code> permission. Operators (OPs) have this permission by default in Bukkit and Velocity.</li>
-                </ul>
-            </section>
+            <div class="faq-item fade-in">
+                <div class="faq-question">All my players get kicked with "Geo verification is temporarily unavailable"</div>
+                <div class="faq-answer">
+                    <p>That's the <code>kickMessageLookupFailure</code> message. It means the Worker is unreachable and you have <code>blockOnLookupFailure: true</code> (the new default). Two things to check:</p>
+                    <ol>
+                        <li>From the server console, try <code>curl -I https://geoprotect.demonzdev.workers.dev/?ip=8.8.8.8</code>. If that times out, the issue is network egress, not the plugin.</li>
+                        <li>If you deployed your own Worker, double-check the <code>gatewayToken</code> matches <code>GATEWAY_TOKENS</code> on the Worker side. Mismatches return 401 and the plugin treats that as a lookup failure.</li>
+                    </ol>
+                    <p>Quick fix: <code>blockOnLookupFailure: false</code> in your config. Re-enable when the network is healthy.</p>
+                </div>
+            </div>
 
-            <!-- Issue 2 -->
-            <section class="trouble-item fade-in">
-                <h2>2. Discord Webhook Notifications Not Firing</h2>
-                <div class="section-divider"></div>
-                <p>If players are being kicked but your Discord channel is not receiving notifications, follow these validation steps:</p>
-                <ul>
-                    <li>Double check the <code>discord.webhook</code> URL in <code>config.yml</code>. Ensure it is correct and not wrapped in conflicting brackets.</li>
-                    <li>Confirm that the server has outbound internet connectivity. If the server is in a restricted sandbox environment, it might block HTTPS requests to <code>discord.com</code>.</li>
-                    <li>Review the console logs for HTTP connection exceptions or error codes returned by the Discord API.</li>
-                </ul>
-            </section>
+            <div class="faq-item fade-in">
+                <div class="faq-question">Players using OVH / Hetzner / DigitalOcean are getting blocked</div>
+                <div class="faq-answer">
+                    <p>That's the ISP keyword scanner doing its job — OVH, Hetzner, DigitalOcean are all in the default <code>vpnKeywords</code> list because they sell VPSes that are commonly used for game-server bot farms.</p>
+                    <p>Options:</p>
+                    <ul>
+                        <li>Remove the specific keyword from <code>vpnKeywords</code> if you know your player base is on that host.</li>
+                        <li>Set <code>vpnCheckEnabled: false</code> to disable keyword detection entirely (boolean flags from the provider still work).</li>
+                        <li>Combine: keep the keyword, but ALLOWLIST the specific players with <code>georestrict.bypass</code> + OP on the backend server.</li>
+                    </ul>
+                </div>
+            </div>
 
-            <!-- Issue 3 -->
-            <section class="trouble-item fade-in">
-                <h2>3. High Connection Latency or Gateway Timeouts</h2>
-                <div class="section-divider"></div>
-                <p>If logins are taking longer than usual or you see timeout errors in the server logs:</p>
-                <ul>
-                    <li>The default connection timeout is 3000ms. If the Cloudflare Worker gateway is slow, you can adjust this value using the <code>connectionTimeoutMs</code> setting in the configuration file.</li>
-                    <li>Verify the health and response times of your deployed Cloudflare Worker gateway. You can monitor request durations on the Cloudflare Dashboard.</li>
-                </ul>
-            </section>
+            <div class="faq-item fade-in">
+                <div class="faq-question">My proxy-installed plugin isn't blocking anyone</div>
+                <div class="faq-answer">
+                    <p>Check which jar is where. If you put the plugin on the backend Bukkit server and your players connect through Bungee/Velocity, the connection arrives at the backend with the proxy's IP — the proxy is the one seeing the player's actual IP at the network edge. Either:</p>
+                    <ul>
+                        <li>Install on the proxy (recommended), or</li>
+                        <li>Install on the backend AND enable <code>proxy-protocol</code> or <code>ip-forwarding: true</code> in Bungee/Velocity so the backend sees the real IP, not the proxy's.</li>
+                    </ul>
+                    <p>You can install on both — the backend will see a second check after the proxy's, and the player gets denied at the proxy if they get past it.</p>
+                </div>
+            </div>
 
-            <!-- Issue 4 -->
-            <section class="trouble-item fade-in">
-                <h2>4. Out-of-Date Cache Data</h2>
-                <div class="section-divider"></div>
-                <p>If you've recently changed rules or if a player's IP location changed but they're still blocked or allowed:</p>
-                <ul>
-                    <li>Player location results are cached locally in <code>plugins/GeoRestrict/geo_cache.json</code> (or the respective directory for Velocity/BungeeCord) for 30 days by default.</li>
-                    <li>You can run the <code>/georestrict purgecache</code> command to clear the local cache file and force fresh lookups on the next connection.</li>
-                    <li>Alternatively, adjust <code>cacheTtlDays</code> in your config to a lower value (e.g., <code>7</code> or <code>14</code> days).</li>
-                </ul>
-            </section>
+            <div class="faq-item fade-in">
+                <div class="faq-question">The plugin isn't loading on Folia</div>
+                <div class="faq-answer">
+                    <p>Check the startup log for the line <code>GeoRestrict v2.1.0 starting...</code>. If you don't see it, the jar isn't in the <code>plugins/</code> folder. If you see the line but errors follow, paste the full stack trace — the Folia scheduler adapter is reflection-based, so it can fail on renamed methods if your Folia build is wildly different from upstream.</p>
+                </div>
+            </div>
 
-            <!-- Issue 5 -->
-            <section class="trouble-item fade-in">
-                <h2>5. BungeeCord / Velocity Sub-Server Bypass</h2>
-                <div class="section-divider"></div>
-                <p>If you run a proxy network (BungeeCord/Velocity) and have the GeoRestrict plugin installed on backend Bukkit servers:</p>
-                <ul>
-                    <li><strong>Important:</strong> Ensure IP forwarding is properly configured in your proxy config (<code>ip_forward: true</code> for BungeeCord, <code>player-info-mode: forwarding</code> for Velocity) and enabled on the backend Spigot/Paper servers (<code>bungeecord: true</code> in <code>spigot.yml</code>).</li>
-                    <li>Without IP forwarding, the backend servers will see all player connections originating from the proxy's local IP address (typically <code>127.0.0.1</code>), which automatically bypasses geographic restrictions.</li>
-                </ul>
-            </section>
+            <div class="faq-item fade-in">
+                <div class="faq-question">The cache file is huge</div>
+                <div class="faq-answer">
+                    <p>100k entries in the default JSON cache is ~5–10 MB. If you're seeing gigabytes, you have a runaway log somewhere — probably a config file that mtime-changes every read. Run <code>/georestrict cachestats</code> to see entry count and oldest age. If entries keep growing without bound, run <code>/georestrict purgecache</code> and watch the log for a config watcher loop.</p>
+                </div>
+            </div>
+
+            <div class="faq-item fade-in">
+                <div class="faq-question">Update check is spamming the log every 6 hours</div>
+                <div class="faq-answer">
+                    <p>It only logs when a new version is <em>actually available</em>. If you're seeing repeated update lines, the version comparison is broken — but that was fixed in 2.1.0. Update to the latest and the spam should stop.</p>
+                </div>
+            </div>
+
+            <div class="faq-item fade-in">
+                <div class="faq-question">Discord webhook is broken / 400 errors</div>
+                <div class="faq-answer">
+                    <p>Three usual causes:</p>
+                    <ol>
+                        <li>Webhook URL is wrong or revoked. Regenerate in Discord, paste the new URL, <code>/georestrict reload</code>.</li>
+                        <li>Network egress to <code>discord.com</code> is blocked (some hosting providers). Check from the server console: <code>curl -I https://discord.com/api/webhooks/...</code></li>
+                        <li>You have an empty field in <code>discord.fields</code>. The plugin drops empty fields, but a malformed YAML <code>{name: ""}</code> used to throw. Make sure each field has a name and a value.</li>
+                    </ol>
+                </div>
+            </div>
 
         </div>
     </main>
