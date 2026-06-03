@@ -1,0 +1,137 @@
+<!--
+ * GeoRestrict - High-performance geographic access control.
+ * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commands &amp; Permissions - GeoRestrict Docs</title>
+    <meta name="description" content="All GeoRestrict commands and permissions explained. Admin commands for checking, caching, and reloading.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <button class="hamburger" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
+        </div>
+        <div class="sidebar-nav">
+            <a href="index.html"><span class="nav-icon">🏠</span> Home</a>
+            <a href="installation.html"><span class="nav-icon">📦</span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon">⚙️</span> Configuration</a>
+            <a href="commands.html" class="active"><span class="nav-icon">💻</span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon">🔧</span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon">❓</span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon">📋</span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+        </div>
+        <div class="sidebar-footer">
+            <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
+        </div>
+    </nav>
+
+
+    <main class="main-content">
+        <div class="content-inner">
+
+            <div class="page-header">
+                <h1><span class="header-icon">💻</span> Commands &amp; Permissions</h1>
+                <p>All available commands and their required permissions.</p>
+            </div>
+
+            <!-- Commands -->
+            <h2 class="fade-in">Commands</h2>
+            <div class="section-divider fade-in"></div>
+
+            <div class="table-wrapper fade-in">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Command</th>
+                            <th>Permission</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>/georestrict</code></td>
+                            <td>—</td>
+                            <td>Show plugin info &amp; credits</td>
+                        </tr>
+                        <tr>
+                            <td><code>/georestrict check &lt;ip|player&gt;</code></td>
+                            <td><code>georestrict.admin</code></td>
+                            <td>Look up geographic and network data for an IP or online player</td>
+                        </tr>
+                        <tr>
+                            <td><code>/georestrict purgecache</code></td>
+                            <td><code>georestrict.admin</code></td>
+                            <td>Clear the entire local IP lookup cache</td>
+                        </tr>
+                        <tr>
+                            <td><code>/georestrict cachestats</code></td>
+                            <td><code>georestrict.admin</code></td>
+                            <td>Show cache statistics (entries, hit rate, size)</td>
+                        </tr>
+                        <tr>
+                            <td><code>/georestrict reload</code></td>
+                            <td><code>georestrict.admin</code></td>
+                            <td>Reload <code>config.yml</code> without restarting the server</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Permissions -->
+            <h2 class="fade-in">Permissions</h2>
+            <div class="section-divider fade-in"></div>
+
+            <div class="table-wrapper fade-in">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Permission</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>georestrict.admin</code></td>
+                            <td><code>OP</code></td>
+                            <td>Grants access to all admin sub-commands (<code>check</code>, <code>purgecache</code>, <code>cachestats</code>, <code>reload</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>georestrict.bypass</code></td>
+                            <td><code>false</code></td>
+                            <td>Bypass all geographic, ASN, and VPN checks. The player will never be kicked by GeoRestrict.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout callout-tip fade-in">
+                <span class="callout-icon">💡</span>
+                <p>Give the <code>georestrict.bypass</code> permission to trusted staff or whitelisted players who may connect from restricted regions or through VPNs.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

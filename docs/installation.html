@@ -1,0 +1,111 @@
+<!--
+ * GeoRestrict - High-performance geographic access control.
+ * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installation - GeoRestrict Docs</title>
+    <meta name="description" content="How to install GeoRestrict on Bukkit, Paper, Spigot, BungeeCord, Waterfall, and Velocity servers.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <button class="hamburger" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
+        </div>
+        <div class="sidebar-nav">
+            <a href="index.html"><span class="nav-icon">🏠</span> Home</a>
+            <a href="installation.html" class="active"><span class="nav-icon">📦</span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon">⚙️</span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon">💻</span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon">🔧</span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon">❓</span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon">📋</span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+        </div>
+        <div class="sidebar-footer">
+            <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
+        </div>
+    </nav>
+
+
+    <main class="main-content">
+        <div class="content-inner">
+
+            <div class="page-header">
+                <h1><span class="header-icon">📦</span> Installation</h1>
+                <p>Get GeoRestrict up and running on your Minecraft server in minutes.</p>
+            </div>
+
+            <!-- Requirements -->
+            <h2 class="fade-in">Requirements</h2>
+            <div class="section-divider fade-in"></div>
+
+            <div class="glass-card fade-in">
+                <ul>
+                    <li><strong>Java 17</strong> or newer</li>
+                    <li><strong>Minecraft 1.16</strong> or newer (up to 1.26.x)</li>
+                </ul>
+            </div>
+
+            <!-- Bukkit / Paper / Spigot -->
+            <h2 class="fade-in">Bukkit / Paper / Spigot</h2>
+            <div class="section-divider fade-in"></div>
+
+            <ol class="steps fade-in">
+                <li><strong>Download</strong> the latest <code>GeoRestrict.jar</code> from the <a href="https://modrinth.com/" target="_blank">Modrinth page</a> or the official release channel.</li>
+                <li><strong>Place</strong> the <code>.jar</code> file into your server's <code>plugins/</code> folder.</li>
+                <li><strong>Restart</strong> the server. GeoRestrict will generate a default <code>config.yml</code> on first launch.</li>
+                <li><strong>Configure</strong> the plugin by editing <code>plugins/GeoRestrict/config.yml</code> to match your needs.</li>
+            </ol>
+
+            <!-- BungeeCord / Waterfall -->
+            <h2 class="fade-in">BungeeCord / Waterfall</h2>
+            <div class="section-divider fade-in"></div>
+
+            <ol class="steps fade-in">
+                <li><strong>Download</strong> the latest <code>GeoRestrict.jar</code> from the official release channel.</li>
+                <li><strong>Place</strong> the <code>.jar</code> file into your proxy's <code>plugins/</code> folder.</li>
+                <li><strong>Restart</strong> the proxy. The default configuration will be generated automatically.</li>
+                <li><strong>Configure</strong> the plugin by editing <code>plugins/GeoRestrict/config.yml</code>.</li>
+            </ol>
+
+            <!-- Velocity -->
+            <h2 class="fade-in">Velocity</h2>
+            <div class="section-divider fade-in"></div>
+
+            <ol class="steps fade-in">
+                <li><strong>Download</strong> the latest <code>GeoRestrict.jar</code> from the official release channel.</li>
+                <li><strong>Place</strong> the <code>.jar</code> file into Velocity's <code>plugins/</code> folder.</li>
+                <li><strong>Restart</strong> the Velocity proxy. Configuration files will be created automatically.</li>
+                <li><strong>Configure</strong> the plugin by editing <code>plugins/georestrict/config.yml</code>.</li>
+            </ol>
+
+            <!-- Folia note -->
+            <div class="callout callout-info fade-in">
+                <span class="callout-icon">ℹ️</span>
+                <p><strong>Folia support</strong> is auto-detected at startup. No extra configuration is needed — GeoRestrict will automatically use region-aware scheduling when running on a Folia server.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

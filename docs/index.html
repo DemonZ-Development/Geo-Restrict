@@ -1,0 +1,116 @@
+<!--
+ * GeoRestrict - High-performance geographic access control.
+ * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - GeoRestrict Docs</title>
+    <meta name="description" content="GeoRestrict — Geographic restriction plugin for Minecraft servers. Block countries, detect VPNs, filter ASNs, and more.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Mobile hamburger -->
+    <button class="hamburger" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
+        </div>
+        <div class="sidebar-nav">
+            <a href="index.html" class="active"><span class="nav-icon">🏠</span> Home</a>
+            <a href="installation.html"><span class="nav-icon">📦</span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon">⚙️</span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon">💻</span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon">🔧</span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon">❓</span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon">📋</span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+        </div>
+        <div class="sidebar-footer">
+            <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
+        </div>
+    </nav>
+
+
+    <!-- Main -->
+    <main class="main-content">
+        <div class="content-inner">
+
+            <!-- Hero -->
+            <section class="hero">
+                <h1 class="hero-title">GeoRestrict</h1>
+                <p class="hero-tagline">Geographic restriction plugin for Minecraft servers</p>
+                <p class="hero-credit">Developed by <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a></p>
+                <div class="section-divider"></div>
+
+                <!-- Platform badges -->
+                <div class="platform-badges">
+                    <span class="badge">Bukkit</span>
+                    <span class="badge">Paper</span>
+                    <span class="badge">Spigot</span>
+                    <span class="badge">BungeeCord</span>
+                    <span class="badge">Waterfall</span>
+                    <span class="badge">Velocity</span>
+                    <span class="badge">Folia</span>
+                </div>
+                <p class="version-badge">Supports Minecraft 1.16 — 1.26.x</p>
+            </section>
+
+            <!-- Features -->
+            <h2 class="fade-in">Features</h2>
+            <div class="section-divider fade-in"></div>
+
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">🌍</span>
+                    <h3>Country Blocking</h3>
+                    <p>Allowlist or blocklist entire countries. Control exactly which regions can access your server with flexible country-code rules.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">🛡️</span>
+                    <h3>VPN &amp; Proxy Detection</h3>
+                    <p>Detect VPNs, proxies, and hosting providers automatically. Keep your server safe from anonymous connections.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">📡</span>
+                    <h3>ASN / ISP Filtering</h3>
+                    <p>Block or allow specific ISPs and ASNs. Fine-grained control over which networks can reach your server.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">💬</span>
+                    <h3>Discord Webhooks</h3>
+                    <p>Get notified instantly when players are blocked. Rich Discord embeds with player info, IP, country, and reason.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">⚡</span>
+                    <h3>Local Privacy Cache</h3>
+                    <p>Cache lookup results locally on your server. No data is sent to or stored on any third-party cloud service.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">🔄</span>
+                    <h3>Auto Updates</h3>
+                    <p>Silent update checking via Modrinth. Stay up to date without any manual effort — get notified of new releases.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

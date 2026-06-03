@@ -1,0 +1,117 @@
+<!--
+ * GeoRestrict - High-performance geographic access control.
+ * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Troubleshooting - GeoRestrict Docs</title>
+    <meta name="description" content="Troubleshooting guide for GeoRestrict. Resolve common issues, check API logs, and debug configuration problems.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <button class="hamburger" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
+        </div>
+        <div class="sidebar-nav">
+            <a href="index.html"><span class="nav-icon">🏠</span> Home</a>
+            <a href="installation.html"><span class="nav-icon">📦</span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon">⚙️</span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon">💻</span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon">🔧</span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon">❓</span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon">📋</span> Changelog</a>
+            <a href="troubleshooting.html" class="active"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+        </div>
+        <div class="sidebar-footer">
+            <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="content-inner">
+
+            <div class="page-header">
+                <h1><span class="header-icon">🛠️</span> Troubleshooting</h1>
+                <p>Diagnostic tips and solutions for common GeoRestrict issues.</p>
+            </div>
+
+            <!-- Issue 1 -->
+            <section class="trouble-item fade-in">
+                <h2>1. Players Bypassing Restrictions (LAN/Localhost)</h2>
+                <div class="section-divider"></div>
+                <p>If you or your team connect to the server and do not get blocked, even when connecting from a blocked country, check the following:</p>
+                <ul>
+                    <li><strong>Private Subnet Exemption:</strong> GeoRestrict has built-in subnet filtering. Any IPv4 range under RFC 1918 (such as <code>192.168.x.x</code>, <code>10.x.x.x</code>, <code>172.16.x.x</code>) and IPv6 loopback (<code>::1</code>) are automatically allowed through without a geo-lookup to prevent locking out local connections.</li>
+                    <li><strong>Bypass Permissions:</strong> Verify if the player has the <code>georestrict.bypass</code> permission. Operators (OPs) have this permission by default in Bukkit and Velocity.</li>
+                </ul>
+            </section>
+
+            <!-- Issue 2 -->
+            <section class="trouble-item fade-in">
+                <h2>2. Discord Webhook Notifications Not Firing</h2>
+                <div class="section-divider"></div>
+                <p>If players are being kicked but your Discord channel is not receiving notifications, follow these validation steps:</p>
+                <ul>
+                    <li>Double check the <code>discord.webhook</code> URL in <code>config.yml</code>. Ensure it is correct and not wrapped in conflicting brackets.</li>
+                    <li>Confirm that the server has outbound internet connectivity. If the server is in a restricted sandbox environment, it might block HTTPS requests to <code>discord.com</code>.</li>
+                    <li>Review the console logs for HTTP connection exceptions or error codes returned by the Discord API.</li>
+                </ul>
+            </section>
+
+            <!-- Issue 3 -->
+            <section class="trouble-item fade-in">
+                <h2>3. High Connection Latency or Gateway Timeouts</h2>
+                <div class="section-divider"></div>
+                <p>If logins are taking longer than usual or you see timeout errors in the server logs:</p>
+                <ul>
+                    <li>The default connection timeout is 3000ms. If the Cloudflare Worker gateway is slow, you can adjust this value using the <code>connectionTimeoutMs</code> setting in the configuration file.</li>
+                    <li>Verify the health and response times of your deployed Cloudflare Worker gateway. You can monitor request durations on the Cloudflare Dashboard.</li>
+                </ul>
+            </section>
+
+            <!-- Issue 4 -->
+            <section class="trouble-item fade-in">
+                <h2>4. Out-of-Date Cache Data</h2>
+                <div class="section-divider"></div>
+                <p>If you've recently changed rules or if a player's IP location changed but they're still blocked or allowed:</p>
+                <ul>
+                    <li>Player location results are cached locally in <code>plugins/GeoRestrict/geo_cache.json</code> (or the respective directory for Velocity/BungeeCord) for 30 days by default.</li>
+                    <li>You can run the <code>/georestrict purgecache</code> command to clear the local cache file and force fresh lookups on the next connection.</li>
+                    <li>Alternatively, adjust <code>cacheTtlDays</code> in your config to a lower value (e.g., <code>7</code> or <code>14</code> days).</li>
+                </ul>
+            </section>
+
+            <!-- Issue 5 -->
+            <section class="trouble-item fade-in">
+                <h2>5. BungeeCord / Velocity Sub-Server Bypass</h2>
+                <div class="section-divider"></div>
+                <p>If you run a proxy network (BungeeCord/Velocity) and have the GeoRestrict plugin installed on backend Bukkit servers:</p>
+                <ul>
+                    <li><strong>Important:</strong> Ensure IP forwarding is properly configured in your proxy config (<code>ip_forward: true</code> for BungeeCord, <code>player-info-mode: forwarding</code> for Velocity) and enabled on the backend Spigot/Paper servers (<code>bungeecord: true</code> in <code>spigot.yml</code>).</li>
+                    <li>Without IP forwarding, the backend servers will see all player connections originating from the proxy's local IP address (typically <code>127.0.0.1</code>), which automatically bypasses geographic restrictions.</li>
+                </ul>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

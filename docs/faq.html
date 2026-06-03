@@ -1,0 +1,127 @@
+<!--
+ * GeoRestrict - High-performance geographic access control.
+ * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - GeoRestrict Docs</title>
+    <meta name="description" content="Frequently asked questions about GeoRestrict — VPNs, proxies, configuration, updates, and more.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <button class="hamburger" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
+        </div>
+        <div class="sidebar-nav">
+            <a href="index.html"><span class="nav-icon">🏠</span> Home</a>
+            <a href="installation.html"><span class="nav-icon">📦</span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon">⚙️</span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon">💻</span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon">🔧</span> How It Works</a>
+            <a href="faq.html" class="active"><span class="nav-icon">❓</span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon">📋</span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+        </div>
+        <div class="sidebar-footer">
+            <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
+        </div>
+    </nav>
+
+
+    <main class="main-content">
+        <div class="content-inner">
+
+            <div class="page-header">
+                <h1><span class="header-icon">❓</span> FAQ</h1>
+                <p>Frequently asked questions about GeoRestrict. Click a question to reveal the answer.</p>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <!-- Q1 -->
+            <div class="faq-item fade-in">
+                <div class="faq-question">Will this block legitimate players?</div>
+                <div class="faq-answer">
+                    <p>It depends on your configuration. If you use <code>ALLOWLIST</code> mode, only players from the listed countries will be allowed in — everyone else is blocked. If you use <code>BLOCKLIST</code> mode, only players from the listed countries are blocked. Make sure your country list matches your intended audience. You can also grant the <code>georestrict.bypass</code> permission to trusted players who may be affected.</p>
+                </div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="faq-item fade-in">
+                <div class="faq-question">Does this work with BungeeCord / Velocity?</div>
+                <div class="faq-answer">
+                    <p>Yes! GeoRestrict fully supports <strong>BungeeCord</strong>, <strong>Waterfall</strong>, and <strong>Velocity</strong> proxies. Simply install the plugin on the proxy itself. When installed on a proxy, it checks connections at the proxy level before they reach any backend server.</p>
+                </div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="faq-item fade-in">
+                <div class="faq-question">What happens if the API is down?</div>
+                <div class="faq-answer">
+                    <p>GeoRestrict uses a <strong>failover system</strong>. The Cloudflare Worker gateway first tries <code>ip-api.com</code> and automatically falls back to <code>ipinfo.io</code>. If both are unavailable, the player is <strong>allowed to join</strong> by default — the plugin never blocks a player due to an API failure. Previously cached results will also continue to work during outages.</p>
+                </div>
+            </div>
+
+            <!-- Q4 -->
+            <div class="faq-item fade-in">
+                <div class="faq-question">Is player data sent to third parties?</div>
+                <div class="faq-answer">
+                    <p>The only data sent externally is the player's IP address during a cache miss — this is required for geolocation. The request goes through a privacy-respecting Cloudflare Worker gateway. All results are <strong>cached locally on your server</strong> and never stored on any third-party service. Enable <code>discord.maskIp</code> to redact IPs in Discord webhooks.</p>
+                </div>
+            </div>
+
+            <!-- Q5 -->
+            <div class="faq-item fade-in">
+                <div class="faq-question">How do I update the plugin?</div>
+                <div class="faq-answer">
+                    <p>If <code>updateCheck</code> is enabled in your config (it is by default), GeoRestrict will automatically check for new versions on Modrinth at startup and notify you in the console. To update, simply download the latest <code>.jar</code>, replace the old file in your <code>plugins/</code> folder, and restart the server. Your configuration will be preserved and auto-migrated if needed.</p>
+                </div>
+            </div>
+
+            <!-- Q6 -->
+            <div class="faq-item fade-in">
+                <div class="faq-question">Can I customize kick messages?</div>
+                <div class="faq-answer">
+                    <p>Absolutely. There are three separate kick messages in <code>config.yml</code>: <code>kickMessageCountry</code>, <code>kickMessageASN</code>, and <code>kickMessageVPN</code>. Each one can be customized to show any text you like. Color codes and formatting are supported on platforms that allow them.</p>
+                </div>
+            </div>
+
+            <!-- Q7 -->
+            <div class="faq-item fade-in">
+                <div class="faq-question">How do I whitelist a specific country?</div>
+                <div class="faq-answer">
+                    <p>Set <code>countryMode</code> to <code>ALLOWLIST</code> and add the desired country codes to the <code>countries</code> list. For example, to only allow players from the US and Canada:</p>
+                    <br>
+                    <div class="code-block-wrapper">
+<pre><code><span class="syn-key">countryMode:</span> <span class="syn-str">"ALLOWLIST"</span>
+<span class="syn-key">countries:</span>
+  <span class="syn-list">-</span> <span class="syn-str">"US"</span>
+  <span class="syn-list">-</span> <span class="syn-str">"CA"</span></code></pre>
+                    </div>
+                    <p>Players from all other countries will be kicked with the <code>kickMessageCountry</code> message.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!--
+ * GeoRestrict - High-performance geographic access control.
+ * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog - GeoRestrict Docs</title>
+    <meta name="description" content="GeoRestrict version history. See what's new, fixed, and improved in every release.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <button class="hamburger" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
+        </div>
+        <div class="sidebar-nav">
+            <a href="index.html"><span class="nav-icon">🏠</span> Home</a>
+            <a href="installation.html"><span class="nav-icon">📦</span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon">⚙️</span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon">💻</span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon">🔧</span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon">❓</span> FAQ</a>
+            <a href="changelog.html" class="active"><span class="nav-icon">📋</span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+        </div>
+        <div class="sidebar-footer">
+            <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
+        </div>
+    </nav>
+
+
+    <main class="main-content">
+        <div class="content-inner">
+
+            <div class="page-header">
+                <h1><span class="header-icon">📋</span> Changelog</h1>
+                <p>Version history and release notes for GeoRestrict.</p>
+            </div>
+
+            <!-- v2.0.0 -->
+            <div class="changelog-version fade-in">
+                <h2>v2.0.0 <span class="changelog-tag tag-latest">Latest</span></h2>
+                <ul class="changelog-list">
+
+                    <li class="added">Local IP cache for enhanced privacy — lookup results stored only on your server</li>
+                    <li class="added">Cloudflare Worker gateway with automatic failover (<code>ip-api.com</code> → <code>ipinfo.io</code>)</li>
+                    <li class="added">Folia scheduler support — auto-detected region-aware task scheduling</li>
+                    <li class="added">Modrinth update checker — silent version check on startup</li>
+                    <li class="added">Config migration system — automatic upgrades between config versions</li>
+                    <li class="added">New commands: <code>/georestrict purgecache</code>, <code>cachestats</code>, <code>reload</code></li>
+                    <li class="added"><code>georestrict.bypass</code> permission — skip all geographic checks</li>
+                    <li class="added">Private subnet bypass — localhost and LAN connections always allowed</li>
+                    <li class="fixed">Discord webhook JSON formatting issue resolved</li>
+                    <li class="improved">Compatibility range expanded to Minecraft 1.16 — 1.26.x</li>
+                </ul>
+            </div>
+
+            <!-- v1.0.0 -->
+            <div class="changelog-version fade-in">
+                <h2>v1.0.0 <span class="changelog-tag tag-initial">Initial</span></h2>
+                <ul class="changelog-list">
+                    <li class="added">Initial release of GeoRestrict</li>
+                    <li class="added">Country blocking with allowlist / blocklist modes</li>
+                    <li class="added">ASN / ISP filtering</li>
+                    <li class="added">VPN and proxy detection</li>
+                    <li class="added">Discord webhook notifications</li>
+                    <li class="added">Customizable kick messages</li>
+                    <li class="added">Multi-platform support: Bukkit, Paper, Spigot, BungeeCord, Waterfall, Velocity</li>
+                </ul>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

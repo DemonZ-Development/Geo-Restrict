@@ -1,0 +1,108 @@
+<!--
+ * GeoRestrict - High-performance geographic access control.
+ * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How It Works - GeoRestrict Docs</title>
+    <meta name="description" content="Learn how GeoRestrict processes player connections, caches data, and evaluates geographic rules.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <button class="hamburger" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
+        </div>
+        <div class="sidebar-nav">
+            <a href="index.html"><span class="nav-icon">🏠</span> Home</a>
+            <a href="installation.html"><span class="nav-icon">📦</span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon">⚙️</span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon">💻</span> Commands</a>
+            <a href="how-it-works.html" class="active"><span class="nav-icon">🔧</span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon">❓</span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon">📋</span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+        </div>
+        <div class="sidebar-footer">
+            <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
+        </div>
+    </nav>
+
+
+    <main class="main-content">
+        <div class="content-inner">
+
+            <div class="page-header">
+                <h1><span class="header-icon">🔧</span> How It Works</h1>
+                <p>A detailed look at how GeoRestrict processes every player connection.</p>
+            </div>
+
+            <!-- Connection flow -->
+            <h2 class="fade-in">Connection Flow</h2>
+            <div class="section-divider fade-in"></div>
+
+            <ol class="steps fade-in">
+                <li><strong>Player connects</strong> — A player attempts to join your server. GeoRestrict hooks into the login event.</li>
+                <li><strong>Check local cache</strong> — The plugin first checks its local IP cache for a previous lookup result.</li>
+                <li><strong>Cache hit</strong> — If a valid cached result exists, rules are evaluated instantly with zero network latency.</li>
+                <li><strong>Cache miss</strong> — If no cache entry is found (or it has expired), the plugin queries the Cloudflare Worker gateway.</li>
+                <li><strong>API lookup</strong> — The gateway tries <code>ip-api.com</code> as the primary source and automatically falls back to <code>ipinfo.io</code> if needed.</li>
+                <li><strong>Cache the response</strong> — The lookup result is stored locally on your server for the configured TTL period, preserving player privacy.</li>
+                <li><strong>Evaluate rules</strong> — Rules are checked in order: <strong>Country</strong> → <strong>ASN/ISP</strong> → <strong>VPN/Proxy</strong>. The first matching rule determines the outcome.</li>
+                <li><strong>Allow or kick</strong> — If a restriction matches, the player is kicked with the configured message. Otherwise, they join normally.</li>
+                <li><strong>Discord notification</strong> — If a webhook is configured, a rich embed is sent to your Discord channel with connection details.</li>
+            </ol>
+
+            <!-- Privacy -->
+            <h2 class="fade-in">Privacy</h2>
+            <div class="section-divider fade-in"></div>
+
+            <div class="glass-card fade-in">
+                <p>GeoRestrict is designed with <strong>privacy first</strong>. All IP lookup data is stored exclusively on <strong>your</strong> server in a local cache file. No player data is ever sent to, or stored on, any third-party cloud service or database.</p>
+                <p>The only external requests made are to the IP geolocation APIs during a cache miss — and even those go through a privacy-respecting Cloudflare Worker gateway.</p>
+            </div>
+
+            <div class="callout callout-info fade-in">
+                <span class="callout-icon">🔒</span>
+                <p>Enable <code>discord.maskIp</code> in your config to partially redact player IP addresses in Discord webhook messages (e.g. <code>192.168.***. ***</code>).</p>
+            </div>
+
+            <!-- Folia -->
+            <h2 class="fade-in">Folia Support</h2>
+            <div class="section-divider fade-in"></div>
+
+            <div class="glass-card fade-in">
+                <p><strong>Folia</strong> uses a region-aware multi-threaded scheduling model instead of a single main thread. GeoRestrict <strong>auto-detects</strong> Folia at startup and switches to region-aware task scheduling automatically.</p>
+                <p>No extra configuration is required — just drop the plugin into your Folia server's <code>plugins/</code> folder and it will work correctly.</p>
+            </div>
+
+            <!-- Private subnet bypass -->
+            <h2 class="fade-in">Private Subnet Bypass</h2>
+            <div class="section-divider fade-in"></div>
+
+            <div class="glass-card fade-in">
+                <p>Connections from private / local IP ranges (e.g. <code>127.0.0.1</code>, <code>192.168.x.x</code>, <code>10.x.x.x</code>) are automatically <strong>bypassed</strong> — they are never sent to the API and are always allowed. This ensures localhost and LAN connections are never blocked.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

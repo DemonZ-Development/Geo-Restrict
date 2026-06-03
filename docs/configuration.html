@@ -1,0 +1,296 @@
+<!--
+ * GeoRestrict - High-performance geographic access control.
+ * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration - GeoRestrict Docs</title>
+    <meta name="description" content="Complete config.yml reference for GeoRestrict. Every field explained with examples.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <button class="hamburger" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="sidebar-overlay"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
+        </div>
+        <div class="sidebar-nav">
+            <a href="index.html"><span class="nav-icon">🏠</span> Home</a>
+            <a href="installation.html"><span class="nav-icon">📦</span> Installation</a>
+            <a href="configuration.html" class="active"><span class="nav-icon">⚙️</span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon">💻</span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon">🔧</span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon">❓</span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon">📋</span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+        </div>
+        <div class="sidebar-footer">
+            <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
+        </div>
+    </nav>
+
+
+    <main class="main-content">
+        <div class="content-inner">
+
+            <div class="page-header">
+                <h1><span class="header-icon">⚙️</span> Configuration</h1>
+                <p>Complete reference for the <code>config.yml</code> file. Every option explained.</p>
+            </div>
+
+            <!-- Full config.yml -->
+            <h2 class="fade-in">config.yml</h2>
+            <div class="section-divider fade-in"></div>
+
+            <div class="code-block-wrapper fade-in">
+                <span class="code-label">config.yml</span>
+<pre><code><span class="syn-cmt"># GeoRestrict configuration</span>
+<span class="syn-key">configVersion:</span> <span class="syn-num">2</span>
+
+<span class="syn-cmt"># Country filtering</span>
+<span class="syn-key">countryMode:</span> <span class="syn-str">"BLOCKLIST"</span>   <span class="syn-cmt"># BLOCKLIST or ALLOWLIST</span>
+<span class="syn-key">countries:</span>
+  <span class="syn-list">-</span> <span class="syn-str">"CN"</span>
+  <span class="syn-list">-</span> <span class="syn-str">"RU"</span>
+
+<span class="syn-cmt"># ASN / ISP filtering</span>
+<span class="syn-key">asnMode:</span> <span class="syn-str">"DISABLED"</span>       <span class="syn-cmt"># BLOCKLIST, ALLOWLIST, or DISABLED</span>
+<span class="syn-key">asns:</span>
+  <span class="syn-list">-</span> <span class="syn-str">"AS12345"</span>
+
+<span class="syn-cmt"># VPN / Proxy detection</span>
+<span class="syn-key">vpnCheckEnabled:</span> <span class="syn-bool">true</span>
+<span class="syn-key">vpnKeywords:</span>
+  <span class="syn-list">-</span> <span class="syn-str">"hosting"</span>
+  <span class="syn-list">-</span> <span class="syn-str">"vpn"</span>
+  <span class="syn-list">-</span> <span class="syn-str">"proxy"</span>
+  <span class="syn-list">-</span> <span class="syn-str">"datacenter"</span>
+
+<span class="syn-cmt"># Kick messages</span>
+<span class="syn-key">kickMessageCountry:</span> <span class="syn-str">"You are not allowed to join from your country."</span>
+<span class="syn-key">kickMessageASN:</span> <span class="syn-str">"Your ISP/ASN is not permitted."</span>
+<span class="syn-key">kickMessageVPN:</span> <span class="syn-str">"VPNs and proxies are not allowed."</span>
+
+<span class="syn-cmt"># Cache &amp; network</span>
+<span class="syn-key">cacheTtlDays:</span> <span class="syn-num">7</span>
+<span class="syn-key">updateCheck:</span> <span class="syn-bool">true</span>
+<span class="syn-key">connectionTimeoutMs:</span> <span class="syn-num">5000</span>
+
+<span class="syn-cmt"># Discord webhook</span>
+<span class="syn-key">discord:</span>
+  <span class="syn-key">webhook:</span> <span class="syn-str">""</span>
+  <span class="syn-key">maskIp:</span> <span class="syn-bool">true</span>
+  <span class="syn-key">title:</span> <span class="syn-str">"GeoRestrict Alert"</span>
+  <span class="syn-key">color:</span> <span class="syn-str">"#FF5555"</span>
+  <span class="syn-key">fields:</span>
+    <span class="syn-list">-</span> <span class="syn-key">name:</span> <span class="syn-str">"Player"</span>
+      <span class="syn-key">value:</span> <span class="syn-str">"<span class="syn-plh">%player%</span>"</span>
+    <span class="syn-list">-</span> <span class="syn-key">name:</span> <span class="syn-str">"Status"</span>
+      <span class="syn-key">value:</span> <span class="syn-str">"<span class="syn-plh">%status%</span>"</span>
+    <span class="syn-list">-</span> <span class="syn-key">name:</span> <span class="syn-str">"IP"</span>
+      <span class="syn-key">value:</span> <span class="syn-str">"<span class="syn-plh">%ip%</span>"</span>
+    <span class="syn-list">-</span> <span class="syn-key">name:</span> <span class="syn-str">"Country"</span>
+      <span class="syn-key">value:</span> <span class="syn-str">"<span class="syn-plh">%country%</span>"</span>
+    <span class="syn-list">-</span> <span class="syn-key">name:</span> <span class="syn-str">"ASN"</span>
+      <span class="syn-key">value:</span> <span class="syn-str">"<span class="syn-plh">%asn%</span>"</span>
+    <span class="syn-list">-</span> <span class="syn-key">name:</span> <span class="syn-str">"ISP"</span>
+      <span class="syn-key">value:</span> <span class="syn-str">"<span class="syn-plh">%isp%</span>"</span>
+    <span class="syn-list">-</span> <span class="syn-key">name:</span> <span class="syn-str">"Reason"</span>
+      <span class="syn-key">value:</span> <span class="syn-str">"<span class="syn-plh">%reason%</span>"</span></code></pre>
+            </div>
+
+            <!-- Config table -->
+            <h2 class="fade-in">Field Reference</h2>
+            <div class="section-divider fade-in"></div>
+
+            <div class="table-wrapper fade-in">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>configVersion</code></td>
+                            <td>Integer</td>
+                            <td><code>2</code></td>
+                            <td>Internal version number for config migration. Do not change manually.</td>
+                        </tr>
+                        <tr>
+                            <td><code>countryMode</code></td>
+                            <td>String</td>
+                            <td><code>BLOCKLIST</code></td>
+                            <td>Set to <code>BLOCKLIST</code> to block listed countries, or <code>ALLOWLIST</code> to only allow them.</td>
+                        </tr>
+                        <tr>
+                            <td><code>countries</code></td>
+                            <td>List</td>
+                            <td><code>[]</code></td>
+                            <td>List of ISO 3166-1 alpha-2 country codes (e.g. <code>US</code>, <code>DE</code>, <code>CN</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>asnMode</code></td>
+                            <td>String</td>
+                            <td><code>DISABLED</code></td>
+                            <td>Set to <code>BLOCKLIST</code>, <code>ALLOWLIST</code>, or <code>DISABLED</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>asns</code></td>
+                            <td>List</td>
+                            <td><code>[]</code></td>
+                            <td>List of ASN identifiers (e.g. <code>AS12345</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>vpnCheckEnabled</code></td>
+                            <td>Boolean</td>
+                            <td><code>true</code></td>
+                            <td>Enable or disable VPN / proxy / hosting detection.</td>
+                        </tr>
+                        <tr>
+                            <td><code>vpnKeywords</code></td>
+                            <td>List</td>
+                            <td><code>[hosting, vpn, proxy, datacenter]</code></td>
+                            <td>Keywords matched against the ISP/org field to detect VPN/proxy usage.</td>
+                        </tr>
+                        <tr>
+                            <td><code>kickMessageCountry</code></td>
+                            <td>String</td>
+                            <td>—</td>
+                            <td>Message shown to players kicked for country restrictions.</td>
+                        </tr>
+                        <tr>
+                            <td><code>kickMessageASN</code></td>
+                            <td>String</td>
+                            <td>—</td>
+                            <td>Message shown to players kicked for ASN/ISP restrictions.</td>
+                        </tr>
+                        <tr>
+                            <td><code>kickMessageVPN</code></td>
+                            <td>String</td>
+                            <td>—</td>
+                            <td>Message shown to players kicked for using a VPN or proxy.</td>
+                        </tr>
+                        <tr>
+                            <td><code>cacheTtlDays</code></td>
+                            <td>Integer</td>
+                            <td><code>7</code></td>
+                            <td>Number of days to keep cached IP lookup results before refreshing.</td>
+                        </tr>
+                        <tr>
+                            <td><code>updateCheck</code></td>
+                            <td>Boolean</td>
+                            <td><code>true</code></td>
+                            <td>Check Modrinth for plugin updates on startup.</td>
+                        </tr>
+                        <tr>
+                            <td><code>connectionTimeoutMs</code></td>
+                            <td>Integer</td>
+                            <td><code>5000</code></td>
+                            <td>HTTP timeout (ms) for IP lookup API requests.</td>
+                        </tr>
+                        <tr>
+                            <td><code>discord.webhook</code></td>
+                            <td>String</td>
+                            <td><code>""</code></td>
+                            <td>Discord webhook URL. Leave empty to disable webhook notifications.</td>
+                        </tr>
+                        <tr>
+                            <td><code>discord.maskIp</code></td>
+                            <td>Boolean</td>
+                            <td><code>true</code></td>
+                            <td>Partially mask player IP addresses in Discord messages for privacy.</td>
+                        </tr>
+                        <tr>
+                            <td><code>discord.title</code></td>
+                            <td>String</td>
+                            <td><code>GeoRestrict Alert</code></td>
+                            <td>Title of the Discord embed message.</td>
+                        </tr>
+                        <tr>
+                            <td><code>discord.color</code></td>
+                            <td>String</td>
+                            <td><code>#FF5555</code></td>
+                            <td>Hex color for the Discord embed sidebar.</td>
+                        </tr>
+                        <tr>
+                            <td><code>discord.fields</code></td>
+                            <td>List</td>
+                            <td>—</td>
+                            <td>Custom fields for the Discord embed. Each field has a <code>name</code> and <code>value</code>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Placeholders -->
+            <h2 class="fade-in">Placeholders</h2>
+            <div class="section-divider fade-in"></div>
+
+            <p class="fade-in">The following placeholders can be used in Discord webhook fields:</p>
+
+            <div class="table-wrapper fade-in">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Placeholder</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>%player%</code></td>
+                            <td>The player's username</td>
+                        </tr>
+                        <tr>
+                            <td><code>%status%</code></td>
+                            <td>Connection status (e.g. BLOCKED, ALLOWED)</td>
+                        </tr>
+                        <tr>
+                            <td><code>%ip%</code></td>
+                            <td>Player's IP address (masked if <code>maskIp</code> is enabled)</td>
+                        </tr>
+                        <tr>
+                            <td><code>%country%</code></td>
+                            <td>Detected country code</td>
+                        </tr>
+                        <tr>
+                            <td><code>%asn%</code></td>
+                            <td>Detected ASN identifier</td>
+                        </tr>
+                        <tr>
+                            <td><code>%isp%</code></td>
+                            <td>Detected ISP / organization name</td>
+                        </tr>
+                        <tr>
+                            <td><code>%reason%</code></td>
+                            <td>Reason for the block (country, ASN, or VPN)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

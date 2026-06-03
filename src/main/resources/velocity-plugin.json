@@ -1,0 +1,10 @@
+{
+  "id": "georestrict",
+  "name": "GeoRestrict",
+  "version": "2.0.0",
+  "description": "Geographic restriction plugin for Minecraft servers",
+
+  "authors": ["Demonz Development"],
+  "main": "zip.linuxaddict.georestrict.velocity.GeoRestrictVelocityPlugin",
+  "url": "https://demonzdevelopment.online/"
+}

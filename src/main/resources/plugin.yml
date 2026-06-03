@@ -1,0 +1,22 @@
+name: GeoRestrict
+main: zip.linuxaddict.georestrict.bukkit.GeoRestrictBukkitPlugin
+version: 2.0.0
+api-version: '1.16'
+folia-supported: true
+
+load: STARTUP
+description: Geographic restriction plugin for Minecraft servers
+author: Demonz Development
+website: https://demonzdevelopment.online/
+commands:
+  georestrict:
+    description: Main command for GeoRestrict
+    usage: /georestrict <check|purgecache|cachestats|reload>
+    permission: georestrict.admin
+permissions:
+  georestrict.admin:
+    description: Allows use of GeoRestrict admin commands
+    default: op
+  georestrict.bypass:
+    description: Bypass GeoRestrict checks
+    default: false
