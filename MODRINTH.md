@@ -9,16 +9,6 @@
   -->
 # Modrinth listing — GeoRestrict
 
-This file is the description for the [Modrinth project page](https://modrinth.com/plugin/georestrict).
-Paste the markdown below into the Modrinth editor. Upload screenshots through
-the Modrinth UI (the `![](...)` lines below are placeholders — replace the
-URLs with your uploaded image URLs).
-
-The tone is intentionally short and direct. Modrinth listings that read like
-press releases get ignored. The body is what it is.
-
----
-
 ## What it does
 
 GeoRestrict blocks or allows Minecraft players based on where they're
@@ -140,15 +130,13 @@ Current maintainer: [Demonz Development](https://demonzdevelopment.online/).
 
 ---
 
-## Modrinth upload checklist
+## Modrinth editor fields
 
-When you paste the above, you also need to set these in the Modrinth UI
-(not in the markdown):
+These go in the Modrinth UI, not in the description body:
 
 - **Project type**: Plugin
 - **Categories**: Admin tools, Anti-griefing tools
 - **Game versions**: 1.16, 1.17, 1.18, 1.19, 1.20, 1.21, 1.22, 1.23, 1.24, 1.25, 1.26
 - **Loaders**: Spigot, Paper, Purpur, BungeeCord, Waterfall, Velocity, Folia
 - **License**: GPL-3.0
-- **Client / server side**: Server side only
 - **Environment**: Server
