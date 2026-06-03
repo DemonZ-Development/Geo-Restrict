@@ -1,4 +1,4 @@
-﻿/*
+/*
  * GeoRestrict - High-performance geographic access control.
  * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
  *
@@ -23,9 +23,8 @@ import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 public class GeoRestrictService {
-    // Placeholder â€” will be updated when the Cloudflare Worker is deployed
+    // Placeholder — will be updated when the Cloudflare Worker is deployed
     private static final String GATEWAY_URL = "https://PLACEHOLDER.workers.dev/lookup";
-    private static final String FALLBACK_URL = "http://ip-api.com/json/%s?fields=status,message,query,country,countryCode,isp,org,as,proxy,hosting,mobile";
 
     private GeoConfig config;
     private final Logger logger;
@@ -79,16 +78,11 @@ public class GeoRestrictService {
                     return result;
                 }
 
-                // 3. Try gateway URL first
+                // 3. Try gateway URL
                 GeoResponse response = fetchFromGateway(ip);
 
-                // 4. If gateway fails, try fallback URL directly
                 if (response == null) {
-                    response = fetchFromFallback(ip);
-                }
-
-                if (response == null) {
-                    logger.warn("Failed to fetch IP info for {} from both gateway and fallback", ip);
+                    logger.warn("Failed to fetch IP info for {} from gateway", ip);
                     return new CheckResult(true, null, null); // Fail open
                 }
 
@@ -137,64 +131,6 @@ public class GeoRestrictService {
         }
     }
 
-    /**
-     * Fetch geo information from the fallback ip-api.com URL.
-     * Maps the ip-api.com response fields to GeoResponse.
-     */
-    private GeoResponse fetchFromFallback(String ip) {
-        try {
-            String urlString = String.format(FALLBACK_URL, ip);
-            URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setConnectTimeout(config.connectionTimeoutMs);
-            conn.setReadTimeout(config.connectionTimeoutMs);
-
-            if (conn.getResponseCode() != 200) {
-                logger.warn("Fallback API returned HTTP {} for IP {}", conn.getResponseCode(), ip);
-                return null;
-            }
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            JsonObject json = gson.fromJson(reader, JsonObject.class);
-            reader.close();
-
-            // Check if ip-api returned an error
-            if (json.has("status") && "fail".equals(json.get("status").getAsString())) {
-                String message = json.has("message") ? json.get("message").getAsString() : "Unknown error";
-                logger.warn("Fallback API returned failure for IP {}: {}", ip, message);
-                return null;
-            }
-
-            // Map ip-api.com fields to GeoResponse
-            GeoResponse response = new GeoResponse();
-            response.ip = json.has("query") ? json.get("query").getAsString() : ip;
-            response.countryCode = json.has("countryCode") ? json.get("countryCode").getAsString() : null;
-            response.countryName = json.has("country") ? json.get("country").getAsString() : null;
-
-            // Parse ASN from the "as" field (format: "AS12345 Organization Name")
-            if (json.has("as") && !json.get("as").isJsonNull()) {
-                String asField = json.get("as").getAsString();
-                String[] asParts = asField.split(" ", 2);
-                response.asn = asParts[0]; // e.g. "AS12345"
-                response.asName = asParts.length > 1 ? asParts[1] : (json.has("isp") ? json.get("isp").getAsString() : null);
-            } else {
-                response.asName = json.has("isp") ? json.get("isp").getAsString() : null;
-            }
-
-            // ip-api.com provides proxy, hosting, mobile as booleans
-            response.isProxy = json.has("proxy") && json.get("proxy").getAsBoolean();
-            response.isHosting = json.has("hosting") && json.get("hosting").getAsBoolean();
-            response.isMobile = json.has("mobile") && json.get("mobile").getAsBoolean();
-            // ip-api.com doesn't distinguish VPN separately; proxy covers it
-            response.isVpn = response.isProxy;
-
-            return response;
-        } catch (Exception e) {
-            logger.warn("Fallback request failed for IP {}: {}", ip, e.getMessage());
-            return null;
-        }
-    }
 
     private CheckResult evaluate(GeoResponse info) {
         if (info == null) return new CheckResult(true, null, null);
