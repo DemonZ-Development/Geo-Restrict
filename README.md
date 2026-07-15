@@ -145,7 +145,7 @@ node --check vps-gateway/src/server.js
 
 The shaded jar is written to `target/georestrict-2.0.0.jar`.
 
-The integration and real platform startup harnesses are documented in [`test/README.md`](test/README.md). Checks that need real player connections are in the [`v2.0.0 manual test plan`](docs/TEST_PLAN.md).
+The integration and real platform startup harnesses are documented in [`test/README.md`](test/README.md).
 
 ## Project history
 
