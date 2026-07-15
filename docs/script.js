@@ -44,7 +44,7 @@ function initIcons() {
 function initBrand() {
   document.querySelectorAll('.sidebar-logo').forEach(brand => {
     if (brand.querySelector('img')) return;
-    brand.innerHTML = '<img src="assets/georestrict-icon.png?rev=20260714e" alt=""><b>GeoRestrict</b><span>Field guide</span>';
+    brand.innerHTML = '<img src="assets/georestrict-icon-v2.png?rev=20260715a" alt=""><b>GeoRestrict</b><span>Field guide</span>';
   });
   document.querySelector('.sidebar')?.setAttribute('aria-label', 'Documentation');
 }
