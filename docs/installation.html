@@ -14,9 +14,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Installation - GeoRestrict</title>
     <meta name="description" content="How to install GeoRestrict on Bukkit, Paper, Folia, BungeeCord, Waterfall or Velocity.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <meta name="theme-color" content="#17324d">
+    <link rel="icon" type="image/png" href="assets/georestrict-icon.png?rev=20260714e">
+    <link rel="stylesheet" href="styles.css?rev=20260714h">
 </head>
 <body>
 
@@ -30,14 +30,16 @@
             <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
         </div>
         <div class="sidebar-nav">
-            <a href="index.html"><span class="nav-icon">🏠</span> Home</a>
-            <a href="installation.html" class="active"><span class="nav-icon">📦</span> Installation</a>
-            <a href="configuration.html"><span class="nav-icon">⚙️</span> Configuration</a>
-            <a href="commands.html"><span class="nav-icon">💻</span> Commands</a>
-            <a href="how-it-works.html"><span class="nav-icon">🔧</span> How It Works</a>
-            <a href="faq.html"><span class="nav-icon">❓</span> FAQ</a>
-            <a href="changelog.html"><span class="nav-icon">📋</span> Changelog</a>
-            <a href="troubleshooting.html"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+            <a href="index.html"><span class="nav-icon" data-icon="home" aria-hidden="true"></span> Home</a>
+            <a href="installation.html" class="active"><span class="nav-icon" data-icon="package" aria-hidden="true"></span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon" data-icon="sliders" aria-hidden="true"></span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon" data-icon="terminal" aria-hidden="true"></span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon" data-icon="route" aria-hidden="true"></span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon" data-icon="chat" aria-hidden="true"></span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon" data-icon="wrench" aria-hidden="true"></span> Troubleshooting</a>
+            <a href="privacy.html"><span class="nav-icon" data-icon="shield" aria-hidden="true"></span> Privacy</a>
+            <a href="terms.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Terms</a>
         </div>
         <div class="sidebar-footer">
             <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
@@ -48,12 +50,12 @@
         <div class="content-inner">
 
             <div class="page-header">
-                <h1><span class="header-icon">📦</span> Installation</h1>
-                <p>Drop-in install for any of the six supported platforms. Same jar, different entrypoints.</p>
+                <h1><span class="header-icon" data-icon="package" aria-hidden="true"></span> Installation</h1>
+                <p>One jar for the supported server and proxy families. Pick the place where you want connections checked.</p>
             </div>
 
             <h2 class="fade-in">1. Pick the right jar</h2>
-            <p class="fade-in">There's only one jar, <code>georestrict-2.1.0.jar</code>. The same file works on:</p>
+            <p class="fade-in">There's only one jar, <code>georestrict-2.0.0.jar</code>. The same file works on:</p>
             <ul class="fade-in">
                 <li>Bukkit 1.16+ (Spigot, Paper, Purpur, ...)</li>
                 <li>Folia 1.20+ — detected at runtime, region-aware scheduler is used automatically</li>
@@ -61,8 +63,14 @@
                 <li>Velocity 3.2.0+</li>
             </ul>
 
+            <div class="alert alert-info fade-in">
+                <strong>Java versions belong to both the plugin and the platform.</strong> GeoRestrict targets Java 17 bytecode, but modern server releases may require a newer runtime. The final release smoke used Java 25 because Velocity 4.0.0 is compiled for Java 25. Always follow the Java requirement published by your server or proxy.
+            </div>
+
+            <p class="fade-in">The final v2.0.0 jar was started successfully on current Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity builds. The exact test versions are recorded in the <a href="https://github.com/DemonZ-Development/Geo-Restrict#release-verification" target="_blank" rel="noopener">GitHub README</a>.</p>
+
             <div class="alert alert-warning fade-in">
-                <strong>Where to put it depends on your topology.</strong> If you have a proxy, install on the <em>proxy</em>. The plugin blocks at the network edge, which is the only place to actually reject a connection. Installing on backend servers is a fallback for direct-connect servers.
+                <strong>Where you install it matters.</strong> On a proxied network, the proxy is usually the cleanest place because it sees the original address and can stop the connection before a backend is chosen. Standalone servers can install it directly. A backend behind a proxy only works when IP forwarding is configured correctly.
             </div>
 
             <h2 class="fade-in">2. Install</h2>
@@ -71,7 +79,7 @@
             <div class="code-block-wrapper fade-in">
                 <span class="code-label">shell</span>
 <pre><code>cd /path/to/server
-cp georestrict-2.1.0.jar plugins/
+cp georestrict-2.0.0.jar plugins/
 ./start.sh   # or systemctl restart minecraft
 </code></pre>
             </div>
@@ -80,7 +88,7 @@ cp georestrict-2.1.0.jar plugins/
             <div class="code-block-wrapper fade-in">
                 <span class="code-label">shell</span>
 <pre><code>cd /path/to/proxy
-cp georestrict-2.1.0.jar plugins/
+cp georestrict-2.0.0.jar plugins/
 ./start.sh
 </code></pre>
             </div>
@@ -89,7 +97,7 @@ cp georestrict-2.1.0.jar plugins/
             <div class="code-block-wrapper fade-in">
                 <span class="code-label">shell</span>
 <pre><code>cd /path/to/velocity
-cp georestrict-2.1.0.jar plugins/
+cp georestrict-2.0.0.jar plugins/
 ./start.sh
 </code></pre>
             </div>
@@ -98,28 +106,24 @@ cp georestrict-2.1.0.jar plugins/
             <p class="fade-in">On startup you should see this in the console:</p>
             <div class="code-block-wrapper fade-in">
                 <span class="code-label">console</span>
-<pre><code>[GeoRestrict] GeoRestrict v2.1.0 starting...
+<pre><code>[GeoRestrict] GeoRestrict v2.0.0 starting...
 [GeoRestrict] GeoRestrict enabled.
+[GeoRestrict] Demonz Development believes listening to its users comes before anything else.
+[GeoRestrict] Found a bug, have a report, or want to share feedback? Join our Discord:
+[GeoRestrict] https://discord.com/invite/GYsTt96ypf - we would genuinely love to hear from you.
 </code></pre>
             </div>
 
             <p class="fade-in">And a config file at <code>plugins/GeoRestrict/config.yml</code> (Bukkit) or <code>plugins/GeoRestrict/config.yml</code> (Bungee/Velocity).</p>
 
-            <h2 class="fade-in">4. Set up the Worker (recommended)</h2>
-            <p class="fade-in">The plugin talks to a Cloudflare Worker. Out of the box it points at the public one at <code>geoprotect.demonzdev.workers.dev</code>, which works but is shared. If you'd rather not share IPs with the rest of the internet:</p>
-            <ol class="fade-in">
-                <li>Fork or copy <code>worker/src/index.js</code> from this repo.</li>
-                <li>Deploy it: <code>npx wrangler deploy</code> in the <code>worker/</code> directory.</li>
-                <li>Set <code>GATEWAY_TOKENS</code> as a Worker secret.</li>
-                <li>Update <code>gatewayUrl</code> and <code>gatewayToken</code> in your plugin config.</li>
-            </ol>
-
-            <div class="alert alert-info fade-in">
-                If you set <code>GATEWAY_TOKENS</code> on the Worker, requests without a matching <code>gatewayToken</code> are rejected with HTTP 401. The default config has an empty token — leave it that way when using the public Worker, or set one to lock down your private one.
+            <h2 class="fade-in">4. Advanced infrastructure</h2>
+            <div class="alert alert-warning fade-in">
+                The generated Worker settings already work. Do not edit them unless you understand the full lookup path and intend to operate the replacement yourself.
             </div>
+            <p class="fade-in">Most server owners can stop here. If you need your own Worker, providers or independent fallback server, use the <a href="https://github.com/DemonZ-Development/Geo-Restrict#advanced-infrastructure-reference" target="_blank" rel="noopener">advanced infrastructure reference in the GitHub README</a>. It is the single source for ports, secrets, deployment and security details.</p>
 
             <h2 class="fade-in">Updating</h2>
-            <p class="fade-in">Replace the jar, restart, done. Config keys you don't have are added with sane defaults. Keys you have are kept. <code>configVersion</code> tracks schema version, not plugin version, and bumps only when the file layout changes.</p>
+            <p class="fade-in">Replace the jar and restart. Missing config keys are merged with documented defaults while your existing values are kept. <code>configVersion</code> tracks the file schema, not the plugin release.</p>
 
             <h2 class="fade-in">Uninstalling</h2>
             <p class="fade-in">Delete the jar, delete <code>plugins/GeoRestrict/</code>, restart. Nothing is written outside that directory.</p>
@@ -127,6 +131,6 @@ cp georestrict-2.1.0.jar plugins/
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <script src="script.js?rev=20260714h"></script>
 </body>
 </html>

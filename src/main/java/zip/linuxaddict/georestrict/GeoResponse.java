@@ -9,10 +9,6 @@
  */
 package zip.linuxaddict.georestrict;
 
-/**
- * Provider-agnostic geolocation result. All string fields are
- * nullable; the service normalizes them after deserialization.
- */
 public class GeoResponse {
     public String ip;
     public String countryCode;

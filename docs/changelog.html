@@ -1,114 +1,112 @@
-<!--
-  ~ GeoRestrict - High-performance geographic access control.
-  ~ Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
-  ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Changelog - GeoRestrict</title>
-    <meta name="description" content="Version history for GeoRestrict.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <meta name="theme-color" content="#17324d">
+    <title>Changelog — GeoRestrict</title>
+    <meta name="description" content="The GeoRestrict release history, including the complete v2.0.0 rewrite.">
+    <link rel="icon" type="image/png" href="assets/georestrict-icon.png?rev=20260714e">
+    <link rel="stylesheet" href="styles.css?rev=20260714h">
 </head>
 <body>
 
-    <button class="hamburger" aria-label="Toggle sidebar">
+    <button class="hamburger" type="button" aria-label="Open documentation menu" aria-controls="sidebar" aria-expanded="false">
         <span></span><span></span><span></span>
     </button>
-    <div class="sidebar-overlay"></div>
+    <div class="sidebar-overlay" aria-hidden="true"></div>
 
-    <nav class="sidebar" id="sidebar">
+    <nav class="sidebar" id="sidebar" aria-label="Documentation">
         <div class="sidebar-header">
-            <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
+            <div class="sidebar-logo"><img src="assets/georestrict-icon.png?rev=20260714e" alt=""><b>GeoRestrict</b><span>Field guide</span></div>
         </div>
         <div class="sidebar-nav">
-            <a href="index.html"><span class="nav-icon">🏠</span> Home</a>
-            <a href="installation.html"><span class="nav-icon">📦</span> Installation</a>
-            <a href="configuration.html"><span class="nav-icon">⚙️</span> Configuration</a>
-            <a href="commands.html"><span class="nav-icon">💻</span> Commands</a>
-            <a href="how-it-works.html"><span class="nav-icon">🔧</span> How It Works</a>
-            <a href="faq.html"><span class="nav-icon">❓</span> FAQ</a>
-            <a href="changelog.html" class="active"><span class="nav-icon">📋</span> Changelog</a>
-            <a href="troubleshooting.html"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+            <a href="index.html"><span class="nav-icon" data-icon="home" aria-hidden="true"></span> Home</a>
+            <a href="installation.html"><span class="nav-icon" data-icon="package" aria-hidden="true"></span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon" data-icon="sliders" aria-hidden="true"></span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon" data-icon="terminal" aria-hidden="true"></span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon" data-icon="route" aria-hidden="true"></span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon" data-icon="chat" aria-hidden="true"></span> FAQ</a>
+            <a href="changelog.html" class="active"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon" data-icon="wrench" aria-hidden="true"></span> Troubleshooting</a>
+            <a href="privacy.html"><span class="nav-icon" data-icon="shield" aria-hidden="true"></span> Privacy</a>
+            <a href="terms.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Terms</a>
         </div>
-        <div class="sidebar-footer">
-            <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
-        </div>
+        <div class="sidebar-footer">Built in the open by <a href="https://demonzdevelopment.online/" target="_blank" rel="noopener">Demonz Development</a>.</div>
     </nav>
 
     <main class="main-content">
         <div class="content-inner">
+            <header class="page-header">
+                <h1><span class="header-icon" data-icon="clipboard" aria-hidden="true"></span> Changelog</h1>
+                <p>The useful version: what changed, why it matters, and what you may need to check after updating.</p>
+            </header>
 
-            <div class="page-header">
-                <h1><span class="header-icon">📋</span> Changelog</h1>
-                <p>What changed, in what version.</p>
-            </div>
+            <section class="changelog-version fade-in">
+                <h2>v2.0.0 <span class="changelog-tag tag-latest">Latest</span></h2>
+                <p class="release-date">14 July 2026 · complete rewrite</p>
+                <p>v2.0.0 turns GeoRestrict from a small country filter into a maintained, multi-platform access-control plugin. The setup is still one jar and one readable config; the machinery behind it is much safer.</p>
 
-            <div class="changelog-version fade-in">
-                <h2>v2.1.0 <span class="changelog-tag tag-latest">Latest</span></h2>
-                <p class="release-date">2026-06-03</p>
+                <h3>Rules and player experience</h3>
                 <ul class="changelog-list">
-                    <li class="changed"><strong>Default is now fail-closed.</strong> <code>blockOnLookupFailure</code> flipped from <code>false</code> to <code>true</code>. If every lookup path dies, players get kicked with <code>kickMessageLookupFailure</code>. Flip back if you really want fail-open.</li>
-                    <li class="changed"><strong>Config migration no longer mangles your file.</strong> Old versions appended new keys at the bottom of the YAML, producing ugly diffs. The new migrator merges defaults into your existing structure and rewrites in place.</li>
-                    <li class="changed"><strong>Worker requires auth when configured.</strong> If you set <code>GATEWAY_TOKENS</code> on the Worker, unauthenticated requests now get HTTP 401. Previously they were silently allowed.</li>
-                    <li class="changed"><strong>Default fallback URL is <code>https://</code>.</strong> The previous default was <code>http://</code> — your players' IPs were going in cleartext if the Worker was down.</li>
-                    <li class="added">Cache size cap (<code>maxCacheEntries</code>, default 100k). Oldest entries are evicted past the limit. Set to 0 to disable.</li>
-                    <li class="added">Scheduled cache purge every 6h. Expired entries are removed even if they're never read again.</li>
-                    <li class="added">Folia region scheduler used for sync work. Previously sync work silently ran async.</li>
-                    <li class="added">IPv4 CGNAT, TEST-NETs, IPv4-mapped IPv6, documentation prefix <code>2001:db8::/32</code> now treated as private.</li>
-                    <li class="added">Update checker compares versions numerically — <code>1.10</code> is now correctly newer than <code>1.9</code>. The lexicographic fallback was a bug.</li>
-                    <li class="added">19 unit tests covering private IP detection, version comparison, config loading, cache eviction, and the rule evaluator.</li>
-                    <li class="added">Single <code>PluginInfo.VERSION</code> constant. No more hardcoded <code>"2.0.0"</code> scattered across five files.</li>
-                    <li class="added">Per-platform bStats IDs (28563 / 28564 / 28565).</li>
-                    <li class="fixed">Bungee login event no longer pretends to do permission lookups that always return false.</li>
-                    <li class="fixed">Worker IPv6 validation is now strict. Previously <code>?ip=::::xxx</code> would pass.</li>
-                    <li class="fixed">Discord webhook body now sets <code>Content-Length</code> correctly via <code>setFixedLengthStreamingMode</code>.</li>
-                    <li class="removed">"Connection rejected:" prefix stripping — that was a Velocity 1.x leftover. Modern Velocity doesn't add it.</li>
-                    <li class="removed">Committed IDE state (IntelliJ <code>.idea/</code>), <code>target/</code>, and a stray <code>georestrict.rar</code> from the repo.</li>
+                    <li class="added">Country <code>ALLOWLIST</code> and <code>BLOCKLIST</code> modes, ASN rules, and configurable VPN/proxy detection.</li>
+                    <li class="added">Clear, editable messages for country, ASN, VPN and lookup-failure blocks.</li>
+                    <li class="fixed"><code>georestrict.bypass</code> now works on Bukkit-compatible backends by making the final decision when live permission data is available.</li>
+                    <li class="changed">Lookup failures are fail-closed by default. Set <code>blockOnLookupFailure: false</code> if your community prefers availability over strict enforcement.</li>
+                    <li class="added">Commands for manual lookups, cache statistics, cache purges and safe config reloads.</li>
                 </ul>
-            </div>
 
-            <div class="changelog-version fade-in">
-                <h2>v2.0.0 <span class="changelog-tag tag-major">Rewrite</span></h2>
-                <p class="release-date">2026-06-03</p>
+                <h3>Platforms and scheduling</h3>
                 <ul class="changelog-list">
-                    <li class="added">Local <code>geo_cache.json</code> for privacy — lookup results stay on your server.</li>
-                    <li class="added">Cloudflare Worker gateway with provider failover (ip-api.com → ipinfo.io).</li>
-                    <li class="added">Folia scheduler support via reflection-based adapter.</li>
-                    <li class="added">Modrinth update checker on a 6h timer.</li>
-                    <li class="added">Config migration with a schema version field.</li>
-                    <li class="added">Subcommands: <code>check</code>, <code>purgecache</code>, <code>cachestats</code>, <code>reload</code>.</li>
-                    <li class="added"><code>georestrict.bypass</code> permission for trusted players.</li>
-                    <li class="added">Private subnet bypass for LAN/loopback.</li>
-                    <li class="improved">Compatibility range expanded to MC 1.16 – 1.26.x.</li>
+                    <li class="added">One shaded jar for Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity.</li>
+                    <li class="added">Folia-aware scheduling with a clean Bukkit fallback on incompatible forks.</li>
+                    <li class="fixed">Bungee and Velocity no longer pretend backend player permissions are available during proxy login.</li>
+                    <li class="added">Separate, privacy-conscious bStats IDs for Bukkit, BungeeCord and Velocity.</li>
                 </ul>
-            </div>
 
-            <div class="changelog-version fade-in">
-                <h2>v1.0.0 <span class="changelog-tag tag-initial">Initial</span></h2>
+                <h3>Cache, config and resilience</h3>
+                <ul class="changelog-list">
+                    <li class="added">A bounded local <code>geo_cache.json</code> with atomic writes, five-second write coalescing and scheduled expiry cleanup.</li>
+                    <li class="added">Config migration that merges new defaults into existing YAML instead of appending a second, untidy block.</li>
+                    <li class="fixed">Private and documentation networks — including CGNAT, TEST-NET, IPv4-mapped IPv6 and <code>2001:db8::/32</code> — bypass public geolocation.</li>
+                    <li class="fixed">The built-in country fallback now matches the generated config: <code>CN</code>, <code>RU</code>, <code>KP</code> and <code>IR</code>.</li>
+                    <li class="fixed">Update checks compare version numbers numerically, so <code>1.10</code> correctly sorts after <code>1.9</code>.</li>
+                </ul>
+
+                <h3>Gateway and privacy</h3>
+                <ul class="changelog-list">
+                    <li class="added">A Cloudflare Worker lookup service with provider failover and one-day caching.</li>
+                    <li class="added">An independent fallback server that can keep country and ASN rules available during a provider outage.</li>
+                    <li class="improved">Connection, read-timeout and general I/O failures now produce distinct log messages.</li>
+                    <li class="removed">Removed the legacy provider URL from the plugin jar. The plugin now talks only to its configured Worker; provider failover stays behind that boundary.</li>
+                    <li class="added">Discord delivery retries once after a temporary network or 5xx failure.</li>
+                    <li class="changed">Detailed deployment, secrets and server security notes now live in the GitHub README instead of marketplace pages or the everyday setup guide.</li>
+                </ul>
+
+                <h3>Quality and documentation</h3>
+                <ul class="changelog-list">
+                    <li class="added">22 Java unit tests, 19 Java integration tests, 12 Worker tests and four fallback server tests, plus JavaScript, XML, HTML and live service checks.</li>
+                    <li class="added">Real startup smoke coverage for Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity 4.0.0, including generated config and community message verification.</li>
+                    <li class="added">A complete documentation field guide covering installation, configuration, commands, architecture, support and release history.</li>
+                    <li class="added">A plain-language Privacy Policy and Terms and Conditions, linked from the wiki and every marketplace listing.</li>
+                    <li class="added">Generated config comments now link directly to the wiki and Discord, and warn operators not to change Worker settings without understanding the lookup path.</li>
+                    <li class="added">Startup logs now invite bug reports and feedback, reflecting Demonz Development's user-first support approach.</li>
+                    <li class="fixed">Removed leftover scheduler hooks, duplicate constants, retired config fields, unused documentation styles and an unreferenced asset copy. Reserved IP checks now run locally before any Worker request.</li>
+                    <li class="changed">User-facing documentation now says “fallback server” instead of using hosting-specific shorthand.</li>
+                    <li class="improved">A warmer, accessible docs design with keyboard-friendly menus and accordions, readable callouts, colourful section headings and responsive layouts.</li>
+                    <li class="improved">New Pillow-generated penguin logo, icon and marketplace banner, plus a hand-drawn SVG interface icon set.</li>
+                    <li class="added">Human-written marketplace copy for the major Minecraft plugin directories.</li>
+                </ul>
+            </section>
+
+            <section class="changelog-version fade-in">
+                <h2>v1.0.0 <span class="changelog-tag tag-initial">Original</span></h2>
                 <p class="release-date">2024</p>
-                <ul class="changelog-list">
-                    <li class="added">Initial release of GeoRestrict.</li>
-                    <li class="added">Country blocklist / allowlist.</li>
-                    <li class="added">ASN filtering.</li>
-                    <li class="added">VPN/proxy detection via ISP keyword.</li>
-                    <li class="added">Discord webhook notifications.</li>
-                    <li class="added">Configurable kick messages.</li>
-                    <li class="added">Bukkit, Paper, Spigot, BungeeCord, Waterfall, Velocity support.</li>
-                </ul>
-            </div>
-
+                <p>The original linuxaddict release introduced country lists, ASN filtering, ISP-keyword VPN detection, Discord notifications and support for the main Bukkit and proxy platforms.</p>
+            </section>
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <script src="script.js?rev=20260714h"></script>
 </body>
 </html>

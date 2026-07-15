@@ -1,0 +1,22 @@
+{
+  "name": "georestrict-vps-gateway",
+  "version": "2.0.0",
+  "description": "Local-MMDB fallback gateway for GeoRestrict.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "check": "node --check src/server.js && node --check src/geo-database.js && node --check scripts/update-databases.js",
+    "test": "node --test test/*.test.js",
+    "update-db": "node scripts/update-databases.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "maxmind": "^5.0.6"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "GPL-3.0"
+}

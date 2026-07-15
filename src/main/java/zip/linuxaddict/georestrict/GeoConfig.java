@@ -21,12 +21,12 @@ public class GeoConfig {
     public int lookupThreads = 4;
     public String gatewayUrl = GeoConfigConstants.DEFAULT_GATEWAY_URL;
     public String gatewayToken = "";
-    public boolean directFallbackEnabled = false;
+    /** Retired key retained only so older YAML loads. The plugin never calls a provider directly. */
     public boolean blockOnLookupFailure = true;
     public int maxCacheEntries = 100_000;
 
     public RestrictionMode countryMode = RestrictionMode.BLOCKLIST;
-    public List<String> countries = Arrays.asList("CN", "RU", "KP");
+    public List<String> countries = Arrays.asList("CN", "RU", "KP", "IR");
 
     public RestrictionMode asnMode = RestrictionMode.DISABLED;
     public List<String> asns = Arrays.asList();
@@ -74,15 +74,6 @@ public class GeoConfig {
     }
 
     public enum RestrictionMode {
-        ALLOWLIST, BLOCKLIST, DISABLED;
-
-        public static RestrictionMode parse(String raw) {
-            if (raw == null) return DISABLED;
-            try {
-                return RestrictionMode.valueOf(raw.trim().toUpperCase());
-            } catch (IllegalArgumentException e) {
-                return DISABLED;
-            }
-        }
+        ALLOWLIST, BLOCKLIST, DISABLED
     }
 }

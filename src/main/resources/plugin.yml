@@ -1,6 +1,6 @@
 name: GeoRestrict
 main: zip.linuxaddict.georestrict.bukkit.GeoRestrictBukkitPlugin
-version: 2.1.0
+version: 2.0.0
 api-version: '1.16'
 folia-supported: true
 
@@ -18,5 +18,5 @@ permissions:
     description: Full access to GeoRestrict commands
     default: op
   georestrict.bypass:
-    description: Skip geographic checks (enforced at the backend post-login)
+    description: Skip geographic checks on Bukkit-compatible backend servers
     default: false

@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bstats.bukkit.Metrics;
@@ -31,8 +32,13 @@ import zip.linuxaddict.georestrict.scheduler.FoliaTaskScheduler;
 import zip.linuxaddict.georestrict.scheduler.TaskScheduler;
 
 import java.io.File;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
+    private static final long PENDING_CHECK_TTL_MS = 300_000L;
+
     private GeoRestrictService service;
     private GeoConfig config;
     private GeoCache cache;
@@ -40,6 +46,7 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
     private UpdateChecker updateChecker;
     private CommandHandler command;
     private Logger log;
+    private final Map<UUID, PendingCheck> pendingChecks = new ConcurrentHashMap<>();
 
     @Override
     public void onEnable() {
@@ -60,12 +67,14 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
 
         new Metrics(this, PluginInfo.BSTATS_BUKKIT);
 
-        command = new CommandHandler(service, cache, configFile, this::applyConfig, () -> {});
+        command = new CommandHandler(service, cache, configFile, this::applyConfig);
         registerCommand();
         startConfigWatcher(configFile);
         startUpdateChecker();
         startCacheMaintenance();
         log.info("GeoRestrict enabled.");
+        log.info(PluginInfo.COMMUNITY_MESSAGE);
+        log.info(PluginInfo.FEEDBACK_MESSAGE);
     }
 
     private void applyConfig(GeoConfig fresh, Runnable done) {
@@ -123,7 +132,7 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
 
     private void startUpdateChecker() {
         if (!config.updateCheck) return;
-        updateChecker = new UpdateChecker(PluginInfo.VERSION, PluginInfo.MODRINTH_PROJECT, log);
+        updateChecker = new UpdateChecker(PluginInfo.VERSION, PluginInfo.MODRINTH_PROJECT);
         scheduler.runTimerAsync(this, () ->
             updateChecker.checkForUpdate().thenAccept(latest -> {
                 if (latest != null) log.info("Update available: {}", latest);
@@ -136,6 +145,7 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        pendingChecks.clear();
         if (scheduler != null) scheduler.cancelAll(this);
         if (service != null) service.shutdown();
         if (cache != null) cache.save();
@@ -146,22 +156,33 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
     public void onAsyncLogin(AsyncPlayerPreLoginEvent event) {
         String ip = event.getAddress().getHostAddress();
         String name = event.getName();
+        UUID uuid = event.getUniqueId();
+        prunePendingChecks();
         try {
-            // Pre-login permission lookups are unreliable across server
-            // implementations, so OP is the only universally safe bypass here.
-            // Permission-based bypass is enforced in PlayerJoinEvent below.
-            boolean bypass = getServer().getOfflinePlayer(event.getUniqueId()).isOp();
-            GeoRestrictService.CheckResult result = service.checkIp(ip, name, bypass).join();
+            GeoRestrictService.CheckResult result = service.checkIp(ip, name, false).join();
             if (!result.allowed) {
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER,
-                    result.reason == null ? "Connection rejected." : result.reason);
+                pendingChecks.put(uuid, new PendingCheck(result, System.currentTimeMillis()));
+            } else {
+                pendingChecks.remove(uuid);
             }
         } catch (Exception e) {
             log.error("Lookup failed during login for {}", name, e);
             if (config.blockOnLookupFailure) {
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, config.kickMessageLookupFailure);
+                GeoRestrictService.CheckResult result = new GeoRestrictService.CheckResult(
+                    false, config.kickMessageLookupFailure, null);
+                pendingChecks.put(uuid, new PendingCheck(result, System.currentTimeMillis()));
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerLogin(PlayerLoginEvent event) {
+        PendingCheck pending = pendingChecks.remove(event.getPlayer().getUniqueId());
+        if (pending == null || event.getResult() != PlayerLoginEvent.Result.ALLOWED) return;
+        if (event.getPlayer().isOp() || event.getPlayer().hasPermission("georestrict.bypass")) return;
+
+        String reason = pending.result.reason == null ? "Connection rejected." : pending.result.reason;
+        event.disallow(PlayerLoginEvent.Result.KICK_OTHER, reason);
     }
 
     @EventHandler
@@ -179,6 +200,23 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
             return new FoliaTaskScheduler();
         } catch (ClassNotFoundException e) {
             return new BukkitTaskScheduler();
+        } catch (NoClassDefFoundError e) {
+            return new BukkitTaskScheduler();
+        }
+    }
+
+    private void prunePendingChecks() {
+        long cutoff = System.currentTimeMillis() - PENDING_CHECK_TTL_MS;
+        pendingChecks.entrySet().removeIf(entry -> entry.getValue().createdAt < cutoff);
+    }
+
+    private static final class PendingCheck {
+        private final GeoRestrictService.CheckResult result;
+        private final long createdAt;
+
+        private PendingCheck(GeoRestrictService.CheckResult result, long createdAt) {
+            this.result = result;
+            this.createdAt = createdAt;
         }
     }
 }

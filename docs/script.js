@@ -10,12 +10,44 @@
 
 
 document.addEventListener('DOMContentLoaded', () => {
+  initIcons();
+  initBrand();
   initSidebar();
   initActiveNav();
   initScrollAnimations();
   initCopyButtons();
   initFaqAccordion();
 });
+
+/* ---------- Code-drawn interface icons ---------- */
+function initIcons() {
+  const svgNamespace = 'http://www.w3.org/2000/svg';
+  const iconNamePattern = /^[a-z-]+$/;
+
+  document.querySelectorAll('[data-icon]').forEach(host => {
+    const iconName = host.dataset.icon || '';
+    if (!iconNamePattern.test(iconName)) return;
+
+    const svg = document.createElementNS(svgNamespace, 'svg');
+    const use = document.createElementNS(svgNamespace, 'use');
+    svg.classList.add('ui-icon');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('focusable', 'false');
+    svg.setAttribute('aria-hidden', 'true');
+    use.setAttribute('href', `assets/ui-icons.svg#icon-${iconName}`);
+    svg.appendChild(use);
+    host.replaceChildren(svg);
+  });
+}
+
+/* ---------- Shared Brand ---------- */
+function initBrand() {
+  document.querySelectorAll('.sidebar-logo').forEach(brand => {
+    if (brand.querySelector('img')) return;
+    brand.innerHTML = '<img src="assets/georestrict-icon.png?rev=20260714e" alt=""><b>GeoRestrict</b><span>Field guide</span>';
+  });
+  document.querySelector('.sidebar')?.setAttribute('aria-label', 'Documentation');
+}
 
 /* ---------- Sidebar Toggle (Mobile) ---------- */
 function initSidebar() {
@@ -25,11 +57,24 @@ function initSidebar() {
 
   if (!hamburger || !sidebar) return;
 
+  hamburger.setAttribute('type', 'button');
+  hamburger.setAttribute('aria-controls', sidebar.id || 'sidebar');
+  hamburger.setAttribute('aria-expanded', 'false');
+  hamburger.setAttribute('aria-label', 'Open documentation menu');
+  overlay?.setAttribute('aria-hidden', 'true');
+
+  function setSidebar(open) {
+    hamburger.classList.toggle('active', open);
+    sidebar.classList.toggle('open', open);
+    overlay?.classList.toggle('active', open);
+    hamburger.setAttribute('aria-expanded', String(open));
+    hamburger.setAttribute('aria-label', open ? 'Close documentation menu' : 'Open documentation menu');
+    overlay?.setAttribute('aria-hidden', String(!open));
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
   function toggleSidebar() {
-    hamburger.classList.toggle('active');
-    sidebar.classList.toggle('open');
-    if (overlay) overlay.classList.toggle('active');
-    document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+    setSidebar(!sidebar.classList.contains('open'));
   }
 
   hamburger.addEventListener('click', toggleSidebar);
@@ -42,6 +87,17 @@ function initSidebar() {
         toggleSidebar();
       }
     });
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && sidebar.classList.contains('open')) {
+      setSidebar(false);
+      hamburger.focus();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 980 && sidebar.classList.contains('open')) setSidebar(false);
   });
 }
 
@@ -62,6 +118,11 @@ function initActiveNav() {
 function initScrollAnimations() {
   const elements = document.querySelectorAll('.fade-in');
   if (!elements.length) return;
+
+  if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    elements.forEach(element => element.classList.add('visible'));
+    return;
+  }
 
   const observer = new IntersectionObserver(
     (entries) => {
@@ -124,18 +185,51 @@ function initCopyButtons() {
 
 /* ---------- FAQ Accordion ---------- */
 function initFaqAccordion() {
-  document.querySelectorAll('.faq-question').forEach(question => {
-    question.addEventListener('click', () => {
+  document.querySelectorAll('.faq-question').forEach((question, index) => {
+    const answer = question.parentElement.querySelector('.faq-answer');
+    const answerId = answer?.id || `faq-answer-${index + 1}`;
+    if (answer) {
+      answer.id = answerId;
+      answer.hidden = true;
+      answer.setAttribute('aria-hidden', 'true');
+    }
+    question.setAttribute('role', 'button');
+    question.setAttribute('tabindex', '0');
+    question.setAttribute('aria-controls', answerId);
+    question.setAttribute('aria-expanded', 'false');
+
+    const toggle = () => {
       const item = question.parentElement;
       const isOpen = item.classList.contains('open');
 
       // Close all others
       document.querySelectorAll('.faq-item.open').forEach(openItem => {
-        if (openItem !== item) openItem.classList.remove('open');
+        if (openItem !== item) {
+          openItem.classList.remove('open');
+          openItem.querySelector('.faq-question')?.setAttribute('aria-expanded', 'false');
+          const openAnswer = openItem.querySelector('.faq-answer');
+          if (openAnswer) {
+            openAnswer.hidden = true;
+            openAnswer.setAttribute('aria-hidden', 'true');
+          }
+        }
       });
 
       // Toggle current
       item.classList.toggle('open', !isOpen);
+      question.setAttribute('aria-expanded', String(!isOpen));
+      if (answer) {
+        answer.hidden = isOpen;
+        answer.setAttribute('aria-hidden', String(isOpen));
+      }
+    };
+
+    question.addEventListener('click', toggle);
+    question.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        toggle();
+      }
     });
   });
 }

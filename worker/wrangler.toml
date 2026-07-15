@@ -1,21 +1,41 @@
-name = "georestrict-gateway"
+name = "geoprotect"
 main = "src/index.js"
 compatibility_date = "2024-03-01"
 
 [vars]
-PROVIDER_ORDER = "ip-api,ipinfo"
-IP_API_ENDPOINTS = "http://ip-api.com/json/"
-IPINFO_ENDPOINTS = "https://ipinfo.io/{ip}"
+PROVIDER_ORDER = "ipinfo,ip-api"
+IP_API_ENDPOINTS = "https://pro.ip-api.com/json/"
+IPINFO_ENDPOINTS = "https://api.ipinfo.io/lite/{ip}"
 REQUEST_TIMEOUT_MS = "3000"
 CACHE_TTL_SECONDS = "86400"
+MEMORY_CACHE_MAX_ENTRIES = "5000"
 ALLOWED_ORIGINS = "*"
+GATEWAY_VERSION = "2.0.0"
+
+# Local-MMDB fallback server. The Worker uses this only after every external
+# provider fails. The server should resolve the IP from local Country/ASN MMDB
+# files, so this last path does not depend on another geolocation API.
+# The VPS_ secret prefix is retained for backward compatibility.
+#   VPS_GATEWAY_URL = "https://geo-fallback.example.com"
+#   VPS_GATEWAY_TIMEOUT_MS = "2500"
+# Configure the URL and matching token as secrets, not plaintext variables:
+#   wrangler secret put VPS_GATEWAY_URL
+#   wrangler secret put VPS_GATEWAY_TOKEN
+
+# The Cache API is the primary 24-hour Worker cache. A small per-isolate memory
+# cache is used as a best-effort fallback when the Cache API is unavailable.
+# KV is deliberately disabled by default. To opt into cross-PoP KV caching,
+# create a namespace and bind it as GEO_CACHE:
+# [[kv_namespaces]]
+# binding = "GEO_CACHE"
+# id = "replace-with-your-kv-namespace-id"
 
 # Configure secrets with wrangler, not in this file:
 #   wrangler secret put GATEWAY_TOKENS
-#   wrangler secret put IPINFO_TOKENS
-#   wrangler secret put IP_API_KEYS
+#   wrangler secret put PROVIDER_TOKENS
+#   wrangler secret put PROVIDER_KEYS
 #
 # For multiple accounts, store comma-separated, newline-separated, or JSON arrays:
 #   ["token-one","token-two"]
-# Numbered secrets are also supported: IPINFO_TOKEN_1, IPINFO_TOKEN_2,
-# IP_API_KEY_1, IP_API_KEY_2, GATEWAY_TOKEN_1, GATEWAY_TOKEN_2.
+# Numbered secrets are also supported: PROVIDER_TOKEN_1, PROVIDER_TOKEN_2,
+# PROVIDER_KEY_1, PROVIDER_KEY_2, GATEWAY_TOKEN_1, GATEWAY_TOKEN_2.

@@ -1,0 +1,12 @@
+[Unit]
+Description=Monthly GeoRestrict local geolocation database update
+
+[Timer]
+OnBootSec=5min
+OnCalendar=*-*-03 04:20:00
+Persistent=true
+RandomizedDelaySec=30min
+Unit=georestrict-db-update.service
+
+[Install]
+WantedBy=timers.target

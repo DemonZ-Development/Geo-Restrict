@@ -1,0 +1,93 @@
+<!--
+  ~ GeoRestrict - High-performance geographic access control.
+  ~ Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+  ~ Licensed under GPL-3.0.
+  -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - GeoRestrict</title>
+    <meta name="description" content="What GeoRestrict processes, where player IP addresses go, how long cache entries remain, and the choices available to server operators.">
+    <meta name="theme-color" content="#17324d">
+    <link rel="icon" type="image/png" href="assets/georestrict-icon.png?rev=20260714e">
+    <link rel="stylesheet" href="styles.css?rev=20260714h">
+</head>
+<body>
+    <button class="hamburger" aria-label="Toggle sidebar"><span></span><span></span><span></span></button>
+    <div class="sidebar-overlay"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header"><div class="sidebar-logo">GeoRestrict<span>Documentation</span></div></div>
+        <div class="sidebar-nav">
+            <a href="index.html"><span class="nav-icon" data-icon="home" aria-hidden="true"></span> Home</a>
+            <a href="installation.html"><span class="nav-icon" data-icon="package" aria-hidden="true"></span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon" data-icon="sliders" aria-hidden="true"></span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon" data-icon="terminal" aria-hidden="true"></span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon" data-icon="route" aria-hidden="true"></span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon" data-icon="chat" aria-hidden="true"></span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon" data-icon="wrench" aria-hidden="true"></span> Troubleshooting</a>
+            <a href="privacy.html" class="active"><span class="nav-icon" data-icon="shield" aria-hidden="true"></span> Privacy</a>
+            <a href="terms.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Terms</a>
+        </div>
+        <div class="sidebar-footer">Questions are welcome in our <a href="https://discord.com/invite/GYsTt96ypf" target="_blank" rel="noopener">Discord community</a>.</div>
+    </nav>
+
+    <main class="main-content">
+        <div class="content-inner">
+            <div class="page-header">
+                <h1><span class="header-icon" data-icon="shield" aria-hidden="true"></span> Privacy policy</h1>
+                <p>A plain account of what GeoRestrict needs, what it stores, and what remains under the server owner's control.</p>
+            </div>
+
+            <p class="fade-in"><strong>Effective 15 July 2026. Applies to GeoRestrict v2.0.0 and the public services maintained for it.</strong></p>
+
+            <div class="alert alert-info fade-in">
+                <strong>The short version:</strong> GeoRestrict needs a connection IP to determine a country and network. It checks the plugin's local cache first. A miss is sent to the configured Worker and may be handled by the services listed below. Demonz Development does not operate a player dashboard or build player profiles from these lookups.
+            </div>
+
+            <h2 class="fade-in">Who controls the data?</h2>
+            <p class="fade-in">The Minecraft server owner chooses whether to install GeoRestrict, which rules to enforce, how long the plugin cache lasts, and whether Discord notifications are enabled. That operator is responsible for telling their community how connection data is used and for following the privacy rules that apply to their server. Demonz Development maintains the open-source plugin, the public Worker, the documentation site, and the protected fallback server.</p>
+
+            <h2 class="fade-in">Data the plugin processes</h2>
+            <div class="table-wrapper fade-in">
+                <table>
+                    <thead><tr><th>Data</th><th>Why it is used</th><th>Where it may go</th></tr></thead>
+                    <tbody>
+                        <tr><td>Connection IP address</td><td>Country, ASN and VPN/proxy checks</td><td>Local plugin cache; configured Worker; a configured provider on a Worker-cache miss; protected fallback server after provider failure</td></tr>
+                        <tr><td>Country, ASN, AS/ISP name and network flags</td><td>Apply the operator's rules</td><td>Local plugin cache and Worker caches</td></tr>
+                        <tr><td>Player name and decision details</td><td>Optional operator notifications</td><td>Only the operator's Discord webhook when that feature is enabled</td></tr>
+                        <tr><td>Aggregate plugin metrics</td><td>Understand platform/version usage</td><td>bStats, when metrics are enabled by the platform configuration</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 class="fade-in">Lookup path and retention</h2>
+            <ul class="fade-in">
+                <li><strong>Plugin cache:</strong> <code>plugins/GeoRestrict/geo_cache.json</code> stores successful lookup results. The default lifetime is 30 days and the operator can set it from 1 to 365 days. The cache has a configurable size cap.</li>
+                <li><strong>Worker cache:</strong> successful public Worker responses are cached for up to 24 hours.</li>
+                <li><strong>Providers:</strong> a cache miss is sent to providers in the configured order. The live Worker uses IPinfo Lite first. Each provider processes requests under its own privacy terms.</li>
+                <li><strong>Fallback server:</strong> after the external providers fail, the Worker may send the IP to a protected server that reads DB-IP Lite Country and ASN files locally. The application does not write player IPs to its logs or call another lookup API for that request.</li>
+                <li><strong>Infrastructure logs:</strong> Cloudflare, the web host, network proxies, and hosting providers may create ordinary access, abuse-prevention, or security logs under their own policies even when the GeoRestrict application does not create a player log.</li>
+            </ul>
+
+            <h2 class="fade-in">Discord, metrics and update checks</h2>
+            <p class="fade-in">Discord notifications are optional. When enabled, the operator chooses the fields sent to their webhook. The default fields include player name, decision, masked IP, country, ASN, ISP and reason; <code>discord.maskIp</code> is on by default. Turning masking off sends the full address to Discord.</p>
+            <p class="fade-in">GeoRestrict uses ordinary aggregate bStats metrics with separate platform IDs. The plugin does not send player names or player IP addresses to bStats. Its update checker asks Modrinth for the latest project version and does not add player information to that request.</p>
+
+            <h2 class="fade-in">Removing data and changing the setup</h2>
+            <p class="fade-in">An operator can clear local lookup data with <code>/georestrict purgecache</code>, disable Discord delivery by removing the webhook, or uninstall the plugin and delete <code>plugins/GeoRestrict/</code>. Worker cache entries expire automatically. A player who has a privacy question should contact the owner of the Minecraft server they joined, because that operator controls the plugin configuration and local cache.</p>
+
+            <h2 class="fade-in">Children and sensitive communities</h2>
+            <p class="fade-in">Minecraft communities can include younger players. GeoRestrict is an administration tool, not a service intended to collect profiles from children. Server owners should use only the data they need, keep IP masking enabled, avoid unnecessary allowed-player notifications, and provide any notices or consent required in their region.</p>
+
+            <h2 class="fade-in">Sources, changes and contact</h2>
+            <p class="fade-in">Primary country and ASN data is supplied by <a href="https://ipinfo.io/lite" target="_blank" rel="noopener">IPinfo Lite</a>. Fallback Country and ASN data comes from <a href="https://db-ip.com/db/lite.php" target="_blank" rel="noopener">DB-IP Lite</a> under CC BY 4.0. Material policy changes will be recorded in the <a href="changelog.html">changelog</a> and dated on this page.</p>
+            <p class="fade-in">For a privacy question, bug report, or concern, open a <a href="https://github.com/DemonZ-Development/Geo-Restrict/issues" target="_blank" rel="noopener">GitHub issue</a> without including a player IP, or join the <a href="https://discord.com/invite/GYsTt96ypf" target="_blank" rel="noopener">Demonz Development Discord</a>. We want to hear when the plugin is unclear or gets something wrong.</p>
+        </div>
+    </main>
+    <script src="script.js?rev=20260714h"></script>
+</body>
+</html>

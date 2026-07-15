@@ -14,9 +14,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FAQ - GeoRestrict</title>
     <meta name="description" content="Common questions about GeoRestrict: cache, privacy, behavior when things break.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <meta name="theme-color" content="#17324d">
+    <link rel="icon" type="image/png" href="assets/georestrict-icon.png?rev=20260714e">
+    <link rel="stylesheet" href="styles.css?rev=20260714h">
 </head>
 <body>
 
@@ -30,14 +30,16 @@
             <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
         </div>
         <div class="sidebar-nav">
-            <a href="index.html"><span class="nav-icon">🏠</span> Home</a>
-            <a href="installation.html"><span class="nav-icon">📦</span> Installation</a>
-            <a href="configuration.html"><span class="nav-icon">⚙️</span> Configuration</a>
-            <a href="commands.html"><span class="nav-icon">💻</span> Commands</a>
-            <a href="how-it-works.html"><span class="nav-icon">🔧</span> How It Works</a>
-            <a href="faq.html" class="active"><span class="nav-icon">❓</span> FAQ</a>
-            <a href="changelog.html"><span class="nav-icon">📋</span> Changelog</a>
-            <a href="troubleshooting.html"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+            <a href="index.html"><span class="nav-icon" data-icon="home" aria-hidden="true"></span> Home</a>
+            <a href="installation.html"><span class="nav-icon" data-icon="package" aria-hidden="true"></span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon" data-icon="sliders" aria-hidden="true"></span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon" data-icon="terminal" aria-hidden="true"></span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon" data-icon="route" aria-hidden="true"></span> How It Works</a>
+            <a href="faq.html" class="active"><span class="nav-icon" data-icon="chat" aria-hidden="true"></span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon" data-icon="wrench" aria-hidden="true"></span> Troubleshooting</a>
+            <a href="privacy.html"><span class="nav-icon" data-icon="shield" aria-hidden="true"></span> Privacy</a>
+            <a href="terms.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Terms</a>
         </div>
         <div class="sidebar-footer">
             <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
@@ -48,42 +50,41 @@
         <div class="content-inner">
 
             <div class="page-header">
-                <h1><span class="header-icon">❓</span> FAQ</h1>
+                <h1><span class="header-icon" data-icon="chat" aria-hidden="true"></span> FAQ</h1>
                 <p>Things people actually ask in support.</p>
             </div>
 
             <div class="faq-item fade-in">
                 <div class="faq-question">What if the Worker is down?</div>
                 <div class="faq-answer">
-                    <p>Three things happen, in order:</p>
+                    <p>Three things matter:</p>
                     <ol>
                         <li>The plugin sees the HTTP error or timeout (your <code>connectionTimeoutMs</code> default is 3s).</li>
-                        <li>If <code>directFallbackEnabled: true</code>, the plugin retries the lookup directly against <code>ip-api.com</code>. This sends the IP without a token, which is a privacy consideration. Default is <code>false</code>.</li>
-                        <li>If that also fails (or is disabled), the plugin runs the lookup-failure policy. With <code>blockOnLookupFailure: true</code> (the default in 2.1.0+) the player is blocked with <code>kickMessageLookupFailure</code>. Flip it to <code>false</code> if you want fail-open.</li>
+                        <li>The plugin does not contact a geolocation provider directly. The configured Worker owns the lookup routes.</li>
+                        <li>If the Worker request still fails, the plugin runs the lookup failure policy. With <code>blockOnLookupFailure: true</code> (the default) the player is blocked with <code>kickMessageLookupFailure</code>. Set it to <code>false</code> if you want the join allowed during an outage.</li>
                     </ol>
-                    <p>Cached entries continue to work through the whole thing — the cache is on your disk and doesn't care whether the Worker exists.</p>
+                    <p>Fresh cached entries continue to work during the outage because the cache is local to the server.</p>
                 </div>
             </div>
 
             <div class="faq-item fade-in">
                 <div class="faq-question">Where does the player data go?</div>
                 <div class="faq-answer">
-                    <p>The player's IP is sent to the Worker on every cache miss. That's unavoidable — geolocation requires the IP. The Worker then sends it to whichever provider answered first. We don't run a central log of who looked up what.</p>
-                    <p>If you don't want to share the public Worker with everyone else, deploy your own (it's <code>worker/src/index.js</code>, ~400 lines, free tier is plenty) and set <code>gatewayToken</code> in your config to match a token in the Worker's <code>GATEWAY_TOKENS</code> secret. Requests without a matching token get HTTP 401.</p>
+                    <p>The player's IP is sent to the configured Worker only when the plugin's local entry is missing or stale. It may then be processed by the services listed in the <a href="privacy.html">Privacy Policy</a>. GeoRestrict does not operate a central player dashboard or player analytics service.</p>
                 </div>
             </div>
 
             <div class="faq-item fade-in">
                 <div class="faq-question">Can I block a specific ISP without blocking the country?</div>
                 <div class="faq-answer">
-                    <p>Yes. Set <code>asnMode: BLOCKLIST</code> and add the ASNs to <code>asns</code>. To find the ASN for a specific ISP, look up an IP from that ISP on a site like bgp.he.net or ipinfo.io — the AS number is right there in the result. Put it in as <code>AS12345</code> (prefix optional).</p>
+                    <p>Yes. Set <code>asnMode: BLOCKLIST</code> and add the ASNs to <code>asns</code>. To find the ASN for a specific ISP, look up an IP from that ISP on a site like bgp.he.net — the AS number is right there in the result. Put it in as <code>AS12345</code> (prefix optional).</p>
                 </div>
             </div>
 
             <div class="faq-item fade-in">
                 <div class="faq-question">My VPN detection keeps catching legit players. What do I do?</div>
                 <div class="faq-answer">
-                    <p>Look at the actual ISP names that are getting flagged. If you see something like "Hetzner Online GmbH" being blocked because a player happens to be on a Hetzner VPS at home (rare, but it happens), trim <code>vpnKeywords</code>. The default list is conservative — it only flags well-known VPN/hosting providers — but the threshold depends on your player base.</p>
+                    <p>Look at the actual ISP names that are getting flagged. If you see something like "Hetzner Online GmbH" being blocked because a player happens to be on a hosted Hetzner server at home (rare, but it happens), trim <code>vpnKeywords</code>. The default list is conservative — it only flags well-known VPN/hosting providers — but the threshold depends on your player base.</p>
                     <p>You can also disable VPN detection entirely with <code>vpnCheckEnabled: false</code>.</p>
                 </div>
             </div>
@@ -106,20 +107,20 @@
                 <div class="faq-question">Why does the cache file get rewritten so much?</div>
                 <div class="faq-answer">
                     <p>It doesn't, usually. Writes are debounced to one every 5 seconds. A burst of cache writes coalesces into a single disk write. On shutdown, one final synchronous save happens.</p>
-                    <p>If you see constant rewrites, you have a loop somewhere — probably a config file that changes every read (bad permissions, weird editor behavior) and triggers the config watcher.</p>
+                    <p>If the file is changing more often than every five seconds during steady traffic, check whether another tool is touching <code>config.yml</code> and repeatedly triggering reloads, then compare the timestamps with the plugin log.</p>
                 </div>
             </div>
 
             <div class="faq-item fade-in">
                 <div class="faq-question">Can I use my own lookup provider?</div>
                 <div class="faq-answer">
-                    <p>Yes, on the Worker side. <code>IP_API_ENDPOINTS</code> and <code>IPINFO_ENDPOINTS</code> accept arbitrary URLs with a <code>{ip}</code> placeholder. Whatever the endpoint returns is parsed by the same logic that parses <code>ip-api.com</code> and <code>ipinfo.io</code> — if your provider returns a different shape, you'll need to fork the Worker.</p>
+                    <p>Yes, but provider changes belong to the Worker, not the plugin config. Read the <a href="https://github.com/DemonZ-Development/Geo-Restrict#advanced-infrastructure-reference" target="_blank" rel="noopener">advanced infrastructure reference</a> before changing that path.</p>
                 </div>
             </div>
 
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <script src="script.js?rev=20260714h"></script>
 </body>
 </html>

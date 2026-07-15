@@ -22,7 +22,6 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bstats.velocity.Metrics;
 import org.slf4j.Logger;
@@ -78,13 +77,15 @@ public class GeoRestrictVelocityPlugin {
         cache.load();
 
         service = new GeoRestrictService(config, logger, cache);
-        command = new CommandHandler(service, cache, configFile, this::applyConfig, () -> {});
+        command = new CommandHandler(service, cache, configFile, this::applyConfig);
 
         registerCommand();
         startConfigWatcher(configFile);
         startUpdateChecker();
         startCacheMaintenance();
         logger.info("GeoRestrict enabled.");
+        logger.info(PluginInfo.COMMUNITY_MESSAGE);
+        logger.info(PluginInfo.FEEDBACK_MESSAGE);
     }
 
     private void applyConfig(GeoConfig fresh, Runnable done) {
@@ -141,7 +142,7 @@ public class GeoRestrictVelocityPlugin {
 
     private void startUpdateChecker() {
         if (!config.updateCheck) return;
-        updateChecker = new UpdateChecker(PluginInfo.VERSION, PluginInfo.MODRINTH_PROJECT, logger);
+        updateChecker = new UpdateChecker(PluginInfo.VERSION, PluginInfo.MODRINTH_PROJECT);
         server.getScheduler().buildTask(this, () ->
             updateChecker.checkForUpdate().thenAccept(latest -> {
                 if (latest != null) logger.info("Update available: {}", latest);
@@ -161,8 +162,6 @@ public class GeoRestrictVelocityPlugin {
         return EventTask.withContinuation(continuation -> {
             String ip = event.getPlayer().getRemoteAddress().getAddress().getHostAddress();
             String name = event.getPlayer().getUsername();
-            // Velocity has no permission API at the LoginEvent stage; bypass
-            // for trusted users is enforced at the backend Bukkit server.
             service.checkIp(ip, name, false).whenComplete((result, error) -> {
                 try {
                     if (error != null) {

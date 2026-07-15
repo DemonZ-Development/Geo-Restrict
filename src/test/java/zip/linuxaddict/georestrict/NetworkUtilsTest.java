@@ -33,6 +33,7 @@ class NetworkUtilsTest {
     void detectsCgnat() {
         assertTrue(NetworkUtils.isPrivateIp("100.64.0.1"));
         assertTrue(NetworkUtils.isPrivateIp("100.127.255.254"));
+        assertTrue(NetworkUtils.isPrivateIp("2001:db8::1"));
     }
 
     @Test
@@ -54,6 +55,14 @@ class NetworkUtilsTest {
     void isValidPublicIpRejectsPrivate() {
         assertFalse(NetworkUtils.isValidPublicIp("192.168.0.1"));
         assertFalse(NetworkUtils.isValidPublicIp("10.0.0.1"));
+        assertFalse(NetworkUtils.isValidPublicIp("100.64.0.1"));
+        assertFalse(NetworkUtils.isValidPublicIp("192.0.2.1"));
+        assertFalse(NetworkUtils.isValidPublicIp("198.19.255.255"));
+        assertFalse(NetworkUtils.isValidPublicIp("198.51.100.1"));
+        assertFalse(NetworkUtils.isValidPublicIp("203.0.113.1"));
+        assertFalse(NetworkUtils.isValidPublicIp("2001:db8::1"));
+        assertFalse(NetworkUtils.isValidPublicIp("example.com"));
         assertTrue(NetworkUtils.isValidPublicIp("8.8.8.8"));
+        assertTrue(NetworkUtils.isValidPublicIp("2606:4700:4700::1111"));
     }
 }

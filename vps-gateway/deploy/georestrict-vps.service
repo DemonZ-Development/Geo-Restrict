@@ -1,0 +1,30 @@
+[Unit]
+Description=GeoRestrict fallback server
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=georestrict
+Group=georestrict
+WorkingDirectory=/opt/georestrict-vps/current
+EnvironmentFile=/opt/georestrict-vps/.env
+ExecStartPre=/usr/bin/test -f /opt/georestrict-vps/current/src/server.js
+ExecStart=/usr/bin/node src/server.js
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateDevices=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+AmbientCapabilities=
+LockPersonality=true
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

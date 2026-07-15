@@ -14,9 +14,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>How it works - GeoRestrict</title>
     <meta name="description" content="Data flow, cache lifecycle, and what the Cloudflare Worker actually does.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <meta name="theme-color" content="#17324d">
+    <link rel="icon" type="image/png" href="assets/georestrict-icon.png?rev=20260714e">
+    <link rel="stylesheet" href="styles.css?rev=20260714h">
 </head>
 <body>
 
@@ -30,14 +30,16 @@
             <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
         </div>
         <div class="sidebar-nav">
-            <a href="index.html"><span class="nav-icon">🏠</span> Home</a>
-            <a href="installation.html"><span class="nav-icon">📦</span> Installation</a>
-            <a href="configuration.html"><span class="nav-icon">⚙️</span> Configuration</a>
-            <a href="commands.html"><span class="nav-icon">💻</span> Commands</a>
-            <a href="how-it-works.html" class="active"><span class="nav-icon">🔧</span> How It Works</a>
-            <a href="faq.html"><span class="nav-icon">❓</span> FAQ</a>
-            <a href="changelog.html"><span class="nav-icon">📋</span> Changelog</a>
-            <a href="troubleshooting.html"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+            <a href="index.html"><span class="nav-icon" data-icon="home" aria-hidden="true"></span> Home</a>
+            <a href="installation.html"><span class="nav-icon" data-icon="package" aria-hidden="true"></span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon" data-icon="sliders" aria-hidden="true"></span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon" data-icon="terminal" aria-hidden="true"></span> Commands</a>
+            <a href="how-it-works.html" class="active"><span class="nav-icon" data-icon="route" aria-hidden="true"></span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon" data-icon="chat" aria-hidden="true"></span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon" data-icon="wrench" aria-hidden="true"></span> Troubleshooting</a>
+            <a href="privacy.html"><span class="nav-icon" data-icon="shield" aria-hidden="true"></span> Privacy</a>
+            <a href="terms.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Terms</a>
         </div>
         <div class="sidebar-footer">
             <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
@@ -48,12 +50,12 @@
         <div class="content-inner">
 
             <div class="page-header">
-                <h1><span class="header-icon">🔧</span> How it works</h1>
-                <p>Three moving parts: your server, the Worker, and the upstream provider. The data path is short.</p>
+                <h1><span class="header-icon" data-icon="route" aria-hidden="true"></span> How it works</h1>
+                <p>A clear path from connection to decision, without hiding where an address goes.</p>
             </div>
 
             <h2 class="fade-in">The short version</h2>
-            <p class="fade-in">Player connects. Plugin checks <code>geo_cache.json</code> on disk. If there's a fresh entry, the rules run locally — no network. If there isn't, the plugin sends one HTTPS request to the Worker. The Worker queries the geolocation provider, returns the result, the plugin caches it, and evaluates.</p>
+            <p class="fade-in">A player connects and the plugin checks its local cache. A fresh result means no network request. On a miss, the configured lookup service finds the country and network, returns a normalized answer, and the plugin applies your country, ASN and VPN rules.</p>
 
             <h2 class="fade-in">Detailed flow</h2>
 
@@ -64,21 +66,11 @@
             <p class="fade-in">The cache is a <code>ConcurrentHashMap</code> in memory, mirrored to <code>geo_cache.json</code> on disk via a debounced async save (5s window). Saves are atomic: write to <code>.tmp</code>, then <code>Files.move(... ATOMIC_MOVE)</code>, with a non-atomic fallback for filesystems that don't support it.</p>
             <p class="fade-in">A cache hit short-circuits the entire network path. The cached <code>GeoResponse</code> is fed straight into the rule evaluator. A cache miss goes to step 3.</p>
 
-            <h3 class="fade-in">3. Worker query</h3>
-            <p class="fade-in">Single HTTPS request:</p>
-            <div class="code-block-wrapper fade-in">
-                <span class="code-label">HTTP</span>
-<pre><code>GET /?ip=1.2.3.4 HTTP/1.1
-Host: geoprotect.demonzdev.workers.dev
-User-Agent: GeoRestrict/2.1.0
-Authorization: Bearer &lt;token&gt;        <span class="syn-cmt"># only if gatewayToken is set</span>
-</code></pre>
-            </div>
-            <p class="fade-in">The plugin hands the IP, the timeout from <code>connectionTimeoutMs</code>, and the optional bearer token. The Worker is the only thing that knows your provider credentials. The plugin itself never speaks to <code>ip-api.com</code> or <code>ipinfo.io</code> directly — that's the Worker's job.</p>
+            <h3 class="fade-in">3. Lookup request</h3>
+            <p class="fade-in">The plugin sends the IP to the configured Worker over HTTPS. The plugin does not contain a provider URL or provider credential. Those choices remain behind the Worker so one plugin config does not have to know every lookup service.</p>
 
-            <h3 class="fade-in">4. Worker → provider</h3>
-            <p class="fade-in">Inside the Worker, the provider order from <code>PROVIDER_ORDER</code> is walked. For each provider, the Worker picks a random endpoint and (if configured) a random key from the pool. The first non-error response wins. Results are stored in <code>caches.default</code> for <code>CACHE_TTL_SECONDS</code> (default 86400s = 24h).</p>
-            <p class="fade-in">If every provider fails, the Worker returns HTTP 502 with an <code>all_providers_failed</code> body. The plugin treats this as a lookup failure and runs the lookup-failure policy.</p>
+            <h3 class="fade-in">4. Lookup service result</h3>
+            <p class="fade-in">The public Worker keeps successful answers for up to one day. On a full miss it tries its configured data sources and uses an independent fallback server only if they are unavailable. If no route can answer, the plugin follows <code>blockOnLookupFailure</code>. Full deployment details belong in the <a href="https://github.com/DemonZ-Development/Geo-Restrict#advanced-infrastructure-reference" target="_blank" rel="noopener">GitHub README</a>.</p>
 
             <h3 class="fade-in">5. Rule evaluation</h3>
             <p class="fade-in">Three rules, in order. First match wins:</p>
@@ -92,7 +84,8 @@ Authorization: Bearer &lt;token&gt;        <span class="syn-cmt"># only if gatew
             <p class="fade-in">If a rule matches, the event is denied with the configured kick message. If nothing matches, the player proceeds normally. In both cases the Discord webhook fires if configured.</p>
 
             <h2 class="fade-in">Privacy boundary</h2>
-            <p class="fade-in">The only thing that leaves your server is the player's IP, and only on a cache miss. The Worker forwards it to a provider, gets a country/ASN back, returns it. The provider keeps its own logs according to their own policy — that's outside our control. The plugin itself writes nothing to disk except the cache, the config, and (if you set one) the Modrinth hit. The Worker can be configured to <em>not</em> cache anything (set <code>CACHE_TTL_SECONDS=0</code>) if you don't want even short-lived retention at the edge.</p>
+            <p class="fade-in">On a local cache miss, the player's IP leaves the Minecraft server for the configured Worker. A further miss can be sent to a geolocation provider or to the protected fallback server. Each external service has its own logging and retention rules. GeoRestrict does not run a player dashboard or analytics profile.</p>
+            <p class="fade-in">Read the <a href="privacy.html">Privacy Policy</a> for the current services, retention periods and optional Discord data before installing the plugin for a public community.</p>
 
             <h2 class="fade-in">Caching details</h2>
             <ul class="fade-in">
@@ -101,14 +94,15 @@ Authorization: Bearer &lt;token&gt;        <span class="syn-cmt"># only if gatew
                 <li>Old entries are purged every 6h via a scheduled task (configurable TTL).</li>
                 <li>Hard cap of <code>maxCacheEntries</code>; oldest entries are evicted in order when exceeded.</li>
                 <li>On load, entries older than 365 days are dropped silently — that's your upper bound for "stale data after a long offline period".</li>
+                <li>The public lookup service keeps successful answers for up to 24 hours.</li>
             </ul>
 
             <h2 class="fade-in">Folia-specific note</h2>
-            <p class="fade-in">The plugin detects Folia at startup (<code>Class.forName("io.papermc.paper.threadedregions.RegionizedServer")</code>) and switches to a Folia scheduler adapter. The adapter uses the global region scheduler for sync tasks and the async scheduler for everything else. The plugin itself doesn't touch world state, so region locality only matters for the configuration-watcher task, which is fine to run on the global region.</p>
+            <p class="fade-in">The plugin detects Folia at startup and switches to its async scheduler for configuration checks, update checks and cache maintenance. GeoRestrict does not touch world state, so none of these tasks needs region ownership.</p>
 
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <script src="script.js?rev=20260714h"></script>
 </body>
 </html>

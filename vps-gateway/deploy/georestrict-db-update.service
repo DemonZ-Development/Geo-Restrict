@@ -1,0 +1,12 @@
+[Unit]
+Description=Update GeoRestrict local DB-IP MMDB files
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/georestrict-vps/current
+EnvironmentFile=-/opt/georestrict-vps/.env
+Environment=DB_DIR=/opt/georestrict-vps/data
+ExecStart=/usr/bin/npm run update-db
+ExecStartPost=/usr/bin/systemctl try-restart georestrict-vps.service

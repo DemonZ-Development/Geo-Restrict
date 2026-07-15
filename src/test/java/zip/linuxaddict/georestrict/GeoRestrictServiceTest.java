@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -44,7 +43,6 @@ class GeoRestrictServiceTest {
         config.asnMode = GeoConfig.RestrictionMode.DISABLED;
         config.vpnCheckEnabled = true;
         config.connectionTimeoutMs = 500;
-        config.directFallbackEnabled = false;
         config.blockOnLookupFailure = true;
         service = new GeoRestrictService(config, log, cache);
     }
@@ -67,6 +65,12 @@ class GeoRestrictServiceTest {
     }
 
     @Test
+    void reservedPublicLookingIpNeverLeavesThePlugin() {
+        GeoRestrictService.CheckResult r = service.checkIp("100.64.0.1", "tester").join();
+        assertTrue(r.allowed);
+    }
+
+    @Test
     void invalidIpAlwaysAllowed() {
         GeoRestrictService.CheckResult r = service.checkIp("not-an-ip", "tester").join();
         assertTrue(r.allowed);
@@ -80,8 +84,6 @@ class GeoRestrictServiceTest {
 
     @Test
     void blockedIpIsDeniedWhenFallbackFails() {
-        // No real network in tests; we expect lookup to fail and (with
-        // blockOnLookupFailure=true) the player to be blocked.
         GeoRestrictService.CheckResult r = service.checkIp("8.8.8.8", "tester", false).join();
         assertFalse(r.allowed);
     }

@@ -24,7 +24,7 @@ class UpdateCheckerTest {
 
     @Test
     void higherMinorIsNewer() {
-        assertTrue(call("2.0.0", "2.1.0"));
+        assertTrue(call("1.9.0", "2.0.0"));
         assertTrue(call("2.0.9", "2.0.10"));
     }
 

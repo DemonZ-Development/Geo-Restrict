@@ -17,42 +17,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
- * Folia scheduler adapter using reflection so the class can be loaded on
- * non-Folia servers without NoClassDefFoundError. All async work is routed
- * through Bukkit.getAsyncScheduler(); sync work that requires a region
- * uses Bukkit.getGlobalRegionScheduler().
+ * Folia scheduler adapter. Loaded via reflection (see GeoRestrictBukkitPlugin#createScheduler)
+ * so this class is never touched on non-Folia servers, avoiding NoClassDefFoundError.
  */
 public class FoliaTaskScheduler implements TaskScheduler {
-
-    @Override
-    public void runAsync(Plugin plugin, Runnable task) {
-        try {
-            Object asyncScheduler = Bukkit.class.getMethod("getAsyncScheduler").invoke(null);
-            Consumer<Object> consumer = scheduled -> task.run();
-            Method runNow = asyncScheduler.getClass().getMethod("runNow", Plugin.class, Consumer.class);
-            runNow.invoke(asyncScheduler, plugin, consumer);
-        } catch (Exception e) {
-            throw new RuntimeException("Folia async scheduling failed", e);
-        }
-    }
-
-    @Override
-    public void runTimer(Plugin plugin, Runnable task, long delayTicks, long periodTicks) {
-        // Folia has no global sync timer; use the global region scheduler,
-        // which always runs on a known region and is safe for sync work.
-        try {
-            Object globalRegionScheduler = Bukkit.class.getMethod("getGlobalRegionScheduler").invoke(null);
-            Method runAtFixedRate = globalRegionScheduler.getClass().getMethod("runAtFixedRate",
-                Plugin.class, Consumer.class, long.class, longTicksAsLong());
-            runAtFixedRate.invoke(globalRegionScheduler, plugin,
-                (Consumer<Object>) scheduled -> task.run(),
-                delayTicks < 1 ? 1 : delayTicks,
-                periodTicks < 1 ? 1 : periodTicks);
-        } catch (Exception e) {
-            // Fall back to async if the region scheduler is unavailable.
-            runTimerAsync(plugin, task, delayTicks, periodTicks);
-        }
-    }
 
     @Override
     public void runTimerAsync(Plugin plugin, Runnable task, long delayTicks, long periodTicks) {
@@ -74,17 +42,8 @@ public class FoliaTaskScheduler implements TaskScheduler {
         try {
             Object asyncScheduler = Bukkit.class.getMethod("getAsyncScheduler").invoke(null);
             asyncScheduler.getClass().getMethod("cancelTasks", Plugin.class).invoke(asyncScheduler, plugin);
-            Object globalRegion = Bukkit.class.getMethod("getGlobalRegionScheduler").invoke(null);
-            try {
-                globalRegion.getClass().getMethod("cancelTasks", Plugin.class).invoke(globalRegion, plugin);
-            } catch (NoSuchMethodException ignored) {}
         } catch (Exception e) {
             throw new RuntimeException("Folia cancelAll failed", e);
         }
-    }
-
-    /** Reflection helper to bridge `long` parameter types across runAtFixedRate overloads. */
-    private static Class<?> longTicksAsLong() {
-        return long.class;
     }
 }

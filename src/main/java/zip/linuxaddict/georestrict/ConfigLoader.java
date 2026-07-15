@@ -15,17 +15,23 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Path;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public final class ConfigLoader {
+
+    private static final Pattern RETIRED_DIRECT_FALLBACK = Pattern.compile(
+        "(?m)^directFallbackEnabled[ \\t]*:[^\\r\\n]*(?:\\r?\\n|$)");
 
     private ConfigLoader() {}
 
@@ -35,15 +41,22 @@ public final class ConfigLoader {
         }
 
         GeoConfig config;
-        try (FileInputStream in = new FileInputStream(file)) {
+        try {
+            String content = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+            String sanitized = RETIRED_DIRECT_FALLBACK.matcher(content).replaceAll("");
+            if (!content.equals(sanitized)) {
+                writeAtomically(file, sanitized);
+                System.out.println("[GeoRestrict] Removed retired directFallbackEnabled setting.");
+            }
             LoaderOptions options = new LoaderOptions();
             options.setCodePointLimit(2_000_000);
             Yaml yaml = new Yaml(new Constructor(GeoConfig.class, options));
             yaml.setBeanAccess(BeanAccess.FIELD);
-            config = yaml.load(in);
+            config = yaml.load(sanitized);
         } catch (Exception e) {
-            System.err.println("[GeoRestrict] Failed to read " + file + ": " + e.getMessage());
-            System.err.println("[GeoRestrict] Falling back to defaults.");
+            System.err.println("[GeoRestrict] Failed to read " + file
+                + " (" + e.getClass().getSimpleName() + "): " + e.getMessage());
+            System.err.println("[GeoRestrict] Falling back to defaults. Check the file for syntax errors.");
             config = new GeoConfig();
         }
         if (config == null) {
@@ -122,7 +135,7 @@ public final class ConfigLoader {
             for (Map.Entry<String, Object> e : yamlMap.entrySet()) {
                 dumpYaml(out, e.getKey(), e.getValue(), 0);
             }
-            Files.writeString(file.toPath(), out.toString(), StandardCharsets.UTF_8);
+            writeAtomically(file, out.toString());
             System.out.println("[GeoRestrict] Migrated config to v" + GeoConfigConstants.CURRENT_VERSION);
         } catch (IOException e) {
             System.err.println("[GeoRestrict] Migration failed: " + e.getMessage());
@@ -181,9 +194,27 @@ public final class ConfigLoader {
         if (file.exists()) return;
         if (file.getParentFile() != null) file.getParentFile().mkdirs();
         try {
-            Files.writeString(file.toPath(), GeoConfigConstants.DEFAULT_CONFIG_YAML, StandardCharsets.UTF_8);
+            writeAtomically(file, GeoConfigConstants.DEFAULT_CONFIG_YAML);
         } catch (IOException e) {
             System.err.println("[GeoRestrict] Failed to write default config: " + e.getMessage());
+        }
+    }
+
+    private static void writeAtomically(File file, String content) throws IOException {
+        Path target = file.toPath().toAbsolutePath();
+        Path parent = target.getParent();
+        if (parent != null) Files.createDirectories(parent);
+        Path temp = Files.createTempFile(parent, target.getFileName().toString(), ".tmp");
+        try {
+            Files.writeString(temp, content, StandardCharsets.UTF_8);
+            try {
+                Files.move(temp, target, StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(temp, target, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            Files.deleteIfExists(temp);
         }
     }
 

@@ -1,5 +1,5 @@
 name: GeoRestrict
 main: zip.linuxaddict.georestrict.bungee.GeoRestrictBungeePlugin
-version: 2.1.0
+version: 2.0.0
 author: Demonz Development
 description: Geographic restriction plugin for Minecraft proxies

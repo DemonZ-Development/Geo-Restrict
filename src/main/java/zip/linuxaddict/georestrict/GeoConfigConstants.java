@@ -15,8 +15,7 @@ import java.util.List;
 public final class GeoConfigConstants {
 
     public static final int CURRENT_VERSION = 4;
-    public static final String DEFAULT_GATEWAY_URL = "https://geoprotect.demonzdev.workers.dev/";
-    public static final String DEFAULT_GATEWAY_TOKEN_ENV = "GEO_TOKEN";
+    public static final String DEFAULT_GATEWAY_URL = "https://geoprotect.demonzdevelopment-e64.workers.dev/";
 
     public static final List<String> DEFAULT_VPN_KEYWORDS = Arrays.asList(
         "vpn", "virtual private network",
@@ -30,7 +29,7 @@ public final class GeoConfigConstants {
         "pia network", "cyberghost", "windscribe", "ipvanish", "vyprvpn",
         "hotspot shield", "tunnelbear", "zenmate", "hide.me", "perfect privacy",
         "airvpn", "ivpn", "trust.zone", "purevpn", "safervpn", "astrill",
-        "goose vpn", "hidemyass", "tunnelbear", "cryptostorm", "vpngate",
+        "goose vpn", "hidemyass", "cryptostorm", "vpngate",
         "amazon aws", "amazon web services", "google cloud", "google cloud platform",
         "microsoft azure", "digitalocean", "linode", "vultr", "hetzner",
         "ovh sas", "scaleway", "contabo", "hostinger", "godaddy", "namecheap",
@@ -42,25 +41,32 @@ public final class GeoConfigConstants {
         "google llc", "amazon.com", "microsoft corp"
     );
 
-    public static final List<String> DEFAULT_COUNTRIES = Arrays.asList("CN", "RU", "KP", "IR");
-
     public static final String DEFAULT_CONFIG_YAML =
         "# ============================================\n" +
         "#        GeoRestrict Configuration\n" +
         "#     (c) Demonz Development 2026\n" +
         "#   https://demonzdevelopment.online/\n" +
         "# ============================================\n" +
+        "# Help and full configuration guide:\n" +
+        "#   " + PluginInfo.DOCS_URL + "configuration\n" +
+        "# Report a problem or share feedback:\n" +
+        "#   " + PluginInfo.SUPPORT_URL + "\n" +
+        "#\n" +
+        "# IMPORTANT: Unless you operate your own lookup infrastructure, do not\n" +
+        "# change gatewayUrl, gatewayToken, or anything\n" +
+        "# related to the Worker. A wrong value can block every uncached join.\n" +
+        "# Read the configuration guide first and ask us if you are unsure.\n" +
+        "#\n" +
         "# Bump configVersion only when this file format changes.\n" +
         "configVersion: " + CURRENT_VERSION + "\n" +
         "\n" +
         "# ----- Lookup gateway -----\n" +
+        "# Most servers should leave this entire section exactly as generated.\n" +
         "# The plugin sends public IPs to this Worker, which queries the\n" +
         "# configured geolocation providers. Set GATEWAY_TOKENS in the\n" +
         "# Worker to require a shared secret; mirror it in gatewayToken.\n" +
         "gatewayUrl: \"" + DEFAULT_GATEWAY_URL + "\"\n" +
         "gatewayToken: \"\"\n" +
-        "# When the Worker is unreachable, fall back to a direct provider.\n" +
-        "directFallbackEnabled: false\n" +
         "# If every lookup fails, block the player. Recommended: true.\n" +
         "blockOnLookupFailure: true\n" +
         "# Background threads for HTTP lookups and webhook delivery.\n" +

@@ -12,8 +12,6 @@ package zip.linuxaddict.georestrict.scheduler;
 import org.bukkit.plugin.Plugin;
 
 public interface TaskScheduler {
-    void runAsync(Plugin plugin, Runnable task);
-    void runTimer(Plugin plugin, Runnable task, long delayTicks, long periodTicks);
     void runTimerAsync(Plugin plugin, Runnable task, long delayTicks, long periodTicks);
     void cancelAll(Plugin plugin);
 }

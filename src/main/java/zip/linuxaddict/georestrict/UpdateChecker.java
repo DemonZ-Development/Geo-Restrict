@@ -12,7 +12,6 @@ package zip.linuxaddict.georestrict;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -28,15 +27,13 @@ public class UpdateChecker {
 
     private final String currentVersion;
     private final String projectSlug;
-    private final Logger logger;
     private final Gson gson = new Gson();
 
     private volatile String latestVersion;
 
-    public UpdateChecker(String currentVersion, String projectSlug, Logger logger) {
+    public UpdateChecker(String currentVersion, String projectSlug) {
         this.currentVersion = currentVersion;
         this.projectSlug = projectSlug;
-        this.logger = logger;
     }
 
     public CompletableFuture<String> checkForUpdate() {
@@ -112,11 +109,7 @@ public class UpdateChecker {
         return 0;
     }
 
-    /**
-     * Parse a version like "v2.3.1-rc.2" into [2, 3, 1, -1] where the
-     * trailing -1 marks "has a pre-release suffix". A release with the
-     * same numeric base is treated as newer than a pre-release.
-     */
+
     private static int[] parseVersion(String version) {
         if (version == null) return null;
         String v = version.trim();

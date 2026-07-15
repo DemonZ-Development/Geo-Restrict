@@ -14,9 +14,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Commands - GeoRestrict</title>
     <meta name="description" content="All /georestrict subcommands: check, purgecache, cachestats, reload.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <meta name="theme-color" content="#17324d">
+    <link rel="icon" type="image/png" href="assets/georestrict-icon.png?rev=20260714e">
+    <link rel="stylesheet" href="styles.css?rev=20260714h">
 </head>
 <body>
 
@@ -30,14 +30,16 @@
             <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
         </div>
         <div class="sidebar-nav">
-            <a href="index.html"><span class="nav-icon">🏠</span> Home</a>
-            <a href="installation.html"><span class="nav-icon">📦</span> Installation</a>
-            <a href="configuration.html"><span class="nav-icon">⚙️</span> Configuration</a>
-            <a href="commands.html" class="active"><span class="nav-icon">💻</span> Commands</a>
-            <a href="how-it-works.html"><span class="nav-icon">🔧</span> How It Works</a>
-            <a href="faq.html"><span class="nav-icon">❓</span> FAQ</a>
-            <a href="changelog.html"><span class="nav-icon">📋</span> Changelog</a>
-            <a href="troubleshooting.html"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+            <a href="index.html"><span class="nav-icon" data-icon="home" aria-hidden="true"></span> Home</a>
+            <a href="installation.html"><span class="nav-icon" data-icon="package" aria-hidden="true"></span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon" data-icon="sliders" aria-hidden="true"></span> Configuration</a>
+            <a href="commands.html" class="active"><span class="nav-icon" data-icon="terminal" aria-hidden="true"></span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon" data-icon="route" aria-hidden="true"></span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon" data-icon="chat" aria-hidden="true"></span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon" data-icon="wrench" aria-hidden="true"></span> Troubleshooting</a>
+            <a href="privacy.html"><span class="nav-icon" data-icon="shield" aria-hidden="true"></span> Privacy</a>
+            <a href="terms.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Terms</a>
         </div>
         <div class="sidebar-footer">
             <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
@@ -48,7 +50,7 @@
         <div class="content-inner">
 
             <div class="page-header">
-                <h1><span class="header-icon">💻</span> Commands</h1>
+                <h1><span class="header-icon" data-icon="terminal" aria-hidden="true"></span> Commands</h1>
                 <p>One root command, four subcommands. <code>georestrict.admin</code> permission on all of them.</p>
             </div>
 
@@ -57,14 +59,14 @@
             <div class="code-block-wrapper fade-in">
                 <span class="code-label">in-game</span>
 <pre><code>/georestrict
-<span class="syn-cmt"># → GeoRestrict v2.1.0</span>
+<span class="syn-cmt"># → GeoRestrict v2.0.0</span>
 <span class="syn-cmt">#   By Demonz Development</span>
 <span class="syn-cmt">#   https://demonzdevelopment.online/</span>
 </code></pre>
             </div>
 
             <h2 class="fade-in">/georestrict check &lt;ip|player&gt;</h2>
-            <p class="fade-in">Looks up an IP or online player's address and shows the rule outcome. Bypasses the cache and runs the rule list immediately.</p>
+            <p class="fade-in">Checks an IP or online player's address and shows the rule outcome. A fresh cached result is reused; otherwise the normal gateway path runs and stores the new result.</p>
             <div class="code-block-wrapper fade-in">
                 <span class="code-label">in-game</span>
 <pre><code>/georestrict check 8.8.8.8
@@ -106,7 +108,7 @@
                     </thead>
                     <tbody>
                         <tr><td><code>georestrict.admin</code></td><td>op</td><td>All subcommands.</td></tr>
-                        <tr><td><code>georestrict.bypass</code></td><td>false</td><td>Skip the country/ASN/VPN check. On Bukkit it's enforced after login (permission metadata isn't reliably available pre-login). On Bungee/Velocity, install on the backend to use it.</td></tr>
+                        <tr><td><code>georestrict.bypass</code></td><td>false</td><td>Skip the country/ASN/VPN decision on Bukkit backends. Bungee/Velocity cannot resolve backend permissions during proxy login.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -114,6 +116,6 @@
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <script src="script.js?rev=20260714h"></script>
 </body>
 </html>

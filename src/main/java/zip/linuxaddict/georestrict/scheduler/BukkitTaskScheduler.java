@@ -20,21 +20,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override
-    public void runAsync(Plugin plugin, Runnable task) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, task);
-    }
-
-    @Override
-    public void runTimer(Plugin plugin, Runnable task, long delayTicks, long periodTicks) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                task.run();
-            }
-        }.runTaskTimer(plugin, delayTicks, periodTicks);
-    }
-
-    @Override
     public void runTimerAsync(Plugin plugin, Runnable task, long delayTicks, long periodTicks) {
         new BukkitRunnable() {
             @Override

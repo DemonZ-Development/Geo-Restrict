@@ -17,14 +17,15 @@ import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -34,9 +35,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GeoRestrictService {
-
-    private static final String FALLBACK_URL =
-        "https://ip-api.com/json/%s?fields=status,message,query,country,countryCode,isp,org,as,proxy,hosting,mobile";
 
     private volatile GeoConfig config;
     private final Logger logger;
@@ -94,9 +92,6 @@ public class GeoRestrictService {
         }
 
         GeoResponse response = fetchFromGateway(ip);
-        if (response == null && current.directFallbackEnabled) {
-            response = fetchFromFallback(ip);
-        }
         if (response == null) {
             logger.warn("Lookup failed for {} ({})", playerName, ip);
             return lookupFailureResult(current);
@@ -117,9 +112,10 @@ public class GeoRestrictService {
 
     private GeoResponse fetchFromGateway(String ip) {
         GeoConfig current = config;
+        HttpURLConnection conn = null;
         try {
             String url = buildLookupUrl(current.gatewayUrl, ip);
-            HttpURLConnection conn = openConnection(url, "GET", current);
+            conn = openConnection(url, "GET", current);
             if (!current.gatewayToken.isEmpty()) {
                 conn.setRequestProperty("Authorization", "Bearer " + current.gatewayToken);
                 conn.setRequestProperty("X-GeoRestrict-Token", current.gatewayToken);
@@ -141,53 +137,23 @@ public class GeoRestrictService {
                 }
                 GeoResponse response = gson.fromJson(json, GeoResponse.class);
                 normalizeResponse(response, ip);
+                if (response == null || isBlank(response.countryCode)) {
+                    logger.warn("Gateway returned incomplete data for {}", ip);
+                    return null;
+                }
                 return response;
             }
+        } catch (SocketTimeoutException e) {
+            logger.warn("Gateway timeout for {} ({}ms): {}", ip, current.connectionTimeoutMs, e.getMessage());
+            return null;
+        } catch (IOException e) {
+            logger.warn("Gateway I/O error for {}: {}", ip, e.getMessage());
+            return null;
         } catch (Exception e) {
             logger.warn("Gateway request failed for {}: {}", ip, e.getMessage());
             return null;
-        }
-    }
-
-    private GeoResponse fetchFromFallback(String ip) {
-        GeoConfig current = config;
-        try {
-            String url = String.format(FALLBACK_URL, URLEncoder.encode(ip, StandardCharsets.UTF_8));
-            HttpURLConnection conn = openConnection(url, "GET", current);
-            int code = conn.getResponseCode();
-            if (code != 200) {
-                closeQuietly(conn.getErrorStream());
-                logger.warn("Fallback HTTP {} for {}", code, ip);
-                return null;
-            }
-            try (BufferedReader r = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
-                JsonObject json = JsonParser.parseReader(r).getAsJsonObject();
-                if ("fail".equals(optString(json, "status", null))) {
-                    logger.warn("Fallback rejected {}: {}", ip, optString(json, "message", null));
-                    return null;
-                }
-                GeoResponse response = new GeoResponse();
-                response.ip = optString(json, "query", ip);
-                response.countryCode = optString(json, "countryCode", null);
-                response.countryName = optString(json, "country", null);
-                if (json.has("as") && !json.get("as").isJsonNull()) {
-                    String[] parts = json.get("as").getAsString().split(" ", 2);
-                    response.asn = parts[0];
-                    response.asName = parts.length > 1 ? parts[1] : optString(json, "isp", null);
-                } else {
-                    response.asName = optString(json, "isp", null);
-                }
-                response.isProxy = optBoolean(json, "proxy");
-                response.isHosting = optBoolean(json, "hosting");
-                response.isMobile = optBoolean(json, "mobile");
-                response.isVpn = response.isProxy;
-                normalizeResponse(response, ip);
-                return response;
-            }
-        } catch (Exception e) {
-            logger.warn("Fallback request failed for {}: {}", ip, e.getMessage());
-            return null;
+        } finally {
+            if (conn != null) conn.disconnect();
         }
     }
 
@@ -251,10 +217,33 @@ public class GeoRestrictService {
         return conn;
     }
 
+    private int postJson(String urlString, String body, GeoConfig current) {
+        HttpURLConnection conn = null;
+        try {
+            byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+            conn = openConnection(urlString, "POST", current);
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
+            conn.setFixedLengthStreamingMode(bytes.length);
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(bytes);
+            }
+            int code = conn.getResponseCode();
+            closeQuietly(code >= 400 ? conn.getErrorStream() : conn.getInputStream());
+            return code;
+        } catch (Exception e) {
+            return -1;
+        } finally {
+            if (conn != null) conn.disconnect();
+        }
+    }
+
     private String buildLookupUrl(String baseUrl, String ip) {
         String trimmed = isBlank(baseUrl) ? GeoConfigConstants.DEFAULT_GATEWAY_URL : baseUrl.trim();
-        char sep = trimmed.contains("?") ? (trimmed.endsWith("?") || trimmed.endsWith("&") ? ' ' : '&') : '?';
-        return trimmed + sep + "ip=" + URLEncoder.encode(ip, StandardCharsets.UTF_8);
+        String separator = trimmed.contains("?")
+            ? (trimmed.endsWith("?") || trimmed.endsWith("&") ? "" : "&")
+            : "?";
+        return trimmed + separator + "ip=" + URLEncoder.encode(ip, StandardCharsets.UTF_8);
     }
 
     private void normalizeResponse(GeoResponse r, String requestedIp) {
@@ -266,16 +255,6 @@ public class GeoRestrictService {
 
     private String normalizeCode(String v) {
         return v == null ? "" : v.trim().toUpperCase(Locale.ROOT);
-    }
-
-    private static String optString(JsonObject json, String key, String fallback) {
-        if (!json.has(key) || json.get(key).isJsonNull()) return fallback;
-        return json.get(key).getAsString();
-    }
-
-    private static boolean optBoolean(JsonObject json, String key) {
-        if (!json.has(key) || json.get(key).isJsonNull()) return false;
-        try { return json.get(key).getAsBoolean(); } catch (Exception e) { return false; }
     }
 
     private void logResultToDiscord(GeoResponse info, CheckResult result, String playerName) {
@@ -325,17 +304,11 @@ public class GeoRestrictService {
                 payload.add("embeds", embeds);
 
                 String body = gson.toJson(payload);
-                HttpURLConnection conn = openConnection(current.discord.webhook, "POST", current);
-                conn.setRequestProperty("Content-Type", "application/json");
-                conn.setDoOutput(true);
-                conn.setFixedLengthStreamingMode(body.getBytes(StandardCharsets.UTF_8).length);
-                try (OutputStream os = conn.getOutputStream()) {
-                    os.write(body.getBytes(StandardCharsets.UTF_8));
-                }
-                int code = conn.getResponseCode();
-                closeQuietly(code >= 400 ? conn.getErrorStream() : conn.getInputStream());
+                int code = postJson(current.discord.webhook, body, current);
+                boolean retry = code == -1 || code == 408 || code == 429 || code >= 500;
+                if (retry) code = postJson(current.discord.webhook, body, current);
                 if (code < 200 || code >= 300) {
-                    logger.warn("Discord webhook returned HTTP {}", code);
+                    logger.warn("Discord webhook returned HTTP {}{}", code, retry ? " after retry" : "");
                 }
             } catch (Exception e) {
                 logger.warn("Discord webhook delivery failed: {}", e.getMessage());

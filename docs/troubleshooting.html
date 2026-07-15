@@ -14,9 +14,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Troubleshooting - GeoRestrict</title>
     <meta name="description" content="Diagnose and fix common GeoRestrict issues: cache, gateway, false positives, BungeeCord permissions.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <meta name="theme-color" content="#17324d">
+    <link rel="icon" type="image/png" href="assets/georestrict-icon.png?rev=20260714e">
+    <link rel="stylesheet" href="styles.css?rev=20260714h">
 </head>
 <body>
 
@@ -30,14 +30,16 @@
             <div class="sidebar-logo">GeoRestrict<span>Documentation</span></div>
         </div>
         <div class="sidebar-nav">
-            <a href="index.html"><span class="nav-icon">🏠</span> Home</a>
-            <a href="installation.html"><span class="nav-icon">📦</span> Installation</a>
-            <a href="configuration.html"><span class="nav-icon">⚙️</span> Configuration</a>
-            <a href="commands.html"><span class="nav-icon">💻</span> Commands</a>
-            <a href="how-it-works.html"><span class="nav-icon">🔧</span> How It Works</a>
-            <a href="faq.html"><span class="nav-icon">❓</span> FAQ</a>
-            <a href="changelog.html"><span class="nav-icon">📋</span> Changelog</a>
-            <a href="troubleshooting.html" class="active"><span class="nav-icon">🛠️</span> Troubleshooting</a>
+            <a href="index.html"><span class="nav-icon" data-icon="home" aria-hidden="true"></span> Home</a>
+            <a href="installation.html"><span class="nav-icon" data-icon="package" aria-hidden="true"></span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon" data-icon="sliders" aria-hidden="true"></span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon" data-icon="terminal" aria-hidden="true"></span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon" data-icon="route" aria-hidden="true"></span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon" data-icon="chat" aria-hidden="true"></span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Changelog</a>
+            <a href="troubleshooting.html" class="active"><span class="nav-icon" data-icon="wrench" aria-hidden="true"></span> Troubleshooting</a>
+            <a href="privacy.html"><span class="nav-icon" data-icon="shield" aria-hidden="true"></span> Privacy</a>
+            <a href="terms.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Terms</a>
         </div>
         <div class="sidebar-footer">
             <a href="https://demonzdevelopment.online/" target="_blank">Demonz Development</a>
@@ -48,30 +50,30 @@
         <div class="content-inner">
 
             <div class="page-header">
-                <h1><span class="header-icon">🛠️</span> Troubleshooting</h1>
+                <h1><span class="header-icon" data-icon="wrench" aria-hidden="true"></span> Troubleshooting</h1>
                 <p>Real problems, with the actual fix.</p>
             </div>
 
             <div class="faq-item fade-in">
                 <div class="faq-question">All my players get kicked with "Geo verification is temporarily unavailable"</div>
                 <div class="faq-answer">
-                    <p>That's the <code>kickMessageLookupFailure</code> message. It means the Worker is unreachable and you have <code>blockOnLookupFailure: true</code> (the new default). Two things to check:</p>
+                    <p>That's the <code>kickMessageLookupFailure</code> message. It means the Worker is unreachable and you have <code>blockOnLookupFailure: true</code> (the new default). Check these first:</p>
                     <ol>
-                        <li>From the server console, try <code>curl -I https://geoprotect.demonzdev.workers.dev/?ip=8.8.8.8</code>. If that times out, the issue is network egress, not the plugin.</li>
-                        <li>If you deployed your own Worker, double-check the <code>gatewayToken</code> matches <code>GATEWAY_TOKENS</code> on the Worker side. Mismatches return 401 and the plugin treats that as a lookup failure.</li>
+                        <li>Confirm the Minecraft host has outbound HTTPS access.</li>
+                        <li>Compare <code>gatewayUrl</code> and <code>gatewayToken</code> with a fresh generated config. Most servers should not change them.</li>
                     </ol>
-                    <p>Quick fix: <code>blockOnLookupFailure: false</code> in your config. Re-enable when the network is healthy.</p>
+                    <p>If you operate your own lookup infrastructure, use the tests in the <a href="https://github.com/DemonZ-Development/Geo-Restrict#advanced-infrastructure-reference" target="_blank" rel="noopener">GitHub README</a>. As a temporary availability choice, set <code>blockOnLookupFailure: false</code> and re-enable blocking when the network is healthy.</p>
                 </div>
             </div>
 
             <div class="faq-item fade-in">
                 <div class="faq-question">Players using OVH / Hetzner / DigitalOcean are getting blocked</div>
                 <div class="faq-answer">
-                    <p>That's the ISP keyword scanner doing its job — OVH, Hetzner, DigitalOcean are all in the default <code>vpnKeywords</code> list because they sell VPSes that are commonly used for game-server bot farms.</p>
+                    <p>That's the ISP keyword scanner doing its job. OVH, Hetzner and DigitalOcean are in the default <code>vpnKeywords</code> list because their hosting networks are commonly used for game server bot traffic.</p>
                     <p>Options:</p>
                     <ul>
                         <li>Remove the specific keyword from <code>vpnKeywords</code> if you know your player base is on that host.</li>
-                        <li>Set <code>vpnCheckEnabled: false</code> to disable keyword detection entirely (boolean flags from the provider still work).</li>
+                        <li>Set <code>vpnCheckEnabled: false</code> to disable both the provider's VPN/proxy/hosting flags and the keyword scan.</li>
                         <li>Combine: keep the keyword, but ALLOWLIST the specific players with <code>georestrict.bypass</code> + OP on the backend server.</li>
                     </ul>
                 </div>
@@ -92,21 +94,21 @@
             <div class="faq-item fade-in">
                 <div class="faq-question">The plugin isn't loading on Folia</div>
                 <div class="faq-answer">
-                    <p>Check the startup log for the line <code>GeoRestrict v2.1.0 starting...</code>. If you don't see it, the jar isn't in the <code>plugins/</code> folder. If you see the line but errors follow, paste the full stack trace — the Folia scheduler adapter is reflection-based, so it can fail on renamed methods if your Folia build is wildly different from upstream.</p>
+                    <p>Check the startup log for <code>GeoRestrict v2.0.0 starting...</code>. If it is missing, confirm that the jar is in <code>plugins/</code> and Java 17 or newer is in use. If the line appears before an error, keep the complete stack trace; the reflection-based Folia adapter may need an update when a fork changes scheduler methods.</p>
                 </div>
             </div>
 
             <div class="faq-item fade-in">
                 <div class="faq-question">The cache file is huge</div>
                 <div class="faq-answer">
-                    <p>100k entries in the default JSON cache is ~5–10 MB. If you're seeing gigabytes, you have a runaway log somewhere — probably a config file that mtime-changes every read. Run <code>/georestrict cachestats</code> to see entry count and oldest age. If entries keep growing without bound, run <code>/georestrict purgecache</code> and watch the log for a config watcher loop.</p>
+                    <p>Run <code>/georestrict cachestats</code> first. The default <code>maxCacheEntries: 100000</code> cap prevents unbounded growth; the oldest entries are evicted after the cap. If the count is above your configured cap, confirm the running jar is v2.0.0 and that the config actually loaded. You can run <code>/georestrict purgecache</code> after saving a copy for diagnosis.</p>
                 </div>
             </div>
 
             <div class="faq-item fade-in">
-                <div class="faq-question">Update check is spamming the log every 6 hours</div>
+                <div class="faq-question">The update notice appears every six hours</div>
                 <div class="faq-answer">
-                    <p>It only logs when a new version is <em>actually available</em>. If you're seeing repeated update lines, the version comparison is broken — but that was fixed in 2.1.0. Update to the latest and the spam should stop.</p>
+                    <p>That is expected while Modrinth reports a newer release than the running jar. Update when convenient, or set <code>updateCheck: false</code> if you do not want periodic reminders. A notice for the same version should be reported with the local version and the Modrinth version shown in the log.</p>
                 </div>
             </div>
 
@@ -125,6 +127,6 @@
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <script src="script.js?rev=20260714h"></script>
 </body>
 </html>

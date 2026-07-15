@@ -1,30 +1,13 @@
-/*
- * GeoRestrict gateway
- *
- * Route: GET /?ip=<address>
- *
- * Environment variables and secrets:
- *   GATEWAY_TOKENS      Optional comma/newline/JSON-list of shared auth tokens.
- *                       When ANY tokens are defined, requests MUST authenticate.
- *   IP_API_ENDPOINTS    ip-api endpoint pool. Supports {ip} templates.
- *   IP_API_KEYS         Optional ip-api Pro key pool.
- *   IPINFO_TOKENS       ipinfo token pool. Used as primary when present,
- *                       otherwise ipinfo is tried as a no-token fallback.
- *   IPINFO_ENDPOINTS    Optional ipinfo endpoint templates.
- *   PROVIDER_ORDER      Comma list, e.g. "ipinfo,ip-api". Defaults to "ipinfo,ip-api".
- *   REQUEST_TIMEOUT_MS  Defaults to 3000.
- *   CACHE_TTL_SECONDS   Defaults to 86400 (1 day). 0 disables caching.
- *   ALLOWED_ORIGINS     Defaults to "*".
- */
+/* GeoRestrict Worker gateway. Route: GET /?ip=<address>. */
 
 const IPV4_PATTERN = /^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
 const IPV6_PATTERN = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1?$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^::(?:[0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,6}(?::[0-9a-fA-F]{1,4}){1,6}$/;
 const IPV4_MAPPED_PATTERN = /^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/i;
 const IP_API_FIELDS = 'status,message,query,country,countryCode,isp,org,as,proxy,hosting,mobile';
-const DEFAULT_IPINFO_ENDPOINT = 'https://ipinfo.io/{ip}/json';
-const DEFAULT_IP_API_ENDPOINT = 'https://ip-api.com/json/{ip}';
 const DEFAULT_PROVIDER_ORDER = ['ipinfo', 'ip-api'];
 const MAX_NUMBERED_VALUES = 20;
+const CACHE_SCHEMA_VERSION = 'v2';
+const memoryCache = new Map();
 
 export default {
   async fetch(request, env, ctx) {
@@ -35,11 +18,29 @@ export default {
     if (request.method !== 'GET') {
       return json({ error: 'method_not_allowed' }, 405, headers);
     }
+
+    const url = new URL(request.url);
+    if (url.pathname === '/health') {
+      const cacheTtlSeconds = getNumber(env.CACHE_TTL_SECONDS, 86400, 0, 604800);
+      return json({
+        ok: true,
+        version: env.GATEWAY_VERSION || '2.0.0',
+        vpsConfigured: Boolean(String(env.VPS_GATEWAY_URL || '').trim()),
+        providers: getProviderOrder(env),
+        fallback: 'vps-local-mmdb',
+        cache: {
+          ttlSeconds: cacheTtlSeconds,
+          cacheApi: true,
+          memory: getNumber(env.MEMORY_CACHE_MAX_ENTRIES, 5000, 0, 50000) > 0,
+          kv: Boolean(env.GEO_CACHE),
+        },
+      }, 200, headers);
+    }
+
     if (!isAuthorized(request, env)) {
       return json({ error: 'unauthorized' }, 401, headers);
     }
 
-    const url = new URL(request.url);
     const ip = (url.searchParams.get('ip') || '').trim();
     if (!ip) return json({ error: 'missing_ip_parameter' }, 400, headers);
     if (!isValidIp(ip)) return json({ error: 'invalid_ip_parameter' }, 400, headers);
@@ -48,17 +49,26 @@ export default {
     }
 
     const cacheTtlSeconds = getNumber(env.CACHE_TTL_SECONDS, 86400, 0, 604800);
-    const cacheKey = new Request(`https://georestrict-cache.local/?ip=${encodeURIComponent(ip)}`);
-    const cached = await readCache(cacheKey);
-    if (cached) return withHeaders(cached, headers);
+    const memoryMaxEntries = getNumber(env.MEMORY_CACHE_MAX_ENTRIES, 5000, 0, 50000);
+    const cacheKey = new Request(`https://georestrict-cache.local/${CACHE_SCHEMA_VERSION}?ip=${encodeURIComponent(ip)}`);
+    const kvKey = `geo:${CACHE_SCHEMA_VERSION}:${ip}`;
+    const cached = await readLookupCaches(cacheKey, kvKey, env, cacheTtlSeconds, memoryMaxEntries);
+    if (cached) return json(cached, 200, headers);
 
     const providersTried = [];
     let result = null;
+
     for (const provider of getProviderOrder(env)) {
       providersTried.push(provider);
       if (provider === 'ipinfo') result = await fetchIpInfo(ip, env);
       else if (provider === 'ip-api') result = await fetchIpApi(ip, env);
       if (result) break;
+    }
+
+    const vpsUrl = String(env.VPS_GATEWAY_URL || '').trim();
+    if (!result && vpsUrl) {
+      providersTried.push('vps-local');
+      result = await fetchFromVps(ip, vpsUrl, env);
     }
 
     if (!result) {
@@ -76,7 +86,10 @@ export default {
 
     const response = json(result, 200, headers);
     if (cacheTtlSeconds > 0) {
-      ctx.waitUntil(writeCache(cacheKey, response.clone(), cacheTtlSeconds));
+      writeMemoryCache(kvKey, result, cacheTtlSeconds, memoryMaxEntries);
+      const cacheWrite = writeLookupCaches(cacheKey, kvKey, result, env, cacheTtlSeconds);
+      if (ctx?.waitUntil) ctx.waitUntil(cacheWrite);
+      else await cacheWrite;
     }
     return response;
   },
@@ -84,16 +97,19 @@ export default {
 
 async function fetchIpApi(ip, env) {
   const endpoints = collectValues(env, ['IP_API_ENDPOINTS'], 'IP_API_ENDPOINT',
-    [DEFAULT_IP_API_ENDPOINT]);
-  const keys = collectValues(env, ['IP_API_KEYS'], 'IP_API_KEY', []);
+    []);
+  const keys = collectValues(env, ['IP_API_KEYS', 'IP_API_KEY', 'PROVIDER_KEYS', 'PROVIDER_KEY'],
+    ['IP_API_KEY', 'PROVIDER_KEY'], []);
   const endpoint = endpoints[Math.floor(Math.random() * endpoints.length)];
+  if (!endpoint) return null;
   const key = keys.length ? keys[Math.floor(Math.random() * keys.length)] : '';
+  if (/^https:\/\/pro\.ip-api\.com(?:\/|$)/i.test(endpoint) && !key) return null;
   const url = buildIpApiUrl(endpoint, ip, key);
   try {
     const res = await fetchWithTimeout(url, env);
     if (!res.ok) return null;
     const data = await res.json();
-    if (data.status && data.status !== 'success') return null;
+    if (!data || data.status !== 'success' || !data.countryCode) return null;
     const asnMatch = String(data.as || '').match(/^(AS\d+)\s*(.*)$/i);
     return {
       ip,
@@ -113,24 +129,28 @@ async function fetchIpApi(ip, env) {
 }
 
 async function fetchIpInfo(ip, env) {
-  const tokens = collectValues(env, ['IPINFO_TOKENS', 'IPINFO_TOKEN'], 'IPINFO_TOKEN', []);
+  const tokens = collectValues(env,
+    ['IPINFO_TOKENS', 'IPINFO_TOKEN', 'PROVIDER_TOKENS', 'PROVIDER_TOKEN'],
+    ['IPINFO_TOKEN', 'PROVIDER_TOKEN'], []);
   const endpoints = collectValues(env, ['IPINFO_ENDPOINTS'], 'IPINFO_ENDPOINT',
-    [DEFAULT_IPINFO_ENDPOINT]);
+    []);
   const endpoint = endpoints[Math.floor(Math.random() * endpoints.length)];
-  // No-token calls hit ipinfo's free tier; if tokens are present, use one
-  // for the higher quota. Both paths are supported.
+  if (!endpoint) return null;
   const token = tokens.length ? tokens[Math.floor(Math.random() * tokens.length)] : '';
   const url = addQueryParam(buildProviderUrl(endpoint, ip), 'token', token);
   try {
     const res = await fetchWithTimeout(url, env);
     if (!res.ok) return null;
     const data = await res.json();
-    if (!data || data.bogon) return null;
-    const asn = parseAsn(data.org || data.asn || '');
+    const legacyCountry = String(data?.country || '');
+    const countryCode = String(data?.country_code || (legacyCountry.length === 2 ? legacyCountry : '')).toUpperCase();
+    if (!data || data.bogon || data.error || !countryCode) return null;
+    const asnText = data.org || [data.asn, data.as_name].filter(Boolean).join(' ') || '';
+    const asn = parseAsn(asnText);
     return {
       ip: data.ip || ip,
-      countryCode: String(data.country || '').toUpperCase(),
-      countryName: data.country_name || data.country || '',
+      countryCode,
+      countryName: data.country_name || legacyCountry || countryCode,
       asn: asn.code,
       asName: asn.name,
       isVpn: false, isHosting: false, isProxy: false, isMobile: false,
@@ -146,6 +166,44 @@ function buildIpApiUrl(endpoint, ip, key) {
   url = addQueryParam(url, 'fields', IP_API_FIELDS, true);
   if (key) url = addQueryParam(url, 'key', key, true);
   return url;
+}
+
+async function fetchFromVps(ip, vpsBaseUrl, env) {
+  const timeoutMs = getNumber(env.VPS_GATEWAY_TIMEOUT_MS, 2500, 250, 10000);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const url = addQueryParam(vpsBaseUrl, 'ip', ip);
+    const headers = { 'Accept': 'application/json' };
+    const token = env.VPS_GATEWAY_TOKEN || '';
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+      headers['X-GeoRestrict-Token'] = token;
+    }
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers,
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data || data.error || !data.countryCode) return null;
+    return {
+      ip: data.ip || ip,
+      countryCode: String(data.countryCode || '').toUpperCase(),
+      countryName: data.countryName || '',
+      asn: data.asn || '',
+      asName: data.asName || '',
+      isVpn: Boolean(data.isVpn),
+      isHosting: Boolean(data.isHosting),
+      isProxy: Boolean(data.isProxy),
+      isMobile: Boolean(data.isMobile),
+      provider: data.provider || 'vps',
+    };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function buildProviderUrl(endpoint, ip) {
@@ -170,29 +228,87 @@ async function fetchWithTimeout(url, env) {
   try {
     return await fetch(url, {
       signal: controller.signal,
-      headers: { 'User-Agent': 'GeoRestrict-Gateway/' + (env.GATEWAY_VERSION || '2.1.0') },
+      headers: { 'User-Agent': 'GeoRestrict-Gateway/' + (env.GATEWAY_VERSION || '2.0.0') },
     });
   } finally {
     clearTimeout(timer);
   }
 }
 
-async function readCache(cacheKey) {
-  try { return await caches.default.match(cacheKey); } catch { return null; }
-}
+async function readLookupCaches(cacheKey, kvKey, env, ttlSeconds, memoryMaxEntries) {
+  if (ttlSeconds <= 0) return null;
 
-async function writeCache(cacheKey, response, ttlSeconds) {
+  const inMemory = readMemoryCache(kvKey, memoryMaxEntries);
+  if (inMemory) return inMemory;
+
   try {
-    const cloned = new Response(response.body, response);
-    cloned.headers.set('Cache-Control', `public, max-age=${ttlSeconds}`);
-    await caches.default.put(cacheKey, cloned);
+    const response = await caches.default.match(cacheKey);
+    if (response?.ok) {
+      const payload = await response.json();
+      if (isLookupResult(payload)) {
+        writeMemoryCache(kvKey, payload, ttlSeconds, memoryMaxEntries);
+        return payload;
+      }
+    }
   } catch {}
+
+  if (env.GEO_CACHE?.get) {
+    try {
+      const payload = await env.GEO_CACHE.get(kvKey, 'json');
+      if (isLookupResult(payload)) {
+        writeMemoryCache(kvKey, payload, ttlSeconds, memoryMaxEntries);
+        return payload;
+      }
+    } catch {}
+  }
+
+  return null;
 }
 
-function withHeaders(response, headers) {
-  const next = new Response(response.body, response);
-  for (const [k, v] of headers.entries()) next.headers.set(k, v);
-  return next;
+async function writeLookupCaches(cacheKey, kvKey, payload, env, ttlSeconds) {
+  const writes = [];
+
+  try {
+    const response = json(payload, 200, new Headers({
+      'Content-Type': 'application/json',
+      'Cache-Control': `public, max-age=${ttlSeconds}`,
+    }));
+    writes.push(caches.default.put(cacheKey, response));
+  } catch {}
+
+  if (env.GEO_CACHE?.put) {
+    try {
+      writes.push(env.GEO_CACHE.put(kvKey, JSON.stringify(payload), { expirationTtl: ttlSeconds }));
+    } catch {}
+  }
+
+  await Promise.allSettled(writes);
+}
+
+function readMemoryCache(key, maxEntries) {
+  if (maxEntries <= 0) return null;
+  const entry = memoryCache.get(key);
+  if (!entry) return null;
+  if (Date.now() >= entry.expiresAt) {
+    memoryCache.delete(key);
+    return null;
+  }
+  memoryCache.delete(key);
+  memoryCache.set(key, entry);
+  return entry.payload;
+}
+
+function writeMemoryCache(key, payload, ttlSeconds, maxEntries) {
+  if (ttlSeconds <= 0 || maxEntries <= 0 || !isLookupResult(payload)) return;
+  memoryCache.delete(key);
+  memoryCache.set(key, { payload, expiresAt: Date.now() + ttlSeconds * 1000 });
+  while (memoryCache.size > maxEntries) {
+    memoryCache.delete(memoryCache.keys().next().value);
+  }
+}
+
+function isLookupResult(payload) {
+  return Boolean(payload && typeof payload === 'object' && String(payload.countryCode || '').trim());
 }
 
 function json(payload, status, headers) {
@@ -209,13 +325,12 @@ function buildHeaders(request, env) {
     'Access-Control-Allow-Origin': allowOrigin,
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-GeoRestrict-Token',
-    'Cache-Control': `public, max-age=${getNumber(env.CACHE_TTL_SECONDS, 86400, 0, 604800)}`,
+    'Cache-Control': 'private, no-store',
   });
 }
 
 function isAuthorized(request, env) {
   const tokens = collectValues(env, ['GATEWAY_TOKENS', 'GATEWAY_TOKEN'], 'GATEWAY_TOKEN', []);
-  // Fail-closed: if ANY tokens are defined, requests MUST authenticate.
   if (!tokens.length) return true;
   const url = new URL(request.url);
   const auth = request.headers.get('Authorization') || '';
@@ -225,11 +340,14 @@ function isAuthorized(request, env) {
   return [bearer, headerToken, queryToken].some(c => tokens.includes(c));
 }
 
-function collectValues(env, multiNames, numberedPrefix, defaults) {
+function collectValues(env, multiNames, numberedPrefixes, defaults) {
   const values = [];
   for (const name of multiNames) values.push(...parseList(env[name]));
-  for (let i = 1; i <= MAX_NUMBERED_VALUES; i++) {
-    values.push(...parseList(env[`${numberedPrefix}_${i}`]));
+  const prefixes = Array.isArray(numberedPrefixes) ? numberedPrefixes : [numberedPrefixes];
+  for (const prefix of prefixes) {
+    for (let i = 1; i <= MAX_NUMBERED_VALUES; i++) {
+      values.push(...parseList(env[`${prefix}_${i}`]));
+    }
   }
   const cleaned = [...new Set(values.map(v => v.trim()).filter(Boolean))];
   return cleaned.length ? cleaned : defaults;

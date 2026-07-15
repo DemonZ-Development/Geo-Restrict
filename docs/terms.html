@@ -1,0 +1,82 @@
+<!--
+  ~ GeoRestrict - High-performance geographic access control.
+  ~ Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+  ~ Licensed under GPL-3.0.
+  -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and Conditions - GeoRestrict</title>
+    <meta name="description" content="Terms for using GeoRestrict and its public Worker and documentation services.">
+    <meta name="theme-color" content="#17324d">
+    <link rel="icon" type="image/png" href="assets/georestrict-icon.png?rev=20260714e">
+    <link rel="stylesheet" href="styles.css?rev=20260714h">
+</head>
+<body>
+    <button class="hamburger" aria-label="Toggle sidebar"><span></span><span></span><span></span></button>
+    <div class="sidebar-overlay"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header"><div class="sidebar-logo">GeoRestrict<span>Documentation</span></div></div>
+        <div class="sidebar-nav">
+            <a href="index.html"><span class="nav-icon" data-icon="home" aria-hidden="true"></span> Home</a>
+            <a href="installation.html"><span class="nav-icon" data-icon="package" aria-hidden="true"></span> Installation</a>
+            <a href="configuration.html"><span class="nav-icon" data-icon="sliders" aria-hidden="true"></span> Configuration</a>
+            <a href="commands.html"><span class="nav-icon" data-icon="terminal" aria-hidden="true"></span> Commands</a>
+            <a href="how-it-works.html"><span class="nav-icon" data-icon="route" aria-hidden="true"></span> How It Works</a>
+            <a href="faq.html"><span class="nav-icon" data-icon="chat" aria-hidden="true"></span> FAQ</a>
+            <a href="changelog.html"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Changelog</a>
+            <a href="troubleshooting.html"><span class="nav-icon" data-icon="wrench" aria-hidden="true"></span> Troubleshooting</a>
+            <a href="privacy.html"><span class="nav-icon" data-icon="shield" aria-hidden="true"></span> Privacy</a>
+            <a href="terms.html" class="active"><span class="nav-icon" data-icon="clipboard" aria-hidden="true"></span> Terms</a>
+        </div>
+        <div class="sidebar-footer">Questions are welcome in our <a href="https://discord.com/invite/GYsTt96ypf" target="_blank" rel="noopener">Discord community</a>.</div>
+    </nav>
+
+    <main class="main-content">
+        <div class="content-inner">
+            <div class="page-header">
+                <h1><span class="header-icon" data-icon="clipboard" aria-hidden="true"></span> Terms and conditions</h1>
+                <p>The practical rules for using the plugin and the public services that support it.</p>
+            </div>
+
+            <p class="fade-in"><strong>Effective 15 July 2026. Applies to GeoRestrict v2.0.0.</strong></p>
+
+            <div class="alert alert-info fade-in">
+                <strong>Two things are separate:</strong> the GeoRestrict source code is licensed under GPL-3.0, while these terms cover use of the public Worker, fallback server, documentation site, and community support spaces. These terms do not take away rights granted by the GPL.
+            </div>
+
+            <h2 class="fade-in">1. Using GeoRestrict responsibly</h2>
+            <p class="fade-in">You may install, inspect, modify and redistribute GeoRestrict under its GPL-3.0 license. You are responsible for your server configuration, the rules shown to players, and compliance with laws and platform policies that apply to your community. Test changes before relying on them in production.</p>
+
+            <h2 class="fade-in">2. What GeoRestrict is and is not</h2>
+            <p class="fade-in">GeoRestrict is a connection-policy tool based on approximate IP geolocation and network data. It is not identity verification, an exact-location service, a complete VPN detector, a DDoS shield, legal advice, or a guarantee that an unwanted person cannot connect. Mobile networks, carrier gateways, corporate networks and VPNs can produce incomplete or unexpected results. Operators should provide a reasonable appeal or support route for players affected by a false result.</p>
+
+            <h2 class="fade-in">3. Public hosted services</h2>
+            <p class="fade-in">Demonz Development currently provides a public Worker, documentation site, and protected fallback server for convenience. They are provided without a paid service-level agreement. We may rate-limit, update, move, suspend or discontinue a hosted endpoint to protect it, comply with provider requirements, or keep the project maintainable. Keep a tested failure policy in <code>config.yml</code> rather than assuming the public path will always be available.</p>
+
+            <h2 class="fade-in">4. Acceptable use</h2>
+            <p class="fade-in">Do not use the hosted services to attack, scan, scrape, overload or bypass protections; test stolen or unauthorized credentials; conceal abusive automation; resell raw lookup access; or interfere with other users. Normal player admission checks, admin lookup commands, health checks, and reasonable development testing are allowed. We may block abusive traffic or compromised credentials.</p>
+
+            <h2 class="fade-in">5. Configuration and security</h2>
+            <p class="fade-in">Most operators should leave the generated Worker settings unchanged. You are responsible for credentials and endpoints under your control. Never post gateway tokens, Discord webhook URLs, or player IPs in a public support message. Operators running their own infrastructure should follow the security notes in the <a href="https://github.com/DemonZ-Development/Geo-Restrict#advanced-infrastructure-reference" target="_blank" rel="noopener">GitHub README</a>.</p>
+
+            <h2 class="fade-in">6. Privacy and third-party data</h2>
+            <p class="fade-in">Our <a href="privacy.html">Privacy Policy</a> explains the lookup path, caching and optional Discord notifications. IPinfo, DB-IP, Cloudflare, Discord, bStats, Modrinth and infrastructure providers have their own terms and policies. Their availability, data and decisions are outside our control. Attribution requirements for bundled or downloaded data must be kept when the relevant license requires it.</p>
+
+            <h2 class="fade-in">7. Support and community conduct</h2>
+            <p class="fade-in">Demonz Development tries to listen to users before anything else, and reports are genuinely welcome. Community support is offered on a best-effort basis with no guaranteed response time. Be respectful, remove sensitive information, explain what you expected, and include useful logs or configuration excerpts with secrets redacted. Harassment, hate speech, threats and targeted disclosure of personal information are not accepted in project spaces.</p>
+
+            <h2 class="fade-in">8. Warranty and liability</h2>
+            <p class="fade-in">The software and hosted services are provided “as is” and “as available,” without promises that every lookup will be correct or every service uninterrupted. To the extent permitted by applicable law, Demonz Development and project contributors are not liable for indirect, incidental, special or consequential loss arising from configuration choices, unavailable providers, false geolocation results, blocked players, lost revenue or misuse of the project. Rights that cannot lawfully be excluded remain unaffected.</p>
+
+            <h2 class="fade-in">9. Changes and contact</h2>
+            <p class="fade-in">We may revise these terms when the service, providers or legal obligations change. Material updates will receive a new effective date and a changelog entry. Continuing to use a hosted service after a published change means you accept the updated hosted-service terms; if you do not, stop using that hosted endpoint. Your GPL rights in a copy of the software remain governed by the license.</p>
+            <p class="fade-in">Questions, bugs and respectful criticism are welcome through the <a href="https://github.com/DemonZ-Development/Geo-Restrict/issues" target="_blank" rel="noopener">GitHub issue tracker</a> or the <a href="https://discord.com/invite/GYsTt96ypf" target="_blank" rel="noopener">Demonz Development Discord</a>.</p>
+        </div>
+    </main>
+    <script src="script.js?rev=20260714h"></script>
+</body>
+</html>

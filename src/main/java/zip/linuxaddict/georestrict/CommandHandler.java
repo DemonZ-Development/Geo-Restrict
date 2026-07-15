@@ -27,18 +27,15 @@ public final class CommandHandler {
     private final GeoCache cache;
     private final File configFile;
     private final BiConsumer<GeoConfig, Runnable> configReloader;
-    private final Runnable cacheReloader;
 
     public CommandHandler(GeoRestrictService service,
                           GeoCache cache,
                           File configFile,
-                          BiConsumer<GeoConfig, Runnable> configReloader,
-                          Runnable cacheReloader) {
+                          BiConsumer<GeoConfig, Runnable> configReloader) {
         this.service = service;
         this.cache = cache;
         this.configFile = configFile;
         this.configReloader = configReloader;
-        this.cacheReloader = cacheReloader;
     }
 
     public boolean execute(Sender sender, IpResolver resolver, String[] args) {
@@ -111,8 +108,8 @@ public final class CommandHandler {
         sender.sendMessage(legacy("&7File size: &f" + String.format("%.2f", stats.fileSizeBytes / 1024.0) + " KB"));
         if (stats.oldestEntryTimestamp > 0) {
             long ageMs = System.currentTimeMillis() - stats.oldestEntryTimestamp;
-            long ageDays = ageMs / (1000L * 60 * 60 * 24);
-            long ageHours = (ageMs / (1000L * 60 * 60)) % 24;
+            long ageDays = ageMs / 1000L / 60 / 60 / 24;
+            long ageHours = ageMs / 1000L / 60 / 60 % 24;
             sender.sendMessage(legacy("&7Oldest entry: &f" + ageDays + "d " + ageHours + "h ago"));
         } else {
             sender.sendMessage(legacy("&7Oldest entry: &fN/A"));

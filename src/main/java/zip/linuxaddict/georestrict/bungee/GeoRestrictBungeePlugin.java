@@ -57,12 +57,14 @@ public class GeoRestrictBungeePlugin extends Plugin implements Listener {
         service = new GeoRestrictService(config, log, cache);
         getProxy().getPluginManager().registerListener(this, this);
 
-        command = new CommandHandler(service, cache, configFile, this::applyConfig, () -> {});
+        command = new CommandHandler(service, cache, configFile, this::applyConfig);
         registerCommand();
         startConfigWatcher(configFile);
         startUpdateChecker();
         startCacheMaintenance();
         log.info("GeoRestrict enabled.");
+        log.info(PluginInfo.COMMUNITY_MESSAGE);
+        log.info(PluginInfo.FEEDBACK_MESSAGE);
     }
 
     private void applyConfig(GeoConfig fresh, Runnable done) {
@@ -110,7 +112,7 @@ public class GeoRestrictBungeePlugin extends Plugin implements Listener {
 
     private void startUpdateChecker() {
         if (!config.updateCheck) return;
-        updateChecker = new UpdateChecker(PluginInfo.VERSION, PluginInfo.MODRINTH_PROJECT, log);
+        updateChecker = new UpdateChecker(PluginInfo.VERSION, PluginInfo.MODRINTH_PROJECT);
         getProxy().getScheduler().schedule(this, () ->
             updateChecker.checkForUpdate().thenAccept(latest -> {
                 if (latest != null) log.info("Update available: {}", latest);
@@ -136,9 +138,6 @@ public class GeoRestrictBungeePlugin extends Plugin implements Listener {
         event.registerIntent(this);
         String ip = event.getConnection().getAddress().getAddress().getHostAddress();
         String name = event.getConnection().getName();
-        // Bungee has no permission lookup at the LoginEvent stage, so bypass
-        // is not enforceable here. Backend Bukkit servers re-check via the
-        // georestrict.bypass permission after the player is fully online.
         try {
             service.checkIp(ip, name, false).whenComplete((result, error) -> {
                 try {
