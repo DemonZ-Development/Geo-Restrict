@@ -25,7 +25,7 @@ These are human written descriptions that are ready to adapt for the major Minec
 | Discord | https://discord.com/invite/GYsTt96ypf |
 | Privacy | https://georestrict-docs.pages.dev/privacy |
 | Terms | https://georestrict-docs.pages.dev/terms |
-| Banner | https://raw.githubusercontent.com/DemonZ-Development/Geo-Restrict/main/georestrict-banner.png |
-| Icon | https://raw.githubusercontent.com/DemonZ-Development/Geo-Restrict/main/georestrict-icon.png |
+| Banner | https://georestrict-docs.pages.dev/assets/georestrict-banner.png?rev=20260714g |
+| Icon | https://georestrict-docs.pages.dev/assets/georestrict-icon.png?rev=20260714e |
 
 Do not add performance numbers unless a reproducible benchmark is published. Do not describe the project as “zero telemetry”: GeoRestrict supports ordinary aggregate bStats metrics. The accurate statement is that the plugin does not send player names or IP addresses to bStats.

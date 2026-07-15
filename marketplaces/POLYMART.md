@@ -1,4 +1,4 @@
-![GeoRestrict geographic access rules for Minecraft](https://raw.githubusercontent.com/DemonZ-Development/Geo-Restrict/main/georestrict-banner.png)
+![GeoRestrict geographic access rules for Minecraft](https://georestrict-docs.pages.dev/assets/georestrict-banner.png?rev=20260714g)
 
 # Practical access rules, without another control panel
 
