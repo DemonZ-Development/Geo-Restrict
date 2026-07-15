@@ -1,4 +1,4 @@
-![GeoRestrict geographic access rules for Minecraft](georestrict-banner.png)
+![GeoRestrict geographic access rules for Minecraft](assets/georestrict-banner.png)
 
 # GeoRestrict
  w
