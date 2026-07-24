@@ -1,6 +1,6 @@
 name: GeoRestrict
 main: zip.linuxaddict.georestrict.bukkit.GeoRestrictBukkitPlugin
-version: 2.0.0
+version: 2.0.1
 api-version: '1.16'
 folia-supported: true
 

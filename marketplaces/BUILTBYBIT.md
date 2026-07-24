@@ -32,4 +32,4 @@ IP geolocation is approximate, and an uncached address must be sent to the confi
 
 The [setup guide](https://georestrict-docs.pages.dev/installation) explains the safe default path. Most operators should leave the generated network settings unchanged. Please also read the [Privacy Policy](https://georestrict-docs.pages.dev/privacy) and [Terms and Conditions](https://georestrict-docs.pages.dev/terms), which cover player IP processing and use of the public services.
 
-[Discord support and feedback](https://discord.com/invite/GYsTt96ypf) · [Repository](https://github.com/DemonZ-Development/Geo-Restrict) · [Releases](https://github.com/DemonZ-Development/Geo-Restrict/releases) · [Issue tracker](https://github.com/DemonZ-Development/Geo-Restrict/issues) · GPL-3.0
+[Discord support and feedback](https://discord.com/invite/GYsTt96ypf) · [Repository](https://github.com/DemonZ-Development/Geo-Restrict) · [Modrinth](https://modrinth.com/plugin/georestrict) · [Issue tracker](https://github.com/DemonZ-Development/Geo-Restrict/issues) · GPL-3.0

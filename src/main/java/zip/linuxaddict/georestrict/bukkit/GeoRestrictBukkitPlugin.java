@@ -18,6 +18,8 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
+import org.bstats.charts.SingleLineChart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import zip.linuxaddict.georestrict.CommandHandler;
@@ -35,6 +37,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
     private static final long PENDING_CHECK_TTL_MS = 300_000L;
@@ -47,6 +50,7 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
     private CommandHandler command;
     private Logger log;
     private final Map<UUID, PendingCheck> pendingChecks = new ConcurrentHashMap<>();
+    private final AtomicLong connectionCount = new AtomicLong();
 
     @Override
     public void onEnable() {
@@ -65,13 +69,17 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
         service = new GeoRestrictService(config, log, cache);
         getServer().getPluginManager().registerEvents(this, this);
 
-        new Metrics(this, PluginInfo.BSTATS_BUKKIT);
+        Metrics metrics = new Metrics(this, PluginInfo.BSTATS_BUKKIT);
+        metrics.addCustomChart(new SingleLineChart("connections", () -> (int) connectionCount.getAndSet(0)));
+        metrics.addCustomChart(new SimplePie("country_mode", () -> config.countryMode.name().toLowerCase()));
+        metrics.addCustomChart(new SimplePie("vpn_check", () -> config.vpnCheckEnabled ? "enabled" : "disabled"));
 
         command = new CommandHandler(service, cache, configFile, this::applyConfig);
         registerCommand();
         startConfigWatcher(configFile);
         startUpdateChecker();
         startCacheMaintenance();
+        startPendingCheckPruning();
         log.info("GeoRestrict enabled.");
         log.info(PluginInfo.COMMUNITY_MESSAGE);
         log.info(PluginInfo.FEEDBACK_MESSAGE);
@@ -143,12 +151,19 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
         scheduler.runTimerAsync(this, () -> cache.purgeExpired(config.cacheTtlDays), 6000L, 216000L);
     }
 
+    private void startPendingCheckPruning() {
+        scheduler.runTimerAsync(this, this::prunePendingChecks, 1200L, 1200L);
+    }
+
     @Override
     public void onDisable() {
         pendingChecks.clear();
         if (scheduler != null) scheduler.cancelAll(this);
         if (service != null) service.shutdown();
-        if (cache != null) cache.save();
+        if (cache != null) {
+            cache.shutdown();
+            cache.save();
+        }
         if (log != null) log.info("GeoRestrict disabled.");
     }
 
@@ -157,8 +172,9 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
         String ip = event.getAddress().getHostAddress();
         String name = event.getName();
         UUID uuid = event.getUniqueId();
-        prunePendingChecks();
+
         try {
+            connectionCount.incrementAndGet();
             GeoRestrictService.CheckResult result = service.checkIp(ip, name, false).join();
             if (!result.allowed) {
                 pendingChecks.put(uuid, new PendingCheck(result, System.currentTimeMillis()));

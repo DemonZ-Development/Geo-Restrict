@@ -21,8 +21,10 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GeoCache {
@@ -35,6 +37,11 @@ public class GeoCache {
     private final Logger logger;
     private final Object ioLock = new Object();
     private final AtomicBoolean savePending = new AtomicBoolean(false);
+    private final ScheduledExecutorService saveScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread t = new Thread(r, "GeoRestrict-CacheSave");
+        t.setDaemon(true);
+        return t;
+    });
 
     public GeoCache(File cacheFile, Gson gson, Logger logger) {
         this.cacheFile = cacheFile;
@@ -147,12 +154,24 @@ public class GeoCache {
 
     private void scheduleSave() {
         if (savePending.compareAndSet(false, true)) {
-            CompletableFuture.runAsync(() -> {
-                try { Thread.sleep(SAVE_DEBOUNCE_MS); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+            saveScheduler.schedule(() -> {
                 savePending.set(false);
                 save();
-            });
+            }, SAVE_DEBOUNCE_MS, TimeUnit.MILLISECONDS);
         }
+    }
+
+    public void shutdown() {
+        saveScheduler.shutdown();
+        try {
+            if (!saveScheduler.awaitTermination(3, TimeUnit.SECONDS)) {
+                saveScheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            saveScheduler.shutdownNow();
+        }
+        save();
     }
 
     public static class CacheEntry {

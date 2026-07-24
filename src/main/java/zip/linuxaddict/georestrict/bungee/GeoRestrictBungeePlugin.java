@@ -129,7 +129,10 @@ public class GeoRestrictBungeePlugin extends Plugin implements Listener {
     public void onDisable() {
         getProxy().getScheduler().cancel(this);
         if (service != null) service.shutdown();
-        if (cache != null) cache.save();
+        if (cache != null) {
+            cache.shutdown();
+            cache.save();
+        }
         if (log != null) log.info("GeoRestrict disabled.");
     }
 

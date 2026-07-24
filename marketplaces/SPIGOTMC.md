@@ -43,6 +43,6 @@ A cache miss sends the connecting IP to the configured lookup service for countr
 
 Most server owners should keep the generated network settings unchanged. The [wiki](https://georestrict-docs.pages.dev/) explains installation, rules and troubleshooting. Please read the [Privacy Policy](https://georestrict-docs.pages.dev/privacy) and [Terms and Conditions](https://georestrict-docs.pages.dev/terms) before using the public services.
 
-[Discord support and feedback](https://discord.com/invite/GYsTt96ypf) · [Source](https://github.com/DemonZ-Development/Geo-Restrict) · [Releases](https://github.com/DemonZ-Development/Geo-Restrict/releases) · [Issues](https://github.com/DemonZ-Development/Geo-Restrict/issues) · GPL-3.0
+[Discord support and feedback](https://discord.com/invite/GYsTt96ypf) · [Source](https://github.com/DemonZ-Development/Geo-Restrict) · [Modrinth](https://modrinth.com/plugin/georestrict) · [Issues](https://github.com/DemonZ-Development/Geo-Restrict/issues) · GPL-3.0
 
 Originally created by linuxaddict; now maintained by the Demonz Development open source community.

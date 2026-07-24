@@ -195,7 +195,10 @@ public class GeoRestrictVelocityPlugin {
     @Subscribe
     public void onShutdown(ProxyShutdownEvent event) {
         if (service != null) service.shutdown();
-        if (cache != null) cache.save();
+        if (cache != null) {
+            cache.shutdown();
+            cache.save();
+        }
         logger.info("GeoRestrict disabled.");
     }
 }

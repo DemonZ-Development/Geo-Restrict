@@ -1,10 +1,10 @@
 ![GeoRestrict geographic access rules for Minecraft](assets/georestrict-banner.png)
 
 # GeoRestrict
- w
+
 GeoRestrict helps Minecraft server owners decide where connections may come from. It can use country codes, network ASNs and VPN/proxy signals, while keeping recent lookup results in a local cache.
 
-The same **v2.0.0** jar runs on Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity. GeoRestrict targets Java 17 bytecode; use a newer Java runtime whenever your server platform requires one.
+The same **v2.0.1** jar runs on Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity. GeoRestrict targets Java 17 bytecode; use a newer Java runtime whenever your server platform requires one.
 
 ## Why it exists
 
@@ -22,7 +22,7 @@ Sometimes a community only serves one region. Sometimes a server is being hit by
 
 ## Start here
 
-1. Download `georestrict-2.0.0.jar` from [Releases](https://github.com/DemonZ-Development/Geo-Restrict/releases).
+1. Download `georestrict-2.0.1.jar` from [Modrinth](https://modrinth.com/plugin/georestrict).
 2. Put it in the server or proxy `plugins/` folder.
 3. Restart once so `plugins/GeoRestrict/config.yml` is created.
 4. Choose `BLOCKLIST` or `ALLOWLIST`, add the countries you need, then run `/georestrict reload`.
@@ -109,7 +109,7 @@ The supplied systemd units are in [`vps-gateway/deploy/`](vps-gateway/deploy/). 
 
 ### Release verification
 
-The final v2.0.0 jar passed unit, integration, Worker and fallback server tests. It was also started on real platform runtimes:
+The final v2.0.1 jar passed unit, integration, Worker and fallback server tests. It was also started on real platform runtimes:
 
 | Runtime | Version tested | Result |
 |---|---|---|
@@ -143,7 +143,7 @@ node --check worker/src/index.js
 node --check vps-gateway/src/server.js
 ```
 
-The shaded jar is written to `target/georestrict-2.0.0.jar`.
+The shaded jar is written to `target/georestrict-2.0.1.jar`.
 
 The integration and real platform startup harnesses are documented in [`test/README.md`](test/README.md).
 

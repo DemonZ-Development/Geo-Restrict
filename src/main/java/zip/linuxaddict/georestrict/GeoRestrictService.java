@@ -41,6 +41,7 @@ public class GeoRestrictService {
     private final GeoCache cache;
     private final Gson gson = new Gson();
     private final ExecutorService executor;
+    private final ExecutorService discordExecutor;
 
     public GeoRestrictService(GeoConfig config, Logger logger, GeoCache cache) {
         this.config = config;
@@ -48,6 +49,11 @@ public class GeoRestrictService {
         this.cache = cache;
         this.executor = Executors.newFixedThreadPool(
             Math.max(1, config.lookupThreads), new LookupThreadFactory());
+        this.discordExecutor = Executors.newSingleThreadExecutor(r -> {
+            Thread t = new Thread(r, "GeoRestrict-Discord");
+            t.setDaemon(true);
+            return t;
+        });
     }
 
     public void setConfig(GeoConfig config) {
@@ -56,13 +62,18 @@ public class GeoRestrictService {
 
     public void shutdown() {
         executor.shutdown();
+        discordExecutor.shutdown();
         try {
             if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
                 executor.shutdownNow();
             }
+            if (!discordExecutor.awaitTermination(3, TimeUnit.SECONDS)) {
+                discordExecutor.shutdownNow();
+            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             executor.shutdownNow();
+            discordExecutor.shutdownNow();
         }
     }
 
@@ -269,7 +280,7 @@ public class GeoRestrictService {
         GeoConfig current = config;
         if (isBlank(current.discord.webhook)) return;
 
-        executor.execute(() -> {
+        discordExecutor.execute(() -> {
             try {
                 String ip = current.discord.maskIp ? maskIp(info.ip) : info.ip;
 

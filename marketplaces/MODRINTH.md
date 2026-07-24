@@ -46,7 +46,7 @@ On a cache miss, the connecting IP goes to the configured lookup service for cou
 ## Help and project links
 
 - [Source code](https://github.com/DemonZ-Development/Geo-Restrict)
-- [Releases](https://github.com/DemonZ-Development/Geo-Restrict/releases)
+- [Download on Modrinth](https://modrinth.com/plugin/georestrict)
 - [Documentation](https://georestrict-docs.pages.dev/)
 - [Privacy Policy](https://georestrict-docs.pages.dev/privacy)
 - [Terms and Conditions](https://georestrict-docs.pages.dev/terms)
