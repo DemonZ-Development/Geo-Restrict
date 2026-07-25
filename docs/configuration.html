@@ -165,6 +165,9 @@
                         <tr><td><code>cacheTtlDays</code></td><td>int 1–365</td><td><code>30</code></td><td>How long a cached lookup is trusted.</td></tr>
                         <tr><td><code>updateCheck</code></td><td>bool</td><td><code>true</code></td><td>Hits Modrinth every 6h, logs when a new version is out.</td></tr>
                         <tr><td><code>connectionTimeoutMs</code></td><td>int</td><td><code>3000</code></td><td>HTTP timeout for the plugin's Worker request.</td></tr>
+                        <tr><td><code>floodgate.enabled</code></td><td>bool</td><td><code>true</code></td><td>Auto-detect Floodgate Bedrock players if Floodgate is installed.</td></tr>
+                        <tr><td><code>floodgate.bypassGeorestrict</code></td><td>bool</td><td><code>false</code></td><td>Bypass all country, ASN, and VPN rules for Floodgate Bedrock players.</td></tr>
+                        <tr><td><code>floodgate.bypassVpnCheck</code></td><td>bool</td><td><code>false</code></td><td>Bypass only VPN/hosting keyword checks for Floodgate Bedrock players.</td></tr>
                         <tr><td><code>discord.webhook</code></td><td>URL</td><td><code>""</code></td><td>Empty = no notifications. Use a private webhook URL.</td></tr>
                         <tr><td><code>discord.maskIp</code></td><td>bool</td><td><code>true</code></td><td>Show <code>1.2.x.x</code> instead of the full IPv4.</td></tr>
                         <tr><td><code>discord.logAllowed</code></td><td>bool</td><td><code>false</code></td><td>Webhook on every allow. This can be high-volume on an active server.</td></tr>
@@ -172,9 +175,24 @@
                         <tr><td><code>discord.title</code></td><td>string</td><td>—</td><td>Embed title.</td></tr>
                         <tr><td><code>discord.colorAllowed</code></td><td>int</td><td><code>65280</code></td><td>Decimal RGB. Green by default.</td></tr>
                         <tr><td><code>discord.colorDenied</code></td><td>int</td><td><code>16711680</code></td><td>Decimal RGB. Red by default.</td></tr>
-                        <tr><td><code>discord.fields</code></td><td>list</td><td>7 default</td><td>Embed fields. Placeholders: <code>%player%</code>, <code>%status%</code>, <code>%ip%</code>, <code>%country%</code>, <code>%asn%</code>, <code>%isp%</code>, <code>%reason%</code>.</td></tr>
+                        <tr><td><code>discord.fields</code></td><td>list</td><td>7 default</td><td>Embed fields. Placeholders: <code>%player%</code>, <code>%status%</code>, <code>%ip%</code>, <code>%country%</code>, <code>%asn%</code>, <code>%isp%</code>, <code>%xuid%</code>, <code>%device_os%</code>, <code>%reason%</code>.</td></tr>
                     </tbody>
                 </table>
+            </div>
+
+            <h2 class="fade-in">Developer API</h2>
+            <p class="fade-in">GeoRestrict exposes a clean Developer API (<code>GeoRestrictAPI</code>) for third-party plugins across Paper/Spigot, BungeeCord, and Velocity:</p>
+            <div class="code-wrapper fade-in">
+<pre><code><span class="syn-cmt">// Check if GeoRestrict API is ready</span>
+<span class="syn-bool">if</span> (GeoRestrictAPI.isAvailable()) {
+    <span class="syn-cmt">// Asynchronously check an IP address</span>
+    GeoRestrictAPI.checkIp(<span class="syn-str">"1.1.1.1"</span>, <span class="syn-str">"PlayerName"</span>).thenAccept(result -> {
+        <span class="syn-bool">if</span> (!result.allowed) {
+            System.out.println(<span class="syn-str">"Blocked: "</span> + result.reason);
+        }
+    });
+}
+</code></pre>
             </div>
 
             <h2 class="fade-in">Migrating old configs</h2>

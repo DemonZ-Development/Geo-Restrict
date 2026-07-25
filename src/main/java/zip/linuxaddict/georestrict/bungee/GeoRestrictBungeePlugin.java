@@ -144,8 +144,9 @@ public class GeoRestrictBungeePlugin extends Plugin implements Listener {
         event.registerIntent(this);
         String ip = event.getConnection().getAddress().getAddress().getHostAddress();
         String name = event.getConnection().getName();
+        java.util.UUID uuid = event.getConnection().getUniqueId();
         try {
-            service.checkIp(ip, name, false).whenComplete((result, error) -> {
+            service.checkIp(ip, name, uuid, false).whenComplete((result, error) -> {
                 try {
                     if (error != null) {
                         log.error("Lookup error for {}: {}", name, error.getMessage());

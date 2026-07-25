@@ -43,7 +43,29 @@
             </header>
 
             <section class="changelog-version fade-in">
-                <h2>v2.0.0 <span class="changelog-tag tag-latest">Latest</span></h2>
+                <h2>v2.0.1 <span class="changelog-tag tag-latest">Latest</span></h2>
+                <p class="release-date">25 July 2026 · hotfix &amp; developer API</p>
+                <p>v2.0.1 introduces a public Developer API, Geyser / Floodgate (Bedrock) integration, expanded VPN detection keywords, and core performance &amp; thread safety hotfixes.</p>
+
+                <h3>Developer API &amp; Bedrock Integration</h3>
+                <ul class="changelog-list">
+                    <li class="added">Public <code>GeoRestrictAPI</code> class for third-party plugins on Paper/Spigot, BungeeCord, and Velocity.</li>
+                    <li class="added">Paper/Bukkit <code>ServicesManager</code> registration out of the box.</li>
+                    <li class="added">Optional Geyser / Floodgate (Bedrock player) detection with configurable <code>floodgate:</code> bypass settings.</li>
+                    <li class="added">New Discord embed placeholders: <code>%xuid%</code> and <code>%device_os%</code> for Bedrock player logging.</li>
+                </ul>
+
+                <h3>Performance &amp; Thread Safety</h3>
+                <ul class="changelog-list">
+                    <li class="fixed">Isolated Discord webhooks to a dedicated single-thread executor (<code>GeoRestrict-Discord</code>) so slow webhooks never block player lookups.</li>
+                    <li class="fixed">Replaced <code>ForkJoinPool</code> thread sleeping in cache save debouncing with a dedicated <code>ScheduledExecutorService</code>.</li>
+                    <li class="fixed">Moved Bukkit pending-check pruning to a periodic 60s task instead of running inline during every login.</li>
+                    <li class="added">Expanded default VPN keywords to include <code>datacamp</code> (Proton VPN host), <code>tzulo</code>, <code>leaseweb</code>, <code>m247</code>, <code>proton</code>, and <code>datacenter</code>.</li>
+                </ul>
+            </section>
+
+            <section class="changelog-version fade-in">
+                <h2>v2.0.0</h2>
                 <p class="release-date">14 July 2026 · complete rewrite</p>
                 <p>v2.0.0 turns GeoRestrict from a small country filter into a maintained, multi-platform access-control plugin. The setup is still one jar and one readable config; the machinery behind it is much safer.</p>
 

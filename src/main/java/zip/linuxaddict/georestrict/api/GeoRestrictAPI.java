@@ -89,7 +89,15 @@ public final class GeoRestrictAPI {
      * @return CompletableFuture containing the CheckResult
      */
     public static CompletableFuture<GeoRestrictService.CheckResult> checkIp(String ip, String playerName, boolean bypass) {
-        return getService().checkIp(ip, playerName, bypass);
+        return getService().checkIp(ip, playerName, null, bypass);
+    }
+
+    public static CompletableFuture<GeoRestrictService.CheckResult> checkIp(String ip, String playerName, java.util.UUID uuid) {
+        return getService().checkIp(ip, playerName, uuid, false);
+    }
+
+    public static CompletableFuture<GeoRestrictService.CheckResult> checkIp(String ip, String playerName, java.util.UUID uuid, boolean bypass) {
+        return getService().checkIp(ip, playerName, uuid, bypass);
     }
 
     /**

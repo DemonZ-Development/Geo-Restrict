@@ -39,7 +39,14 @@ public class GeoConfig {
     public String kickMessageVpn = "VPN or proxy connections are not allowed.";
     public String kickMessageLookupFailure = "Geo verification is temporarily unavailable. Please try again later.";
 
+    public FloodgateSettings floodgate = new FloodgateSettings();
     public DiscordSettings discord = new DiscordSettings();
+
+    public static class FloodgateSettings {
+        public boolean enabled = true;
+        public boolean bypassGeorestrict = false;
+        public boolean bypassVpnCheck = false;
+    }
 
     public static class DiscordSettings {
         public String webhook = "";

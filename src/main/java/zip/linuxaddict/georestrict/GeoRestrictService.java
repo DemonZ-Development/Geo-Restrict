@@ -86,27 +86,43 @@ public class GeoRestrictService {
     }
 
     public CompletableFuture<CheckResult> checkIp(String ip, String playerName) {
-        return checkIp(ip, playerName, false);
+        return checkIp(ip, playerName, null, false);
     }
 
     public CompletableFuture<CheckResult> checkIp(String ip, String playerName, boolean bypass) {
-        return CompletableFuture.supplyAsync(() -> checkIpNow(ip, playerName, bypass), executor);
+        return checkIp(ip, playerName, null, bypass);
     }
 
-    private CheckResult checkIpNow(String ip, String playerName, boolean bypass) {
+    public CompletableFuture<CheckResult> checkIp(String ip, String playerName, java.util.UUID uuid) {
+        return checkIp(ip, playerName, uuid, false);
+    }
+
+    public CompletableFuture<CheckResult> checkIp(String ip, String playerName, java.util.UUID uuid, boolean bypass) {
+        return CompletableFuture.supplyAsync(() -> checkIpNow(ip, playerName, uuid, bypass), executor);
+    }
+
+    private CheckResult checkIpNow(String ip, String playerName, java.util.UUID uuid, boolean bypass) {
         GeoConfig current = config;
         if (bypass) {
             logger.info("Bypass granted to {} ({})", playerName, ip);
             return new CheckResult(true, null, null);
         }
+
+        boolean isBedrock = uuid != null && current.floodgate.enabled
+            && zip.linuxaddict.georestrict.floodgate.FloodgateHandler.isBedrockPlayer(uuid);
+        if (isBedrock && current.floodgate.bypassGeorestrict) {
+            logger.info("Floodgate Bedrock bypass granted to {} ({})", playerName, ip);
+            return new CheckResult(true, null, null);
+        }
+
         if (!NetworkUtils.isValidPublicIp(ip)) {
             return new CheckResult(true, null, null);
         }
 
         GeoResponse cached = cache.get(ip, current.cacheTtlDays);
         if (cached != null) {
-            CheckResult result = evaluate(cached);
-            logResultToDiscord(cached, result, playerName);
+            CheckResult result = evaluate(cached, isBedrock);
+            logResultToDiscord(cached, result, playerName, uuid);
             return result;
         }
 
@@ -117,8 +133,8 @@ public class GeoRestrictService {
         }
 
         cache.put(ip, response, current.maxCacheEntries);
-        CheckResult result = evaluate(response);
-        logResultToDiscord(response, result, playerName);
+        CheckResult result = evaluate(response, isBedrock);
+        logResultToDiscord(response, result, playerName, uuid);
         return result;
     }
 
@@ -176,7 +192,7 @@ public class GeoRestrictService {
         }
     }
 
-    private CheckResult evaluate(GeoResponse info) {
+    private CheckResult evaluate(GeoResponse info, boolean isBedrock) {
         GeoConfig current = config;
         if (info == null) return new CheckResult(true, null, null);
 
@@ -206,7 +222,7 @@ public class GeoRestrictService {
             }
         }
 
-        if (current.vpnCheckEnabled) {
+        if (current.vpnCheckEnabled && !(isBedrock && current.floodgate.bypassVpnCheck)) {
             if (info.isVpn || info.isHosting || info.isProxy) {
                 logger.info("Blocked {} (vpn/hosting/proxy flag)", info.ip);
                 return new CheckResult(false, current.kickMessageVpn, info);
@@ -276,21 +292,25 @@ public class GeoRestrictService {
         return v == null ? "" : v.trim().toUpperCase(Locale.ROOT);
     }
 
-    private void logResultToDiscord(GeoResponse info, CheckResult result, String playerName) {
+    private void logResultToDiscord(GeoResponse info, CheckResult result, String playerName, java.util.UUID uuid) {
         GeoConfig current = config;
         if (result.allowed && !current.discord.logAllowed) return;
         if (!result.allowed && !current.discord.logDenied) return;
         logToDiscord(info, result.allowed ? "Allowed" : "Blocked",
-            result.allowed ? "Connection allowed." : result.reason, playerName);
+            result.allowed ? "Connection allowed." : result.reason, playerName, uuid);
     }
 
-    private void logToDiscord(GeoResponse info, String status, String reason, String playerName) {
+    private void logToDiscord(GeoResponse info, String status, String reason, String playerName, java.util.UUID uuid) {
         GeoConfig current = config;
         if (isBlank(current.discord.webhook)) return;
 
         discordExecutor.execute(() -> {
             try {
                 String ip = current.discord.maskIp ? maskIp(info.ip) : info.ip;
+                zip.linuxaddict.georestrict.floodgate.FloodgateHandler.BedrockPlayerInfo bedrock =
+                    zip.linuxaddict.georestrict.floodgate.FloodgateHandler.getBedrockInfo(uuid);
+                String xuid = bedrock != null ? bedrock.xuid : "N/A";
+                String deviceOs = bedrock != null ? bedrock.deviceOs : "N/A";
 
                 JsonArray fieldsArray = new JsonArray();
                 for (GeoConfig.EmbedField f : current.discord.fields) {
@@ -301,6 +321,8 @@ public class GeoRestrictService {
                         .replace("%country%", nullSafe(info.countryCode, "Unknown"))
                         .replace("%asn%", nullSafe(info.asn, "Unknown"))
                         .replace("%isp%", nullSafe(info.asName, "Unknown"))
+                        .replace("%xuid%", nullSafe(xuid, "N/A"))
+                        .replace("%device_os%", nullSafe(deviceOs, "N/A"))
                         .replace("%reason%", reason == null ? "" : reason);
 
                     JsonObject obj = new JsonObject();

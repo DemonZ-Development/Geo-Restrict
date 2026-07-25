@@ -103,6 +103,12 @@ public final class GeoConfigConstants {
         "updateCheck: true\n" +
         "connectionTimeoutMs: 3000\n" +
         "\n" +
+        "# ----- Floodgate / Geyser (Bedrock) -----\n" +
+        "floodgate:\n" +
+        "  enabled: true\n" +
+        "  bypassGeorestrict: false\n" +
+        "  bypassVpnCheck: false\n" +
+        "\n" +
         "# ----- Discord webhook -----\n" +
         "discord:\n" +
         "  webhook: \"\"\n" +

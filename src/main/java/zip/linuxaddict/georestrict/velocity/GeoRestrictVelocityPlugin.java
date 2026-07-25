@@ -164,7 +164,8 @@ public class GeoRestrictVelocityPlugin {
         return EventTask.withContinuation(continuation -> {
             String ip = event.getPlayer().getRemoteAddress().getAddress().getHostAddress();
             String name = event.getPlayer().getUsername();
-            service.checkIp(ip, name, false).whenComplete((result, error) -> {
+            java.util.UUID uuid = event.getPlayer().getUniqueId();
+            service.checkIp(ip, name, uuid, false).whenComplete((result, error) -> {
                 try {
                     if (error != null) {
                         logger.error("Lookup error for {}: {}", name, error.getMessage());

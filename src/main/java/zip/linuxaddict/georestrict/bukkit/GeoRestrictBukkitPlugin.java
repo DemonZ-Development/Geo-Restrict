@@ -183,7 +183,7 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
 
         try {
             connectionCount.incrementAndGet();
-            GeoRestrictService.CheckResult result = service.checkIp(ip, name, false).join();
+            GeoRestrictService.CheckResult result = service.checkIp(ip, name, uuid, false).join();
             if (!result.allowed) {
                 pendingChecks.put(uuid, new PendingCheck(result, System.currentTimeMillis()));
             } else {
