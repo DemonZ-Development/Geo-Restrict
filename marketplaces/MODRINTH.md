@@ -6,13 +6,19 @@
 
 GeoRestrict lets you make practical rules around where connections come from. Block a short list of countries, keep a private server open to one region, stop traffic from a troublesome hosting network, or add a VPN rule while an attack is active. The policy stays in your own `config.yml`, where you can read it and change it.
 
+## Sponsored by Nexeu Hosting
+
+[![nexeu-sponsor](https://whodoesntloveavatars.s3.fra.databucket.eu/assets/promo.png)](https://nexeu.zip/)
+
+High-performance, affordable hosting for your Minecraft server. Premium hardware, instant setup, 24/7 support.
+
 ## The useful bits
 
 - Country allowlists and blocklists
 - ASN rules for individual ISPs and hosting networks
 - Configurable VPN, proxy and hosting detection
 - Geyser / Floodgate (Bedrock) integration with custom bypass options
-- Developer API (`GeoRestrictAPI`) for Paper, BungeeCord, and Velocity
+- Developer API (`GeoRestrictAPI`) for Paper, BungeeCord, and Velocity (Geo-Routing, VPN queries, ASN lookups)
 - One v2.0.1 jar for Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity
 - Local, bounded cache with atomic saves and automatic expiry cleanup
 - Clear behavior when the lookup service is temporarily unavailable
@@ -33,6 +39,12 @@ You do not need to enable every feature on day one. Country rules are enough for
 ## When a lookup fails
 
 v2.0.1 blocks by default when the cache is empty and the lookup service is unavailable. The player receives your `kickMessageLookupFailure`. Set `blockOnLookupFailure: false` if keeping the server reachable during an outage matters more than strict filtering.
+
+## Live Statistics
+
+[![bStats Bukkit](https://bstats.org/signatures/bukkit/georestrict.svg)](https://bstats.org/plugin/bukkit/georestrict/32871)
+[![bStats BungeeCord](https://bstats.org/signatures/bungeecord/georestrict.svg)](https://bstats.org/plugin/bungeecord/georestrict/32872)
+[![bStats Velocity](https://bstats.org/signatures/velocity/georestrict.svg)](https://bstats.org/plugin/velocity/georestrict/32873)
 
 ## Privacy, without vague promises
 

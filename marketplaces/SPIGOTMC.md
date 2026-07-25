@@ -1,10 +1,16 @@
 ![GeoRestrict geographic access rules for Minecraft](https://georestrict-docs.pages.dev/assets/georestrict-banner.png?rev=20260714g)
 
-# GeoRestrict v2.0.0
+# GeoRestrict v2.0.1
 
 You should not need a security dashboard, a paid subscription, and an afternoon of tutorials just to respond to repeated connections from one network.
 
 GeoRestrict puts country, ASN, VPN and proxy rules in a normal Minecraft config. It works on the backend or at the proxy edge, remembers recent lookups locally, and gives blocked players a message you control.
+
+## Sponsored by Nexeu Hosting
+
+[![nexeu-sponsor](https://whodoesntloveavatars.s3.fra.databucket.eu/assets/promo.png)](https://nexeu.zip/)
+
+High-performance, affordable hosting for your Minecraft server. Premium hardware, instant setup, 24/7 support.
 
 ## Works with your stack
 
@@ -15,19 +21,27 @@ One jar supports Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and
 - Allow or block countries with two letter ISO codes
 - Allow or block individual networks by ASN
 - Detect VPN, proxy and hosting traffic with provider flags and an editable keyword list
+- Geyser & Floodgate Bedrock player detection with custom bypass rules
+- Geo-Routing & Developer API (`GeoRestrictAPI`) for third-party plugins
 - Give trusted Bukkit players `georestrict.bypass`
-- Send useful block events to Discord
+- Send useful block events to Discord with `%xuid%` support
 - Inspect an IP or online player before changing a rule
 - Choose whether joins are blocked or allowed during a lookup outage
 
 ## Install in four steps
 
-1. Put `georestrict-2.0.0.jar` in `plugins/`.
+1. Put `georestrict-2.0.1.jar` in `plugins/`.
 2. Restart once.
 3. Edit `plugins/GeoRestrict/config.yml`.
 4. Run `/georestrict reload` and verify with `/georestrict check <ip>`.
 
 GeoRestrict targets Java 17 bytecode. Use a newer Java runtime whenever your server platform requires one.
+
+## Live Statistics
+
+[![bStats Bukkit](https://bstats.org/signatures/bukkit/georestrict.svg)](https://bstats.org/plugin/bukkit/georestrict/32871)
+[![bStats BungeeCord](https://bstats.org/signatures/bungeecord/georestrict.svg)](https://bstats.org/plugin/bungeecord/georestrict/32872)
+[![bStats Velocity](https://bstats.org/signatures/velocity/georestrict.svg)](https://bstats.org/plugin/velocity/georestrict/32873)
 
 ## Designed for real outages
 

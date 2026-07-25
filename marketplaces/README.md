@@ -1,31 +1,24 @@
-# GeoRestrict marketplace pack
+# Marketplace Listing Texts
 
-These are human written descriptions that are ready to adapt for the major Minecraft plugin directories. They share the same facts but lead with what each audience is most likely to care about.
+This directory contains the exact description copy formatted for each release platform and plugin portal.
 
-- [Modrinth](MODRINTH.md): concise, technical and focused on open source
-- [SpigotMC](SPIGOTMC.md): setup and compatibility first
-- [Hangar](HANGAR.md): Paper, Velocity and Folia audience
-- [Polymart](POLYMART.md): approachable feature overview
-- [BuiltByBit](BUILTBYBIT.md): operations and infrastructure control
-- [CurseForge](CURSEFORGE.md): broad discovery copy
+## Sponsored by Nexeu Hosting
 
-## Shared listing facts
+[![nexeu-sponsor](https://whodoesntloveavatars.s3.fra.databucket.eu/assets/promo.png)](https://nexeu.zip/)
 
-| Field | Value |
-|---|---|
-| Version | 2.0.0 |
-| Project type | Server plugin |
-| Java | 17+ |
-| Minecraft | Verify the exact release against the tested platform matrix before publishing |
-| Platforms | Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall, Velocity |
-| License | GPL-3.0 |
-| Source | https://github.com/DemonZ-Development/Geo-Restrict |
-| Issues | https://github.com/DemonZ-Development/Geo-Restrict/issues |
-| Wiki | https://georestrict-docs.pages.dev/ |
-| Discord | https://discord.com/invite/GYsTt96ypf |
-| Privacy | https://georestrict-docs.pages.dev/privacy |
-| Terms | https://georestrict-docs.pages.dev/terms |
-| Banner | https://georestrict-docs.pages.dev/assets/georestrict-banner.png?rev=20260714g |
-| Icon | https://georestrict-docs.pages.dev/assets/georestrict-icon.png?rev=20260714e |
+High-performance, affordable hosting for your Minecraft server. Premium hardware, instant setup, 24/7 support.
 
-Do not add performance numbers unless a reproducible benchmark is published. Do not describe the project as “zero telemetry”: GeoRestrict supports ordinary aggregate bStats metrics. The accurate statement is that the plugin does not send player names or IP addresses to bStats.
+## Live Statistics
+
+[![bStats Bukkit](https://bstats.org/signatures/bukkit/georestrict.svg)](https://bstats.org/plugin/bukkit/georestrict/32871)
+[![bStats BungeeCord](https://bstats.org/signatures/bungeecord/georestrict.svg)](https://bstats.org/plugin/bungeecord/georestrict/32872)
+[![bStats Velocity](https://bstats.org/signatures/velocity/georestrict.svg)](https://bstats.org/plugin/velocity/georestrict/32873)
+
+## File Directory
+
+- `MODRINTH.md` — Modrinth project description (Markdown)
+- `HANGAR.md` — Paper Hangar project description (Markdown)
+- `SPIGOTMC.md` — SpigotMC resource description (BBCode/Markdown compatible)
+- `BUILTBYBIT.md` — BuiltByBit resource overview (Markdown)
+- `POLYMART.md` — Polymart resource details (Markdown)
+- `CURSEFORGE.md` — CurseForge project page (Markdown)

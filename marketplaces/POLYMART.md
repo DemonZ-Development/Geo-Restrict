@@ -4,17 +4,31 @@
 
 GeoRestrict gives your Minecraft server a geographic front door. You decide which countries and networks are welcome, whether VPN and proxy traffic needs extra scrutiny, and what players see when a rule stops their connection.
 
-There is no remote policy panel to learn. Your rules stay in `config.yml`, recent answers stay in a local cache, and one v2.0.0 jar covers Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity.
+## Sponsored by Nexeu Hosting
+
+[![nexeu-sponsor](https://whodoesntloveavatars.s3.fra.databucket.eu/assets/promo.png)](https://nexeu.zip/)
+
+High-performance, affordable hosting for your Minecraft server. Premium hardware, instant setup, 24/7 support.
+
+There is no remote policy panel to learn. Your rules stay in `config.yml`, recent answers stay in a local cache, and one v2.0.1 jar covers Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity.
 
 ## Features that earn their place
 
 - Country blocklists for targeted abuse, or allowlists for regional/private servers
 - ASN rules when the problem is one ISP or data centre network
 - Configurable VPN and proxy detection instead of a fixed black box
+- Geyser / Floodgate Bedrock integration with custom bypass settings
+- Developer API (`GeoRestrictAPI`) for Geo-Routing without kicking players
 - Discord notifications with player addresses masked by default
 - `/georestrict check` for confirming a result before enforcing it
 - Local cache with atomic writes, expiry and size limits
 - A clear choice between blocking or allowing joins during lookup outages
+
+## Live Statistics
+
+[![bStats Bukkit](https://bstats.org/signatures/bukkit/georestrict.svg)](https://bstats.org/plugin/bukkit/georestrict/32871)
+[![bStats BungeeCord](https://bstats.org/signatures/bungeecord/georestrict.svg)](https://bstats.org/plugin/bungeecord/georestrict/32872)
+[![bStats Velocity](https://bstats.org/signatures/velocity/georestrict.svg)](https://bstats.org/plugin/velocity/georestrict/32873)
 
 ## Set it up
 
