@@ -158,6 +158,18 @@ if (GeoRestrictAPI.isAvailable()) {
 
     // Retrieve cached geo data
     GeoResponse cached = GeoRestrictAPI.getCachedResponse("8.8.8.8");
+
+    // Geo-Routing without blocking: Get ISO country code
+    GeoRestrictAPI.getCountryCode("1.1.1.1").thenAccept(country -> {
+        System.out.println("Country: " + country); // e.g. "US", "DE"
+    });
+
+    // Raw Geo Lookup (country, ASN, ISP, VPN flags)
+    GeoRestrictAPI.lookup("1.1.1.1").thenAccept(geo -> {
+        if (geo != null) {
+            System.out.println("ISP: " + geo.isp + ", VPN: " + geo.isVpn);
+        }
+    });
 }
 ```
 

@@ -101,6 +101,26 @@ public class GeoRestrictService {
         return CompletableFuture.supplyAsync(() -> checkIpNow(ip, playerName, uuid, bypass), executor);
     }
 
+    public CompletableFuture<GeoResponse> lookup(String ip) {
+        return CompletableFuture.supplyAsync(() -> lookupNow(ip), executor);
+    }
+
+    public GeoResponse lookupNow(String ip) {
+        if (!NetworkUtils.isValidPublicIp(ip)) {
+            return null;
+        }
+        GeoConfig current = config;
+        GeoResponse cached = cache.get(ip, current.cacheTtlDays);
+        if (cached != null) {
+            return cached;
+        }
+        GeoResponse response = fetchFromGateway(ip);
+        if (response != null) {
+            cache.put(ip, response, current.maxCacheEntries);
+        }
+        return response;
+    }
+
     private CheckResult checkIpNow(String ip, String playerName, java.util.UUID uuid, boolean bypass) {
         GeoConfig current = config;
         if (bypass) {
@@ -222,23 +242,26 @@ public class GeoRestrictService {
             }
         }
 
-        if (current.vpnCheckEnabled && !(isBedrock && current.floodgate.bypassVpnCheck)) {
-            if (info.isVpn || info.isHosting || info.isProxy) {
-                logger.info("Blocked {} (vpn/hosting/proxy flag)", info.ip);
-                return new CheckResult(false, current.kickMessageVpn, info);
-            }
-            if (info.asName != null) {
-                String asName = info.asName.toLowerCase(Locale.ROOT);
-                for (String badWord : current.vpnKeywords) {
-                    if (asName.contains(badWord.toLowerCase(Locale.ROOT))) {
-                        logger.info("Blocked {} (ISP matched '{}')", info.ip, badWord);
-                        return new CheckResult(false, current.kickMessageVpn, info);
-                    }
-                }
-            }
+        if (current.vpnCheckEnabled && !(isBedrock && current.floodgate.bypassVpnCheck) && isVpn(info)) {
+            logger.info("Blocked {} (vpn/hosting/proxy/keyword)", info.ip);
+            return new CheckResult(false, current.kickMessageVpn, info);
         }
 
         return new CheckResult(true, null, info);
+    }
+
+    public boolean isVpn(GeoResponse info) {
+        if (info == null) return false;
+        if (info.isVpn || info.isHosting || info.isProxy) return true;
+        if (info.asName != null) {
+            String asName = info.asName.toLowerCase(Locale.ROOT);
+            for (String badWord : config.vpnKeywords) {
+                if (asName.contains(badWord.toLowerCase(Locale.ROOT))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private HttpURLConnection openConnection(String urlString, String method, GeoConfig current) throws Exception {

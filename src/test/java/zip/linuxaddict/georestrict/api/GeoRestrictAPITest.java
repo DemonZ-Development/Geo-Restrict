@@ -103,4 +103,33 @@ class GeoRestrictAPITest {
         assertFalse(GeoRestrictAPI.isAvailable());
         assertThrows(IllegalStateException.class, GeoRestrictAPI::getService);
     }
+
+    @Test
+    void lookupAndGetCountryCodeReturnsGeoData() {
+        GeoResponse r = new GeoResponse();
+        r.ip = "1.1.1.1";
+        r.countryCode = "AU";
+        r.countryName = "Australia";
+        r.asn = "AS15169";
+        r.asName = "Google Cloud DataCenter";
+        r.isVpn = true;
+        cache.put("1.1.1.1", r, 1000);
+
+        GeoResponse res = GeoRestrictAPI.lookup("1.1.1.1").join();
+        assertNotNull(res);
+        assertEquals("AU", res.countryCode);
+        assertEquals("Australia", res.countryName);
+
+        String cc = GeoRestrictAPI.getCountryCode("1.1.1.1").join();
+        assertEquals("AU", cc);
+
+        Boolean isVpn = GeoRestrictAPI.isVpn("1.1.1.1").join();
+        assertTrue(isVpn);
+
+        String asn = GeoRestrictAPI.getAsn("1.1.1.1").join();
+        assertEquals("AS15169", asn);
+
+        String isp = GeoRestrictAPI.getIsp("1.1.1.1").join();
+        assertEquals("Google Cloud DataCenter", isp);
+    }
 }

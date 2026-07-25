@@ -124,6 +124,62 @@ public final class GeoRestrictAPI {
     }
 
     /**
+     * Asynchronously performs a raw IP geolocation lookup using cache or gateway service.
+     * Returns raw GeoResponse containing countryCode, countryName, asn, isp, isVpn, etc.
+     * Does NOT perform rule evaluation, kick decisions, or Discord logging.
+     *
+     * @param ip IP address (IPv4 or IPv6)
+     * @return CompletableFuture resolving to GeoResponse or null if lookup failed
+     */
+    public static CompletableFuture<GeoResponse> lookup(String ip) {
+        return getService().lookup(ip);
+    }
+
+    /**
+     * Convenience method to asynchronously fetch the 2-letter ISO country code for an IP address.
+     * Useful for Geo-Routing and region-based player proxy assignment.
+     *
+     * @param ip IP address
+     * @return CompletableFuture resolving to ISO 2-letter country code (e.g. "US", "DE", "RU") or null
+     */
+    public static CompletableFuture<String> getCountryCode(String ip) {
+        return lookup(ip).thenApply(res -> res != null ? res.countryCode : null);
+    }
+
+    /**
+     * Convenience method to asynchronously check if an IP address is identified as a VPN, proxy, or hosting node.
+     * Uses both provider boolean flags and configured vpnKeywords.
+     *
+     * @param ip IP address
+     * @return CompletableFuture resolving to true if IP is a VPN/proxy/hosting node, false otherwise
+     */
+    public static CompletableFuture<Boolean> isVpn(String ip) {
+        return lookup(ip).thenApply(res -> getService().isVpn(res));
+    }
+
+    /**
+     * Convenience method to asynchronously fetch the AS (Autonomous System) Number for an IP address.
+     * E.g., returns "AS16276", "AS15169", or null if unknown.
+     *
+     * @param ip IP address
+     * @return CompletableFuture resolving to AS number string or null
+     */
+    public static CompletableFuture<String> getAsn(String ip) {
+        return lookup(ip).thenApply(res -> res != null ? res.asn : null);
+    }
+
+    /**
+     * Convenience method to asynchronously fetch the ISP / Organization name for an IP address.
+     * E.g., returns "Google LLC", "OVH SAS", "Comcast Cable", or null.
+     *
+     * @param ip IP address
+     * @return CompletableFuture resolving to ISP name or null
+     */
+    public static CompletableFuture<String> getIsp(String ip) {
+        return lookup(ip).thenApply(res -> res != null ? (res.asName != null ? res.asName : res.provider) : null);
+    }
+
+    /**
      * Gets the current plugin version string (e.g. "2.0.1").
      *
      * @return version string

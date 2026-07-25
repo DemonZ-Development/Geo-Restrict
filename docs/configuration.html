@@ -186,15 +186,27 @@
                 </table>
             </div>
 
-            <h2 class="fade-in">Developer API</h2>
-            <p class="fade-in">GeoRestrict exposes a clean Developer API (<code>GeoRestrictAPI</code>) for third-party plugins across Paper/Spigot, BungeeCord, and Velocity:</p>
+            <h2 class="fade-in">Developer API &amp; Geo-Routing</h2>
+            <p class="fade-in">GeoRestrict exposes a clean Developer API (<code>GeoRestrictAPI</code>) for third-party plugins across Paper/Spigot, BungeeCord, and Velocity. Use it for restriction enforcement or for raw geolocation routing without kicking players:</p>
             <div class="code-wrapper fade-in">
 <pre><code><span class="syn-cmt">// Check if GeoRestrict API is ready</span>
 <span class="syn-bool">if</span> (GeoRestrictAPI.isAvailable()) {
-    <span class="syn-cmt">// Asynchronously check an IP address</span>
+    <span class="syn-cmt">// 1. Restriction check (returns allow/deny &amp; kick reason)</span>
     GeoRestrictAPI.checkIp(<span class="syn-str">"1.1.1.1"</span>, <span class="syn-str">"PlayerName"</span>).thenAccept(result -> {
         <span class="syn-bool">if</span> (!result.allowed) {
             System.out.println(<span class="syn-str">"Blocked: "</span> + result.reason);
+        }
+    });
+
+    <span class="syn-cmt">// 2. Geo-Routing: Get ISO Country Code without blocking</span>
+    GeoRestrictAPI.getCountryCode(<span class="syn-str">"1.1.1.1"</span>).thenAccept(country -> {
+        System.out.println(<span class="syn-str">"Player Country: "</span> + country); <span class="syn-cmt">// e.g. "US", "DE", "JP"</span>
+    });
+
+    <span class="syn-cmt">// 3. Raw Geo Data: Get full GeoResponse (country, ASN, ISP, VPN flags)</span>
+    GeoRestrictAPI.lookup(<span class="syn-str">"1.1.1.1"</span>).thenAccept(geo -> {
+        <span class="syn-bool">if</span> (geo != null) {
+            System.out.println(<span class="syn-str">"ISP: "</span> + geo.isp + <span class="syn-str">", VPN: "</span> + geo.isVpn);
         }
     });
 }
