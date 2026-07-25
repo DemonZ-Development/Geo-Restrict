@@ -32,9 +32,9 @@ By default, GeoRestrict blocks a new connection when the cache is empty and ever
 
 ## Live Statistics
 
-[![bStats Bukkit](https://bstats.org/signatures/bukkit/32871.svg)](https://bstats.org/plugin/bukkit/georestrict/32871)
-[![bStats BungeeCord](https://bstats.org/signatures/bungeecord/32872.svg)](https://bstats.org/plugin/bungeecord/georestrict/32872)
-[![bStats Velocity](https://bstats.org/signatures/velocity/32873.svg)](https://bstats.org/plugin/velocity/georestrict/32873)
+[![bStats Bukkit](https://bstats.org/signatures/bukkit/Geo-Restrict.svg)](https://bstats.org/plugin/bukkit/georestrict/32871)
+[![bStats BungeeCord](https://bstats.org/signatures/bungeecord/GeoRestrict-Bungee.svg)](https://bstats.org/plugin/bungeecord/georestrict/32872)
+[![bStats Velocity](https://bstats.org/signatures/velocity/GeoRestrict-Velocity.svg)](https://bstats.org/plugin/velocity/georestrict/32873)
 
 ## Where lookup data goes
 
