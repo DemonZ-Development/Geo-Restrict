@@ -27,7 +27,7 @@ Sometimes a community only serves one region. Sometimes a server is being hit by
 3. Restart once so `plugins/GeoRestrict/config.yml` is created.
 4. Choose `BLOCKLIST` or `ALLOWLIST`, add the countries you need, then run `/georestrict reload`.
 
-The live field guide covers [installation](https://georestrict-docs.pages.dev/installation), [configuration](https://georestrict-docs.pages.dev/configuration), [commands](https://georestrict-docs.pages.dev/commands), [how the lookup path works](https://georestrict-docs.pages.dev/how-it-works), and [troubleshooting](https://georestrict-docs.pages.dev/troubleshooting).
+The live field guide covers [installation](https://georestrict-docs.pages.dev/installation), [configuration](https://georestrict-docs.pages.dev/configuration), [commands](https://georestrict-docs.pages.dev/commands), [how the lookup path works](https://georestrict-docs.pages.dev/how-it-works), [changelog](CHANGELOG.md), and [troubleshooting](https://georestrict-docs.pages.dev/troubleshooting).
 
 ## A plain-language privacy note
 
