@@ -32,6 +32,7 @@ import zip.linuxaddict.georestrict.GeoConfig;
 import zip.linuxaddict.georestrict.GeoRestrictService;
 import zip.linuxaddict.georestrict.PluginInfo;
 import zip.linuxaddict.georestrict.UpdateChecker;
+import zip.linuxaddict.georestrict.api.GeoRestrictAPI;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -77,6 +78,7 @@ public class GeoRestrictVelocityPlugin {
         cache.load();
 
         service = new GeoRestrictService(config, logger, cache);
+        GeoRestrictAPI.register(service, cache);
         command = new CommandHandler(service, cache, configFile, this::applyConfig);
 
         registerCommand();
@@ -194,11 +196,20 @@ public class GeoRestrictVelocityPlugin {
 
     @Subscribe
     public void onShutdown(ProxyShutdownEvent event) {
+        GeoRestrictAPI.unregister();
         if (service != null) service.shutdown();
         if (cache != null) {
             cache.shutdown();
             cache.save();
         }
         logger.info("GeoRestrict disabled.");
+    }
+
+    public GeoRestrictService getService() {
+        return service;
+    }
+
+    public GeoCache getCache() {
+        return cache;
     }
 }

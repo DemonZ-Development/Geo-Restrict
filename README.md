@@ -134,6 +134,38 @@ GeoRestrict targets Java 17 bytecode, but the platform can require a newer runti
 
 `georestrict.admin` grants admin commands. `georestrict.bypass` skips enforcement on Bukkit-compatible backend servers, where live player permissions are available at login.
 
+## Developer API
+
+Other plugins can query GeoRestrict programmatically via `GeoRestrictAPI` across Paper/Spigot, BungeeCord, and Velocity:
+
+```java
+import zip.linuxaddict.georestrict.api.GeoRestrictAPI;
+
+// Check if GeoRestrict API is ready
+if (GeoRestrictAPI.isAvailable()) {
+    // Asynchronously check an IP address
+    GeoRestrictAPI.checkIp("1.1.1.1", "PlayerName").thenAccept(result -> {
+        if (!result.allowed) {
+            System.out.println("Blocked: " + result.reason);
+            System.out.println("Country: " + result.info.countryCode);
+        }
+    });
+
+    // Quick boolean check
+    GeoRestrictAPI.isAllowed("8.8.8.8", "PlayerName").thenAccept(allowed -> {
+        System.out.println("Allowed: " + allowed);
+    });
+
+    // Retrieve cached geo data
+    GeoResponse cached = GeoRestrictAPI.getCachedResponse("8.8.8.8");
+}
+```
+
+On Bukkit/Paper, `GeoRestrictService` is also registered with standard `ServicesManager`:
+```java
+GeoRestrictService service = Bukkit.getServicesManager().load(GeoRestrictService.class);
+```
+
 ## Build and test
 
 ```bash

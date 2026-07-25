@@ -37,7 +37,8 @@ public final class GeoConfigConstants {
         "a2hosting", "siteground", "inmotion", "nexcess", "wpengine", "kinsta",
         "kamatera", "phoenixnap", "cherry servers", "frantech", "incognet",
         "psychz networks", "psychz", "buyvm", "choopa", "ramnode", "serverhub",
-        "quadranet", "m247 ltd", "rackspace", "cloudflare", "fastly", "akamai",
+        "datacamp", "tzulo", "leaseweb", "m247", "proton", "datacenter",
+        "quadranet", "rackspace", "cloudflare", "fastly", "akamai",
         "google llc", "amazon.com", "microsoft corp"
     );
 

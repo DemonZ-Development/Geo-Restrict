@@ -60,6 +60,14 @@ public class GeoRestrictService {
         this.config = config;
     }
 
+    public GeoCache getCache() {
+        return cache;
+    }
+
+    public GeoConfig getConfig() {
+        return config;
+    }
+
     public void shutdown() {
         executor.shutdown();
         discordExecutor.shutdown();

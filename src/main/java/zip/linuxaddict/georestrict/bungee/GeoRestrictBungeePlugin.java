@@ -28,6 +28,7 @@ import zip.linuxaddict.georestrict.GeoConfig;
 import zip.linuxaddict.georestrict.GeoRestrictService;
 import zip.linuxaddict.georestrict.PluginInfo;
 import zip.linuxaddict.georestrict.UpdateChecker;
+import zip.linuxaddict.georestrict.api.GeoRestrictAPI;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -55,6 +56,7 @@ public class GeoRestrictBungeePlugin extends Plugin implements Listener {
         cache.load();
 
         service = new GeoRestrictService(config, log, cache);
+        GeoRestrictAPI.register(service, cache);
         getProxy().getPluginManager().registerListener(this, this);
 
         command = new CommandHandler(service, cache, configFile, this::applyConfig);
@@ -127,6 +129,7 @@ public class GeoRestrictBungeePlugin extends Plugin implements Listener {
 
     @Override
     public void onDisable() {
+        GeoRestrictAPI.unregister();
         getProxy().getScheduler().cancel(this);
         if (service != null) service.shutdown();
         if (cache != null) {
@@ -175,5 +178,13 @@ public class GeoRestrictBungeePlugin extends Plugin implements Listener {
             event.getPlayer().sendMessage(TextComponent.fromLegacyText(CommandHandler.legacy(
                 "&7[&bGeoRestrict&7] Update available: &b" + updateChecker.getLatestVersion())));
         }
+    }
+
+    public GeoRestrictService getService() {
+        return service;
+    }
+
+    public GeoCache getCache() {
+        return cache;
     }
 }

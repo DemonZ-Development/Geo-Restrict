@@ -16,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
@@ -29,6 +30,7 @@ import zip.linuxaddict.georestrict.GeoConfig;
 import zip.linuxaddict.georestrict.GeoRestrictService;
 import zip.linuxaddict.georestrict.PluginInfo;
 import zip.linuxaddict.georestrict.UpdateChecker;
+import zip.linuxaddict.georestrict.api.GeoRestrictAPI;
 import zip.linuxaddict.georestrict.scheduler.BukkitTaskScheduler;
 import zip.linuxaddict.georestrict.scheduler.FoliaTaskScheduler;
 import zip.linuxaddict.georestrict.scheduler.TaskScheduler;
@@ -67,6 +69,8 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
         cache.load();
 
         service = new GeoRestrictService(config, log, cache);
+        GeoRestrictAPI.register(service, cache);
+        getServer().getServicesManager().register(GeoRestrictService.class, service, this, ServicePriority.Normal);
         getServer().getPluginManager().registerEvents(this, this);
 
         Metrics metrics = new Metrics(this, PluginInfo.BSTATS_BUKKIT);
@@ -157,6 +161,10 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        GeoRestrictAPI.unregister();
+        if (getServer() != null && getServer().getServicesManager() != null && service != null) {
+            getServer().getServicesManager().unregister(service);
+        }
         pendingChecks.clear();
         if (scheduler != null) scheduler.cancelAll(this);
         if (service != null) service.shutdown();
@@ -234,5 +242,13 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
             this.result = result;
             this.createdAt = createdAt;
         }
+    }
+
+    public GeoRestrictService getService() {
+        return service;
+    }
+
+    public GeoCache getCache() {
+        return cache;
     }
 }

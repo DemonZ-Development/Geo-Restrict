@@ -1,0 +1,106 @@
+/*
+ * GeoRestrict - High-performance geographic access control.
+ * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+package zip.linuxaddict.georestrict.api;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import zip.linuxaddict.georestrict.GeoCache;
+import zip.linuxaddict.georestrict.GeoConfig;
+import zip.linuxaddict.georestrict.GeoResponse;
+import zip.linuxaddict.georestrict.GeoRestrictService;
+
+import java.io.File;
+import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class GeoRestrictAPITest {
+
+    private GeoRestrictService service;
+    private GeoCache cache;
+    private File tmpDir;
+
+    @BeforeEach
+    void setUp() throws Exception {
+        tmpDir = File.createTempFile("grapi-svc", "");
+        tmpDir.delete();
+        tmpDir.mkdirs();
+        File cacheFile = new File(tmpDir, "cache.json");
+        Logger log = LoggerFactory.getLogger("test");
+        cache = new GeoCache(cacheFile, new com.google.gson.Gson(), log);
+        cache.load();
+
+        GeoConfig config = new GeoConfig();
+        config.countries = Arrays.asList("CN", "RU");
+        config.countryMode = GeoConfig.RestrictionMode.BLOCKLIST;
+        config.asnMode = GeoConfig.RestrictionMode.DISABLED;
+        config.vpnCheckEnabled = true;
+
+        service = new GeoRestrictService(config, log, cache);
+        GeoRestrictAPI.register(service, cache);
+    }
+
+    @AfterEach
+    void tearDown() {
+        GeoRestrictAPI.unregister();
+        service.shutdown();
+        deleteRecursively(tmpDir);
+    }
+
+    private void deleteRecursively(File f) {
+        if (f.isDirectory()) for (File c : f.listFiles()) deleteRecursively(c);
+        f.delete();
+    }
+
+    @Test
+    void isAvailableReturnsTrueWhenRegistered() {
+        assertTrue(GeoRestrictAPI.isAvailable());
+        assertNotNull(GeoRestrictAPI.getService());
+    }
+
+    @Test
+    void checkIpReturnsCheckResult() {
+        GeoRestrictService.CheckResult result = GeoRestrictAPI.checkIp("127.0.0.1", "tester").join();
+        assertTrue(result.allowed);
+    }
+
+    @Test
+    void isAllowedReturnsBoolean() {
+        Boolean allowed = GeoRestrictAPI.isAllowed("127.0.0.1", "tester").join();
+        assertTrue(allowed);
+    }
+
+    @Test
+    void getCachedResponseReturnsCachedData() {
+        GeoResponse r = new GeoResponse();
+        r.countryCode = "US";
+        r.asn = "AS15169";
+        cache.put("8.8.8.8", r, 1000);
+
+        GeoResponse cached = GeoRestrictAPI.getCachedResponse("8.8.8.8");
+        assertNotNull(cached);
+        assertEquals("US", cached.countryCode);
+    }
+
+    @Test
+    void getVersionReturnsNonNullString() {
+        assertNotNull(GeoRestrictAPI.getVersion());
+    }
+
+    @Test
+    void unregisterClearsApiState() {
+        GeoRestrictAPI.unregister();
+        assertFalse(GeoRestrictAPI.isAvailable());
+        assertThrows(IllegalStateException.class, GeoRestrictAPI::getService);
+    }
+}
