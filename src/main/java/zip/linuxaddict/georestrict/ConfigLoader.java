@@ -129,6 +129,7 @@ public final class ConfigLoader {
             Map<String, Object> defaults = yaml.load(GeoConfigConstants.DEFAULT_CONFIG_YAML);
             mergeDefaults(yamlMap, defaults);
             yamlMap.put("configVersion", GeoConfigConstants.CURRENT_VERSION);
+            config.configVersion = GeoConfigConstants.CURRENT_VERSION;
 
             StringBuilder out = new StringBuilder("# GeoRestrict configuration (migrated to v")
                 .append(GeoConfigConstants.CURRENT_VERSION).append(")\n");

@@ -152,7 +152,7 @@
                         <tr><th>Key</th><th>Type</th><th>Default</th><th>Notes</th></tr>
                     </thead>
                     <tbody>
-                        <tr><td><code>configVersion</code></td><td>int</td><td><code>4</code></td><td>Schema version. Bumped when file layout changes. Don't edit.</td></tr>
+                        <tr><td><code>configVersion</code></td><td>int</td><td><code>5</code></td><td>Schema version. Bumped when file layout changes. Don't edit.</td></tr>
                         <tr><td><code>gatewayUrl</code></td><td>URL</td><td>public Worker</td><td>Where lookups go. Leave this unchanged unless you operate another compatible Worker.</td></tr>
                         <tr><td><code>gatewayToken</code></td><td>string</td><td><code>""</code></td><td>Bearer token for a private Worker. Keep it empty for the public Worker and never publish a real token.</td></tr>
                         <tr><td><code>blockOnLookupFailure</code></td><td>bool</td><td><code>true</code></td><td>When every lookup path fails, block. <em>Recommended</em>. Flip to <code>false</code> if you prefer fail-open.</td></tr>

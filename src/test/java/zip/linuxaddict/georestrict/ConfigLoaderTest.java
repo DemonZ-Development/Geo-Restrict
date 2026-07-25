@@ -94,4 +94,27 @@ class ConfigLoaderTest {
         assertEquals(GeoConfigConstants.DEFAULT_GATEWAY_URL, config.gatewayUrl);
         tmp.delete();
     }
+
+    @Test
+    void migratesV4ConfigToV5WithFloodgateDefaults() throws Exception {
+        File tmp = File.createTempFile("geo-config-v4", ".yml");
+        Files.writeString(tmp.toPath(),
+            "configVersion: 4\n"
+                + "countryMode: BLOCKLIST\n"
+                + "countries:\n"
+                + "  - CN\n",
+            StandardCharsets.UTF_8);
+
+        GeoConfig config = ConfigLoader.load(tmp);
+
+        assertEquals(5, config.configVersion);
+        assertTrue(config.floodgate.enabled);
+        assertFalse(config.floodgate.bypassGeorestrict);
+        assertFalse(config.floodgate.bypassVpnCheck);
+
+        String migratedContent = Files.readString(tmp.toPath(), StandardCharsets.UTF_8);
+        assertTrue(migratedContent.contains("configVersion: 5"));
+        assertTrue(migratedContent.contains("floodgate:"));
+        tmp.delete();
+    }
 }

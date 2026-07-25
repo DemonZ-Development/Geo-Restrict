@@ -14,7 +14,7 @@ import java.util.List;
 
 public final class GeoConfigConstants {
 
-    public static final int CURRENT_VERSION = 4;
+    public static final int CURRENT_VERSION = 5;
     public static final String DEFAULT_GATEWAY_URL = "https://geoprotect.demonzdevelopment-e64.workers.dev/";
 
     public static final List<String> DEFAULT_VPN_KEYWORDS = Arrays.asList(
