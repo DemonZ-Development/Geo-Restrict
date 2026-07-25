@@ -42,9 +42,9 @@ v2.0.1 blocks by default when the cache is empty and the lookup service is unava
 
 ## Live Statistics
 
-[![bStats Bukkit](https://bstats.org/signatures/bukkit/georestrict.svg)](https://bstats.org/plugin/bukkit/georestrict/32871)
-[![bStats BungeeCord](https://bstats.org/signatures/bungeecord/georestrict.svg)](https://bstats.org/plugin/bungeecord/georestrict/32872)
-[![bStats Velocity](https://bstats.org/signatures/velocity/georestrict.svg)](https://bstats.org/plugin/velocity/georestrict/32873)
+[![bStats Bukkit](https://bstats.org/signatures/bukkit/32871.svg)](https://bstats.org/plugin/bukkit/georestrict/32871)
+[![bStats BungeeCord](https://bstats.org/signatures/bungeecord/32872.svg)](https://bstats.org/plugin/bungeecord/georestrict/32872)
+[![bStats Velocity](https://bstats.org/signatures/velocity/32873.svg)](https://bstats.org/plugin/velocity/georestrict/32873)
 
 ## Privacy, without vague promises
 
