@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollAnimations();
   initCopyButtons();
   initFaqAccordion();
+  initBStatsMetrics();
 });
 
 /* ---------- Code-drawn interface icons ---------- */
@@ -232,4 +233,44 @@ function initFaqAccordion() {
       }
     });
   });
+}
+
+/* ---------- bStats Live Indicator ---------- */
+async function initBStatsMetrics() {
+  const container = document.getElementById('bstats-live-metrics');
+  if (!container) return;
+
+  const plugins = [32871, 32872, 32873];
+  let totalServers = 0;
+  let totalPlayers = 0;
+
+  for (const id of plugins) {
+    try {
+      const [sRes, pRes] = await Promise.all([
+        fetch(`https://bstats.org/api/v1/plugins/${id}/charts/servers/data`),
+        fetch(`https://bstats.org/api/v1/plugins/${id}/charts/players/data`)
+      ]);
+      if (sRes.ok) {
+        const sData = await sRes.json();
+        if (Array.isArray(sData) && sData.length > 0) {
+          totalServers += sData[sData.length - 1][1] || 0;
+        }
+      }
+      if (pRes.ok) {
+        const pData = await pRes.json();
+        if (Array.isArray(pData) && pData.length > 0) {
+          totalPlayers += pData[pData.length - 1][1] || 0;
+        }
+      }
+    } catch (e) {
+      // Ignore network errors on metrics lookup
+    }
+  }
+
+  container.innerHTML = `
+    <div class="bstats-live-pill">
+      <span class="bstats-dot"></span>
+      <span><strong>bStats Live:</strong> ${totalServers} Active Servers &bull; ${totalPlayers} Players Online</span>
+    </div>
+  `;
 }
