@@ -1,0 +1,22 @@
+# GeoRestrict
+
+> High-performance geographic access control plugin for Minecraft servers and proxies (Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall, Velocity).
+
+GeoRestrict evaluates connecting players by their IP address against country codes (ISO-3166 alpha-2), Autonomous System Numbers (ASN/ISP), and VPN/proxy detection rules.
+
+## Documentation Overview
+
+- [Installation](https://georestrict-docs.pages.dev/installation.html): Single JAR installation for Bukkit, BungeeCord, and Velocity.
+- [Configuration](https://georestrict-docs.pages.dev/configuration.html): Complete options for ALLOWLIST/BLOCKLIST modes, vpnKeywords, Floodgate Bedrock integration, and Discord webhooks.
+- [Commands & Permissions](https://georestrict-docs.pages.dev/commands.html): `/georestrict check`, `/georestrict cachestats`, `/georestrict purgecache`, `/georestrict reload`.
+- [How It Works](https://georestrict-docs.pages.dev/how-it-works.html): Multi-stage lookup architecture (Local Cache -> Cloudflare Worker Gateway -> Local VPS Fallback MMDB).
+- [Developer API](https://georestrict-docs.pages.dev/configuration.html#developer-api): Java API (`GeoRestrictAPI`) for third-party plugin integration.
+- [Full Technical Reference](https://georestrict-docs.pages.dev/llms-full.txt): Comprehensive technical specification for AI models.
+
+## Key Features
+
+- **Multi-Platform Single JAR**: One binary runs on Paper, Folia, BungeeCord, Waterfall, and Velocity.
+- **Fail-Closed Resilience**: If Cloudflare Worker fails, lookups automatically fall back to local MaxMind MMDB databases on VPS.
+- **Local Caching**: Atomic JSON caching (`geo_cache.json`) with debounced disk persistence.
+- **Geyser / Floodgate Integration**: Auto-detects Bedrock players via Floodgate with optional Bedrock bypass rules and `%xuid%`/`%device_os%` Discord placeholders.
+- **Developer API**: Static entrypoint `GeoRestrictAPI` and Paper `ServicesManager` registration.
