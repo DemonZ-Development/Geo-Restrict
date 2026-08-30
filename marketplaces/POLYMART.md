@@ -10,7 +10,7 @@ GeoRestrict gives your Minecraft server a geographic front door. You decide whic
 
 High-performance, affordable hosting for your Minecraft server. Premium hardware, instant setup, 24/7 support.
 
-There is no remote policy panel to learn. Your rules stay in `config.yml`, recent answers stay in a local cache, and one v2.0.1 jar covers Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity.
+There is no remote policy panel to learn. Your rules stay in `config.yml`, recent answers stay in a local cache, and one v2.0.2 jar covers Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity.
 
 ## Features that earn their place
 

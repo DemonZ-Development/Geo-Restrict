@@ -1,6 +1,6 @@
 ![GeoRestrict geographic access rules for Minecraft](https://georestrict-docs.pages.dev/assets/georestrict-banner.png?rev=20260714g)
 
-# GeoRestrict v2.0.1
+# GeoRestrict v2.0.2
 
 You should not need a security dashboard, a paid subscription, and an afternoon of tutorials just to respond to repeated connections from one network.
 
@@ -30,7 +30,7 @@ One jar supports Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and
 
 ## Install in four steps
 
-1. Put `georestrict-2.0.1.jar` in `plugins/`.
+1. Put `georestrict-2.0.2.jar` in `plugins/`.
 2. Restart once.
 3. Edit `plugins/GeoRestrict/config.yml`.
 4. Run `/georestrict reload` and verify with `/georestrict check <ip>`.

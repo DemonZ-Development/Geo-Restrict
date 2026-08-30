@@ -55,7 +55,7 @@
             </div>
 
             <h2 class="fade-in">1. Pick the right jar</h2>
-            <p class="fade-in">There's only one jar, <code>georestrict-2.0.1.jar</code>. The same file works on:</p>
+            <p class="fade-in">There's only one jar, <code>georestrict-2.0.2.jar</code>. The same file works on:</p>
             <ul class="fade-in">
                 <li>Bukkit 1.16+ (Spigot, Paper, Purpur, ...)</li>
                 <li>Folia 1.20+ — detected at runtime, region-aware scheduler is used automatically</li>
@@ -67,7 +67,7 @@
                 <strong>Java versions belong to both the plugin and the platform.</strong> GeoRestrict targets Java 17 bytecode, but modern server releases may require a newer runtime. The final release smoke used Java 25 because Velocity 4.0.0 is compiled for Java 25. Always follow the Java requirement published by your server or proxy.
             </div>
 
-            <p class="fade-in">The final v2.0.1 jar was started successfully on current Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity builds. The exact test versions are recorded in the <a href="https://github.com/DemonZ-Development/Geo-Restrict#release-verification" target="_blank" rel="noopener">GitHub README</a>.</p>
+            <p class="fade-in">The v2.0.1 jar was started successfully on current Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity builds. The exact test versions are recorded in the <a href="https://github.com/DemonZ-Development/Geo-Restrict#release-verification" target="_blank" rel="noopener">GitHub README</a>.</p>
 
             <div class="alert alert-warning fade-in">
                 <strong>Where you install it matters.</strong> On a proxied network, the proxy is usually the cleanest place because it sees the original address and can stop the connection before a backend is chosen. Standalone servers can install it directly. A backend behind a proxy only works when IP forwarding is configured correctly.
@@ -79,7 +79,7 @@
             <div class="code-block-wrapper fade-in">
                 <span class="code-label">shell</span>
 <pre><code>cd /path/to/server
-cp georestrict-2.0.1.jar plugins/
+cp georestrict-2.0.2.jar plugins/
 ./start.sh   # or systemctl restart minecraft
 </code></pre>
             </div>
@@ -88,7 +88,7 @@ cp georestrict-2.0.1.jar plugins/
             <div class="code-block-wrapper fade-in">
                 <span class="code-label">shell</span>
 <pre><code>cd /path/to/proxy
-cp georestrict-2.0.1.jar plugins/
+cp georestrict-2.0.2.jar plugins/
 ./start.sh
 </code></pre>
             </div>
@@ -97,7 +97,7 @@ cp georestrict-2.0.1.jar plugins/
             <div class="code-block-wrapper fade-in">
                 <span class="code-label">shell</span>
 <pre><code>cd /path/to/velocity
-cp georestrict-2.0.1.jar plugins/
+cp georestrict-2.0.2.jar plugins/
 ./start.sh
 </code></pre>
             </div>
@@ -106,7 +106,7 @@ cp georestrict-2.0.1.jar plugins/
             <p class="fade-in">On startup you should see this in the console:</p>
             <div class="code-block-wrapper fade-in">
                 <span class="code-label">console</span>
-<pre><code>[GeoRestrict] GeoRestrict v2.0.1 starting...
+<pre><code>[GeoRestrict] GeoRestrict v2.0.2 starting...
 [GeoRestrict] GeoRestrict enabled.
 [GeoRestrict] Demonz Development believes listening to its users comes before anything else.
 [GeoRestrict] Found a bug, have a report, or want to share feedback? Join our Discord:

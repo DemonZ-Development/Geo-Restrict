@@ -22,7 +22,7 @@ High-performance, affordable hosting for your Minecraft server. Premium hardware
 - Clear behavior when the lookup service is temporarily unavailable
 - Commands for lookup checks, cache management and reloads
 
-One v2.0.1 jar supports Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity. GeoRestrict targets Java 17 bytecode, while the server itself may require a newer Java runtime.
+One v2.0.2 jar supports Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity. GeoRestrict targets Java 17 bytecode, while the server itself may require a newer Java runtime.
 
 ## First setup
 

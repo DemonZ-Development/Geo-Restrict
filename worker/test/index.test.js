@@ -36,7 +36,7 @@ test('health endpoint is public and does not perform an upstream lookup', async 
   assert.equal(fetched, false);
   assert.deepEqual(await response.json(), {
     ok: true,
-    version: '2.0.0',
+    version: '2.0.2',
     vpsConfigured: true,
     providers: ['ipinfo', 'ip-api'],
     fallback: 'vps-local-mmdb',
@@ -322,4 +322,144 @@ test('optional KV caching works when GEO_CACHE is bound', async () => {
   assert.equal(cached.status, 200);
   assert.equal(fetchCount, 1);
   assert.equal(putOptions.expirationTtl, 86400);
+});
+
+test('status dashboard stays hidden while no status token is configured', async () => {
+  let fetched = false;
+  const response = await runWorker(
+    { GATEWAY_TOKENS: 'gateway-token' },
+    async () => { fetched = true; return Response.json({}); },
+    'https://worker.test/status',
+  );
+
+  assert.equal(response.status, 404);
+  assert.equal(fetched, false);
+  assert.equal((await response.json()).error, 'not_found');
+});
+
+test('status dashboard rejects requests without the status token', async () => {
+  let fetched = false;
+  const response = await runWorker(
+    { STATUS_TOKENS: 'status-secret' },
+    async () => { fetched = true; return Response.json({}); },
+    'https://worker.test/status',
+  );
+
+  assert.equal(response.status, 401);
+  assert.equal(fetched, false);
+  assert.equal((await response.json()).error, 'unauthorized');
+});
+
+test('status JSON probes providers and the fallback server for token holders', async () => {
+  let vpsRequest = null;
+  const fetchImpl = async (url, options) => {
+    const target = new URL(url);
+    if (target.hostname === 'provider.example.test') {
+      return Response.json({
+        ip: '1.1.1.1',
+        country_code: 'US',
+        country: 'United States',
+        asn: 'AS13335',
+        as_name: 'Cloudflare, Inc.',
+      });
+    }
+    if (target.hostname === 'pro.ip-api.com') {
+      return Response.json({
+        status: 'success',
+        country: 'United States',
+        countryCode: 'US',
+        as: 'AS13335 Cloudflare, Inc.',
+        proxy: false,
+        hosting: false,
+        mobile: false,
+      });
+    }
+    if (target.hostname === 'vps.example.test') {
+      vpsRequest = { url: target, headers: options.headers };
+      return Response.json({
+        ok: true,
+        uptime: 4321,
+        database: { loaded: true, release: '2026-08' },
+      });
+    }
+    throw new Error(`unexpected status probe to ${url}`);
+  };
+
+  const response = await runWorker(
+    {
+      STATUS_TOKENS: 'status-secret',
+      GATEWAY_TOKENS: 'different-gateway-token',
+      PROVIDER_ORDER: 'ipinfo,ip-api',
+      IPINFO_ENDPOINTS: 'https://provider.example.test/lite/{ip}',
+      IP_API_ENDPOINTS: 'https://pro.ip-api.com/json/{ip}',
+      IP_API_KEY: 'pro-key',
+      VPS_GATEWAY_URL: 'https://vps.example.test/gateway?source=worker',
+      VPS_GATEWAY_TOKEN: 'shared-secret',
+      CACHE_TTL_SECONDS: '86400',
+    },
+    fetchImpl,
+    'https://worker.test/status?key=status-secret&format=json',
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('X-Robots-Tag'), 'noindex, nofollow');
+  const body = await response.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.version, '2.0.2');
+  assert.equal(body.overall, 'operational');
+  assert.deepEqual(
+    body.components.map(component => component.id),
+    ['gateway', 'provider:ipinfo', 'provider:ip-api', 'fallback', 'cache-edge', 'cache-memory', 'cache-kv'],
+  );
+  const byId = Object.fromEntries(body.components.map(c => [c.id, c]));
+  assert.equal(byId['provider:ipinfo'].status, 'up');
+  assert.equal(byId['provider:ipinfo'].detail.countryCode, 'US');
+  assert.equal(byId['provider:ip-api'].status, 'up');
+  assert.equal(byId.fallback.status, 'up');
+  assert.equal(byId.fallback.detail.databaseRelease, '2026-08');
+  assert.equal(byId['cache-edge'].status, 'up');
+  assert.equal(byId['cache-kv'].status, 'not_configured');
+
+  assert.equal(vpsRequest.url.pathname, '/gateway/health');
+  assert.equal(vpsRequest.url.searchParams.get('source'), 'worker');
+  assert.equal(vpsRequest.url.searchParams.get('ip'), null);
+  assert.equal(vpsRequest.headers.Authorization, 'Bearer shared-secret');
+});
+
+test('a down provider degrades the status summary without hiding the page', async () => {
+  const response = await runWorker(
+    {
+      STATUS_TOKEN: 'status-secret',
+      PROVIDER_ORDER: 'ipinfo',
+      IPINFO_ENDPOINTS: 'https://provider.example.test/{ip}',
+      CACHE_TTL_SECONDS: '86400',
+    },
+    async () => new Response(null, { status: 503 }),
+    'https://worker.test/status?key=status-secret&format=json',
+  );
+
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.overall, 'degraded');
+  assert.equal(body.components.find(c => c.id === 'provider:ipinfo').status, 'down');
+});
+
+test('status renders a private HTML dashboard that never echoes the token', async () => {
+  const response = await runWorker(
+    {
+      STATUS_TOKENS: 'status-secret',
+      PROVIDER_ORDER: 'ipinfo',
+      IPINFO_ENDPOINTS: 'https://provider.example.test/{ip}',
+    },
+    async () => Response.json({ ip: '1.1.1.1', country_code: 'US' }),
+    'https://worker.test/status?key=status-secret',
+  );
+
+  assert.equal(response.status, 200);
+  assert.ok(response.headers.get('Content-Type').startsWith('text/html'));
+  const html = await response.text();
+  assert.ok(html.includes('GeoRestrict Gateway Status'));
+  assert.ok(html.includes('IPinfo Lite'));
+  assert.ok(html.includes('Refresh'));
+  assert.ok(!html.includes('status-secret'));
 });

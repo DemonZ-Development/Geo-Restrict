@@ -206,9 +206,24 @@
     <span class="syn-cmt">// 3. Raw Geo Data: Get full GeoResponse (country, ASN, ISP, VPN flags)</span>
     GeoRestrictAPI.lookup(<span class="syn-str">"1.1.1.1"</span>).thenAccept(geo -> {
         <span class="syn-bool">if</span> (geo != null) {
-            System.out.println(<span class="syn-str">"ISP: "</span> + geo.isp + <span class="syn-str">", VPN: "</span> + geo.isVpn);
+            System.out.println(<span class="syn-str">"ISP: "</span> + geo.asName + <span class="syn-str">", VPN: "</span> + geo.isVpn);
         }
     });
+
+    <span class="syn-cmt">// 4. More getters: country name, AS org name and provider signal flags</span>
+    GeoRestrictAPI.getCountryName(<span class="syn-str">"1.1.1.1"</span>).thenAccept(name ->
+        System.out.println(<span class="syn-str">"Country: "</span> + name)); <span class="syn-cmt">// e.g. "United States"</span>
+    GeoRestrictAPI.isHosting(<span class="syn-str">"8.8.8.8"</span>).thenAccept(hosting ->
+        System.out.println(<span class="syn-str">"Hosting: "</span> + hosting));
+
+    <span class="syn-cmt">// 5. Batch lookups in parallel (order preserved; failed IPs resolve to null)</span>
+    GeoRestrictAPI.lookupAll(java.util.List.of(<span class="syn-str">"1.1.1.1"</span>, <span class="syn-str">"8.8.8.8"</span>)).thenAccept(map -> {
+        map.forEach((ip, geo) -> System.out.println(ip + <span class="syn-str">" -> "</span> + geo.countryCode));
+    });
+
+    <span class="syn-cmt">// 6. Offline cache helpers (never touch the network)</span>
+    String cached = GeoRestrictAPI.getCachedCountryCode(<span class="syn-str">"1.1.1.1"</span>);
+    GeoRestrictAPI.purgeCache();
 }
 </code></pre>
             </div>

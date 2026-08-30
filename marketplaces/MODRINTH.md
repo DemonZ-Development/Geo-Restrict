@@ -19,7 +19,7 @@ High-performance, affordable hosting for your Minecraft server. Premium hardware
 - Configurable VPN, proxy and hosting detection
 - Geyser / Floodgate (Bedrock) integration with custom bypass options
 - Developer API (`GeoRestrictAPI`) for Paper, BungeeCord, and Velocity (Geo-Routing, VPN queries, ASN lookups)
-- One v2.0.1 jar for Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity
+- One v2.0.2 jar for Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity
 - Local, bounded cache with atomic saves and automatic expiry cleanup
 - Clear behavior when the lookup service is temporarily unavailable
 - Discord block notifications with IP masking enabled by default
@@ -28,7 +28,7 @@ High-performance, affordable hosting for your Minecraft server. Premium hardware
 
 ## Start small
 
-1. Put `georestrict-2.0.1.jar` in the server or proxy `plugins/` folder.
+1. Put `georestrict-2.0.2.jar` in the server or proxy `plugins/` folder.
 2. Restart once to create `plugins/GeoRestrict/config.yml`.
 3. Pick `BLOCKLIST` or `ALLOWLIST` and add two letter country codes.
 4. Run `/georestrict reload`.
@@ -38,7 +38,7 @@ You do not need to enable every feature on day one. Country rules are enough for
 
 ## When a lookup fails
 
-v2.0.1 blocks by default when the cache is empty and the lookup service is unavailable. The player receives your `kickMessageLookupFailure`. Set `blockOnLookupFailure: false` if keeping the server reachable during an outage matters more than strict filtering.
+v2.0.2 blocks by default when the cache is empty and the lookup service is unavailable. The player receives your `kickMessageLookupFailure`. Set `blockOnLookupFailure: false` if keeping the server reachable during an outage matters more than strict filtering.
 
 ## Live Statistics
 

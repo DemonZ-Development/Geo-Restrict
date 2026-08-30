@@ -1,5 +1,3 @@
-/* GeoRestrict Worker gateway. Route: GET /?ip=<address>. */
-
 const IPV4_PATTERN = /^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
 const IPV6_PATTERN = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1?$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^::(?:[0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,6}(?::[0-9a-fA-F]{1,4}){1,6}$/;
 const IPV4_MAPPED_PATTERN = /^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/i;
@@ -7,6 +5,7 @@ const IP_API_FIELDS = 'status,message,query,country,countryCode,isp,org,as,proxy
 const DEFAULT_PROVIDER_ORDER = ['ipinfo', 'ip-api'];
 const MAX_NUMBERED_VALUES = 20;
 const CACHE_SCHEMA_VERSION = 'v2';
+const STATUS_PROBE_IP = '1.1.1.1';
 const memoryCache = new Map();
 
 export default {
@@ -24,7 +23,7 @@ export default {
       const cacheTtlSeconds = getNumber(env.CACHE_TTL_SECONDS, 86400, 0, 604800);
       return json({
         ok: true,
-        version: env.GATEWAY_VERSION || '2.0.0',
+        version: env.GATEWAY_VERSION || '2.0.2',
         vpsConfigured: Boolean(String(env.VPS_GATEWAY_URL || '').trim()),
         providers: getProviderOrder(env),
         fallback: 'vps-local-mmdb',
@@ -35,6 +34,10 @@ export default {
           kv: Boolean(env.GEO_CACHE),
         },
       }, 200, headers);
+    }
+
+    if (url.pathname === '/status') {
+      return handleStatus(request, url, env);
     }
 
     if (!isAuthorized(request, env)) {
@@ -94,6 +97,292 @@ export default {
     return response;
   },
 };
+
+async function handleStatus(request, url, env) {
+  const tokens = collectValues(env, ['STATUS_TOKENS', 'STATUS_TOKEN'], 'STATUS_TOKEN', []);
+  if (!tokens.length) {
+    return json({ error: 'not_found' }, 404, statusHeaders('application/json'));
+  }
+  if (!tokens.includes(presentedStatusKey(request, url))) {
+    return json({ error: 'unauthorized' }, 401, statusHeaders('application/json'));
+  }
+
+  const report = await buildStatusReport(env);
+  const format = (url.searchParams.get('format') || '').toLowerCase();
+  if (format === 'json') {
+    return json(report, 200, statusHeaders('application/json'));
+  }
+  return new Response(renderStatusHtml(report), {
+    status: 200,
+    headers: statusHeaders('text/html; charset=utf-8'),
+  });
+}
+
+async function buildStatusReport(env) {
+  const components = [{
+    id: 'gateway',
+    label: 'Worker gateway',
+    status: 'up',
+    critical: true,
+    detail: { version: env.GATEWAY_VERSION || '2.0.2' },
+  }];
+
+  for (const provider of getProviderOrder(env)) {
+    components.push(await probeProvider(provider, env));
+  }
+  components.push(await probeFallbackServer(env));
+  components.push(...await buildCacheComponents(env));
+
+  const critical = components.filter(component => component.critical);
+  const downCritical = critical.filter(component => component.status === 'down').length;
+  const overall = downCritical === 0 ? 'operational'
+    : downCritical === critical.length ? 'outage' : 'degraded';
+
+  return {
+    ok: true,
+    scope: 'status',
+    version: env.GATEWAY_VERSION || '2.0.2',
+    generatedAt: new Date().toISOString(),
+    overall,
+    summary: overall === 'operational' ? 'All systems operational'
+      : overall === 'degraded' ? 'Partial degradation' : 'Major outage',
+    components,
+  };
+}
+
+async function probeProvider(provider, env) {
+  const component = {
+    id: `provider:${provider}`,
+    label: provider === 'ipinfo' ? 'IPinfo Lite' : 'IP-API Pro',
+    critical: true,
+  };
+  const configured = provider === 'ipinfo' ? ipInfoConfigured(env)
+    : provider === 'ip-api' ? ipApiConfigured(env) : false;
+  if (!configured) {
+    return { ...component, status: 'not_configured', detail: {} };
+  }
+  const startedAt = Date.now();
+  const result = provider === 'ipinfo'
+    ? await fetchIpInfo(STATUS_PROBE_IP, env)
+    : await fetchIpApi(STATUS_PROBE_IP, env);
+  return {
+    ...component,
+    status: result ? 'up' : 'down',
+    latencyMs: Date.now() - startedAt,
+    detail: result ? { countryCode: result.countryCode, probeIp: STATUS_PROBE_IP } : {},
+  };
+}
+
+async function probeFallbackServer(env) {
+  const component = {
+    id: 'fallback',
+    label: 'Fallback server (local MMDB)',
+    critical: false,
+  };
+  const baseUrl = String(env.VPS_GATEWAY_URL || '').trim();
+  if (!baseUrl || !env.VPS_GATEWAY_TOKEN) {
+    return { ...component, status: 'not_configured', detail: {} };
+  }
+  const startedAt = Date.now();
+  let healthy = false;
+  let detail = {};
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(),
+      getNumber(env.VPS_GATEWAY_TIMEOUT_MS, 2500, 250, 10000));
+    try {
+      const response = await fetch(buildVpsHealthUrl(baseUrl), {
+        signal: controller.signal,
+        headers: vpsAuthHeaders(env),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        healthy = Boolean(data?.ok);
+        if (data?.database?.release) detail.databaseRelease = data.database.release;
+      }
+    } finally {
+      clearTimeout(timer);
+    }
+  } catch {}
+  return {
+    ...component,
+    status: healthy ? 'up' : 'down',
+    latencyMs: Date.now() - startedAt,
+    detail,
+  };
+}
+
+async function buildCacheComponents(env) {
+  let edgeReachable = false;
+  try {
+    if (typeof caches !== 'undefined' && caches.default?.match) {
+      await caches.default.match(new Request('https://georestrict-status.local/probe'));
+      edgeReachable = true;
+    }
+  } catch {}
+  const ttlSeconds = getNumber(env.CACHE_TTL_SECONDS, 86400, 0, 604800);
+  const memoryMaxEntries = getNumber(env.MEMORY_CACHE_MAX_ENTRIES, 5000, 0, 50000);
+  return [
+    {
+      id: 'cache-edge',
+      label: 'Edge cache (Cache API)',
+      status: ttlSeconds <= 0 ? 'not_configured' : edgeReachable ? 'up' : 'down',
+      critical: false,
+      detail: ttlSeconds > 0 ? { ttlSeconds } : { note: 'disabled by CACHE_TTL_SECONDS=0' },
+    },
+    {
+      id: 'cache-memory',
+      label: 'Memory cache',
+      status: memoryMaxEntries > 0 && ttlSeconds > 0 ? 'up' : 'not_configured',
+      critical: false,
+      detail: memoryMaxEntries > 0
+        ? { maxEntries: memoryMaxEntries, entries: memoryCache.size }
+        : {},
+    },
+    {
+      id: 'cache-kv',
+      label: 'KV cache',
+      status: env.GEO_CACHE ? 'up' : 'not_configured',
+      critical: false,
+      detail: {},
+    },
+  ];
+}
+
+function ipInfoConfigured(env) {
+  return collectValues(env, ['IPINFO_ENDPOINTS'], 'IPINFO_ENDPOINT', []).length > 0;
+}
+
+function ipApiConfigured(env) {
+  const endpoints = collectValues(env, ['IP_API_ENDPOINTS'], 'IP_API_ENDPOINT', []);
+  if (!endpoints.length) return false;
+  const needsKey = endpoints.some(endpoint => /^https:\/\/pro\.ip-api\.com(?:\/|$)/i.test(endpoint));
+  if (!needsKey) return true;
+  return collectValues(env, ['IP_API_KEYS', 'IP_API_KEY', 'PROVIDER_KEYS', 'PROVIDER_KEY'],
+    ['IP_API_KEY', 'PROVIDER_KEY'], []).length > 0;
+}
+
+function presentedStatusKey(request, url) {
+  const auth = request.headers.get('Authorization') || '';
+  if (auth.toLowerCase().startsWith('bearer ')) return auth.slice(7).trim();
+  return request.headers.get('X-GeoRestrict-Status')
+    || request.headers.get('X-GeoRestrict-Token')
+    || url.searchParams.get('key')
+    || '';
+}
+
+function buildVpsHealthUrl(baseUrl) {
+  const queryIndex = baseUrl.indexOf('?');
+  const root = queryIndex === -1 ? baseUrl : baseUrl.slice(0, queryIndex);
+  const query = queryIndex === -1 ? '' : baseUrl.slice(queryIndex);
+  return `${root.replace(/\/+$/, '')}/health${query}`;
+}
+
+function vpsAuthHeaders(env) {
+  const headers = { 'Accept': 'application/json' };
+  const token = env.VPS_GATEWAY_TOKEN || '';
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+    headers['X-GeoRestrict-Token'] = token;
+  }
+  return headers;
+}
+
+function statusHeaders(contentType) {
+  return new Headers({
+    'Content-Type': contentType,
+    'Cache-Control': 'private, no-store',
+    'X-Robots-Tag': 'noindex, nofollow',
+    'Referrer-Policy': 'no-referrer',
+  });
+}
+
+function renderStatusHtml(report) {
+  const dotColor = { up: '#4ade80', down: '#f87171', not_configured: '#94a3b8' };
+  const badgeClass = {
+    operational: 'badge badge-ok',
+    degraded: 'badge badge-warn',
+    outage: 'badge badge-bad',
+  };
+  const rows = report.components.map(component => `
+    <div class="card">
+      <span class="dot" style="background:${dotColor[component.status] || '#94a3b8'}"></span>
+      <div class="name">${escapeHtml(component.label)}</div>
+      <div class="meta">${escapeHtml(describeComponent(component))}</div>
+    </div>`).join('');
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>GeoRestrict Gateway Status</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:#0b1220;color:#e2e8f0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;justify-content:center;padding:32px 16px}
+.wrap{width:100%;max-width:720px}
+h1{font-size:20px;margin:0}
+.sub{color:#94a3b8;font-size:13px;margin:4px 0 20px}
+.badge{display:inline-block;padding:5px 14px;border-radius:999px;font-weight:600;font-size:13px;margin-bottom:20px}
+.badge-ok{background:#052e16;color:#4ade80}
+.badge-warn{background:#431407;color:#fb923c}
+.badge-bad{background:#450a0a;color:#f87171}
+.card{background:#111a2e;border:1px solid #1e293b;border-radius:10px;padding:13px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.name{font-weight:600}
+.meta{margin-left:auto;color:#94a3b8;font-size:12px;text-align:right}
+footer{margin-top:22px;color:#64748b;font-size:12px;display:flex;gap:16px;flex-wrap:wrap}
+a{color:#7dd3fc;text-decoration:none}
+a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>GeoRestrict Gateway Status</h1>
+<p class="sub">Live probe &middot; ${escapeHtml(new Date(report.generatedAt).toUTCString())}</p>
+<span class="${badgeClass[report.overall] || 'badge badge-warn'}">${escapeHtml(report.summary)}</span>
+${rows}
+<footer>
+<a href="">Refresh</a>
+<a id="json-view" href="#">JSON view</a>
+<span>Private dashboard &middot; GeoRestrict Gateway v${escapeHtml(report.version)}</span>
+</footer>
+</div>
+<script>
+document.getElementById('json-view').addEventListener('click', function (event) {
+  event.preventDefault();
+  var search = window.location.search;
+  if (search.indexOf('format=') === -1) {
+    window.location.search = search + (search ? '&' : '') + 'format=json';
+  }
+});
+</script>
+</body>
+</html>`;
+}
+
+function describeComponent(component) {
+  if (component.status === 'not_configured') {
+    return component.id === 'cache-kv' ? 'Optional, not bound' : 'Not configured';
+  }
+  const parts = [component.status === 'up' ? 'Operational' : 'Down'];
+  if (typeof component.latencyMs === 'number') parts.push(`${component.latencyMs} ms`);
+  const detail = component.detail || {};
+  if (detail.countryCode) parts.push(String(detail.countryCode));
+  if (detail.databaseRelease) parts.push(`DB release ${detail.databaseRelease}`);
+  if (detail.maxEntries != null) parts.push(`${detail.entries}/${detail.maxEntries} entries`);
+  if (detail.ttlSeconds != null) parts.push(`TTL ${detail.ttlSeconds}s`);
+  if (detail.version) parts.push(`v${detail.version}`);
+  if (detail.note) parts.push(detail.note);
+  return parts.join(' · ');
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[char]));
+}
 
 async function fetchIpApi(ip, env) {
   const endpoints = collectValues(env, ['IP_API_ENDPOINTS'], 'IP_API_ENDPOINT',
@@ -174,15 +463,9 @@ async function fetchFromVps(ip, vpsBaseUrl, env) {
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const url = addQueryParam(vpsBaseUrl, 'ip', ip);
-    const headers = { 'Accept': 'application/json' };
-    const token = env.VPS_GATEWAY_TOKEN || '';
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-      headers['X-GeoRestrict-Token'] = token;
-    }
     const res = await fetch(url, {
       signal: controller.signal,
-      headers,
+      headers: vpsAuthHeaders(env),
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -228,7 +511,7 @@ async function fetchWithTimeout(url, env) {
   try {
     return await fetch(url, {
       signal: controller.signal,
-      headers: { 'User-Agent': 'GeoRestrict-Gateway/' + (env.GATEWAY_VERSION || '2.0.0') },
+      headers: { 'User-Agent': 'GeoRestrict-Gateway/' + (env.GATEWAY_VERSION || '2.0.2') },
     });
   } finally {
     clearTimeout(timer);

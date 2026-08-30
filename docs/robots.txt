@@ -1,23 +1,4 @@
 User-agent: *
 Allow: /
 
-# Allow AI & LLM Crawlers
-User-agent: GPTBot
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: Bytespider
-Allow: /
-
-User-agent: CCBot
-Allow: /
-
 Sitemap: https://georestrict-docs.pages.dev/sitemap.xml

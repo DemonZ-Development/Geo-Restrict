@@ -4,7 +4,7 @@
 
 GeoRestrict helps Minecraft server owners decide where connections may come from. It can use country codes, network ASNs and VPN/proxy signals, while keeping recent lookup results in a local cache.
 
-The same **v2.0.1** jar runs on Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity. GeoRestrict targets Java 17 bytecode; use a newer Java runtime whenever your server platform requires one.
+The same **v2.0.2** jar runs on Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity. GeoRestrict targets Java 17 bytecode; use a newer Java runtime whenever your server platform requires one.
 
 ## Why it exists
 
@@ -22,7 +22,7 @@ Sometimes a community only serves one region. Sometimes a server is being hit by
 
 ## Start here
 
-1. Download `georestrict-2.0.1.jar` from [Modrinth](https://modrinth.com/plugin/georestrict).
+1. Download `georestrict-2.0.2.jar` from [Modrinth](https://modrinth.com/plugin/georestrict).
 2. Put it in the server or proxy `plugins/` folder.
 3. Restart once so `plugins/GeoRestrict/config.yml` is created.
 4. Choose `BLOCKLIST` or `ALLOWLIST`, add the countries you need, then run `/georestrict reload`.
@@ -77,8 +77,22 @@ Only add the secrets you actually use:
 | `VPS_GATEWAY_URL` | The Worker should use the independent fallback server |
 | `VPS_GATEWAY_TOKEN` | Must match a token accepted by that fallback server |
 | `GATEWAY_TOKENS` | Optional private Worker access; leave unset for the public Worker |
+| `STATUS_TOKENS` | The private `/status` dashboard; leave unset to keep the page hidden |
 
 The `VPS_` names are retained for backward compatibility. They refer to the fallback server, not a requirement to use a particular hosting product. Never commit token values to this repository or place them in `wrangler.toml`.
+
+### Private status dashboard
+
+`GET /status` on the Worker is an operator-only view of every lookup path. It stays invisible (404) until a `STATUS_TOKENS` secret exists; after that it answers only to that token and live-probes each provider, the fallback server health route, and all three cache tiers on every load.
+
+```bash
+npx wrangler secret put STATUS_TOKENS
+# then open in a browser:
+#   https://<your-worker>/status?key=<token>
+# or send: Authorization: Bearer <token>
+```
+
+Append `&format=json` for machine-readable output. The page is marked `noindex`, never cached, sends no CORS headers, and returns 404 to any request without the token. Each view performs real provider probes, so treat it as an on-demand check rather than something to poll aggressively.
 
 The public Worker is `https://geoprotect.demonzdevelopment-e64.workers.dev`. The public wiki is `https://georestrict-docs.pages.dev`. Publish wiki changes from the repository root with:
 
@@ -109,7 +123,7 @@ The supplied systemd units are in [`vps-gateway/deploy/`](vps-gateway/deploy/). 
 
 ### Release verification
 
-The final v2.0.1 jar passed unit, integration, Worker and fallback server tests. It was also started on real platform runtimes:
+The final v2.0.2 jar passed unit, integration, Worker and fallback server tests. Platform startup verification below was last executed on the v2.0.1 jar; v2.0.2 changes do not touch plugin enforcement logic:
 
 | Runtime | Version tested | Result |
 |---|---|---|
@@ -167,9 +181,26 @@ if (GeoRestrictAPI.isAvailable()) {
     // Raw Geo Lookup (country, ASN, ISP, VPN flags)
     GeoRestrictAPI.lookup("1.1.1.1").thenAccept(geo -> {
         if (geo != null) {
-            System.out.println("ISP: " + geo.isp + ", VPN: " + geo.isVpn);
+            System.out.println("ISP: " + geo.asName + ", VPN: " + geo.isVpn);
         }
     });
+
+    // More getters: full country name, AS organization name and provider signal flags
+    GeoRestrictAPI.getCountryName("1.1.1.1").thenAccept(name -> System.out.println(name));
+    GeoRestrictAPI.getAsnName("8.8.8.8").thenAccept(name -> System.out.println(name));
+    GeoRestrictAPI.isHosting("8.8.8.8").thenAccept(hosting -> System.out.println(hosting));
+    GeoRestrictAPI.isProxy("8.8.8.8").thenAccept(proxy -> System.out.println(proxy));
+    GeoRestrictAPI.isMobile("8.8.8.8").thenAccept(mobile -> System.out.println(mobile));
+
+    // Batch lookups in parallel; insertion order preserved, failed IPs resolve to null
+    GeoRestrictAPI.lookupAll(java.util.List.of("1.1.1.1", "8.8.8.8")).thenAccept(map -> {
+        map.forEach((ip, geo) -> System.out.println(ip + " -> " + geo.countryCode));
+    });
+
+    // Offline cache helpers: never touch the network
+    String cachedCode = GeoRestrictAPI.getCachedCountryCode("1.1.1.1");
+    int entries = GeoRestrictAPI.getCacheSize();
+    GeoRestrictAPI.purgeCache();
 }
 ```
 
@@ -187,7 +218,7 @@ node --check worker/src/index.js
 node --check vps-gateway/src/server.js
 ```
 
-The shaded jar is written to `target/georestrict-2.0.1.jar`.
+The shaded jar is written to `target/georestrict-2.0.2.jar`.
 
 The integration and real platform startup harnesses are documented in [`test/README.md`](test/README.md).
 

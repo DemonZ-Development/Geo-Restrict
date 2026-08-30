@@ -17,7 +17,7 @@ High-performance, affordable hosting for your Minecraft server. Premium hardware
 - you need a temporary VPN rule during an attack; or
 - you want the same policy at the proxy and backend without maintaining separate builds.
 
-## v2.0.1 highlights
+## v2.0.2 highlights
 
 - One jar targeting Java 17 bytecode for Paper, Folia, Velocity and the wider Bukkit and Bungee ecosystem
 - Country and ASN allowlist and blocklist modes
@@ -41,7 +41,7 @@ GeoRestrict blocks by default when there is no cached answer and the lookup serv
 
 ## Quick start
 
-Drop `georestrict-2.0.1.jar` into `plugins/`, start once, edit `plugins/GeoRestrict/config.yml`, and run `/georestrict reload`. Use `/georestrict check <ip|player>` to see the normalized data the rule engine will use.
+Drop `georestrict-2.0.2.jar` into `plugins/`, start once, edit `plugins/GeoRestrict/config.yml`, and run `/georestrict reload`. Use `/georestrict check <ip|player>` to see the normalized data the rule engine will use.
 
 ## Before you put it at the edge
 

@@ -1,6 +1,6 @@
 ![GeoRestrict geographic access rules for Minecraft](https://georestrict-docs.pages.dev/assets/georestrict-banner.png?rev=20260714g)
 
-# GeoRestrict v2.0.1: geographic rules that stay in your config
+# GeoRestrict v2.0.2: geographic rules that stay in your config
 
 GeoRestrict is for server teams that want country, ASN, VPN and proxy rules without renting another dashboard. The policy lives in readable YAML, and the same jar runs across backend and proxy platforms.
 

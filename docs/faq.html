@@ -114,7 +114,7 @@
             <div class="faq-item fade-in">
                 <div class="faq-question">Can I use GeoRestrict for Geo-Routing without kicking players?</div>
                 <div class="faq-answer">
-                    <p>Yes! GeoRestrict includes a public Developer API (<code>GeoRestrictAPI</code>). Third-party plugins or custom proxy routers can call <code>GeoRestrictAPI.getCountryCode(ip)</code>, <code>GeoRestrictAPI.isVpn(ip)</code>, <code>GeoRestrictAPI.getAsn(ip)</code>, or <code>GeoRestrictAPI.lookup(ip)</code> to perform raw geolocation queries and route players to nearby proxy servers without kicking them or evaluating restriction rules.</p>
+                    <p>Yes! GeoRestrict includes a public Developer API (<code>GeoRestrictAPI</code>). Third-party plugins or custom proxy routers can call <code>GeoRestrictAPI.getCountryCode(ip)</code>, <code>GeoRestrictAPI.getCountryName(ip)</code>, <code>GeoRestrictAPI.getAsn(ip)</code>, <code>GeoRestrictAPI.getIsp(ip)</code>, the signal checks <code>isVpn</code>/<code>isHosting</code>/<code>isProxy</code>/<code>isMobile</code>, parallel batch lookups with <code>lookupAll(ips)</code>, or <code>GeoRestrictAPI.lookup(ip)</code> to perform raw geolocation queries and route players to nearby proxy servers without kicking them or evaluating restriction rules. Offline helpers like <code>getCachedCountryCode(ip)</code>, <code>getCacheSize()</code> and <code>purgeCache()</code> read and manage the local cache without any network request.</p>
                 </div>
             </div>
 

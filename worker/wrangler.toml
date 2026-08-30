@@ -10,7 +10,7 @@ REQUEST_TIMEOUT_MS = "3000"
 CACHE_TTL_SECONDS = "86400"
 MEMORY_CACHE_MAX_ENTRIES = "5000"
 ALLOWED_ORIGINS = "*"
-GATEWAY_VERSION = "2.0.0"
+GATEWAY_VERSION = "2.0.2"
 
 # Local-MMDB fallback server. The Worker uses this only after every external
 # provider fails. The server should resolve the IP from local Country/ASN MMDB
@@ -35,7 +35,15 @@ GATEWAY_VERSION = "2.0.0"
 #   wrangler secret put PROVIDER_TOKENS
 #   wrangler secret put PROVIDER_KEYS
 #
+# Private status dashboard: GET /status stays hidden (404) until a status token
+# exists, then answers only to that token. Probes every provider, the fallback
+# server and the cache tiers live on each view:
+#   wrangler secret put STATUS_TOKENS
+# Open https://<your-worker>/status?key=<token> in a browser, or send
+# Authorization: Bearer <token>. Append &format=json for machine-readable output.
+#
 # For multiple accounts, store comma-separated, newline-separated, or JSON arrays:
 #   ["token-one","token-two"]
 # Numbered secrets are also supported: PROVIDER_TOKEN_1, PROVIDER_TOKEN_2,
-# PROVIDER_KEY_1, PROVIDER_KEY_2, GATEWAY_TOKEN_1, GATEWAY_TOKEN_2.
+# PROVIDER_KEY_1, PROVIDER_KEY_2, GATEWAY_TOKEN_1, GATEWAY_TOKEN_2,
+# STATUS_TOKEN_1, STATUS_TOKEN_2.

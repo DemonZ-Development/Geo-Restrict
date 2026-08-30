@@ -43,7 +43,25 @@
             </header>
 
             <section class="changelog-version fade-in">
-                <h2>v2.0.1 <span class="changelog-tag tag-latest">Latest</span></h2>
+                <h2>v2.0.2 <span class="changelog-tag tag-latest">Latest</span></h2>
+                <p class="release-date">26 August 2026 · maintenance &amp; operator tooling</p>
+                <p>v2.0.2 is a maintenance patch for operators: a private status dashboard on the lookup gateway, tidier crawler rules, and one consistent version number across the plugin, gateway and services.</p>
+
+                <h3>Operator tooling</h3>
+                <ul class="changelog-list">
+                    <li class="added">Private, token-gated status dashboard on the lookup gateway showing what is up, down or unconfigured.</li>
+                    <li class="added">Live probes of each geolocation provider, the fallback server and all cache tiers, with latency and JSON output for scripts.</li>
+                </ul>
+
+                <h3>Housekeeping</h3>
+                <ul class="changelog-list">
+                    <li class="removed">Removed legacy crawler-helper files from the docs site; robots rules are back to standard.</li>
+                    <li class="changed">Versions aligned across the plugin, the lookup gateway and both service packages.</li>
+                </ul>
+            </section>
+
+            <section class="changelog-version fade-in">
+                <h2>v2.0.1</h2>
                 <p class="release-date">25 July 2026 · hotfix &amp; developer API</p>
                 <p>v2.0.1 introduces a public Developer API, Geyser / Floodgate (Bedrock) integration, expanded VPN detection keywords, and core performance &amp; thread safety hotfixes.</p>
 

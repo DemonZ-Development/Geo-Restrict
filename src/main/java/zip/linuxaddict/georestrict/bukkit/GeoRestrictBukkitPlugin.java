@@ -1,12 +1,3 @@
-/*
- * GeoRestrict - High-performance geographic access control.
- * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- */
 package zip.linuxaddict.georestrict.bukkit;
 
 import org.bukkit.command.PluginCommand;
@@ -89,6 +80,7 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
         log.info(PluginInfo.FEEDBACK_MESSAGE);
     }
 
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void applyConfig(GeoConfig fresh, Runnable done) {
         this.config = fresh;
         service.setConfig(fresh);
@@ -156,7 +148,10 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
     }
 
     private void startPendingCheckPruning() {
-        scheduler.runTimerAsync(this, this::prunePendingChecks, 1200L, 1200L);
+        scheduler.runTimerAsync(this, () -> {
+            long cutoff = System.currentTimeMillis() - PENDING_CHECK_TTL_MS;
+            pendingChecks.entrySet().removeIf(entry -> entry.getValue().isExpired(cutoff));
+        }, 1200L, 1200L);
     }
 
     @Override
@@ -229,11 +224,6 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
         }
     }
 
-    private void prunePendingChecks() {
-        long cutoff = System.currentTimeMillis() - PENDING_CHECK_TTL_MS;
-        pendingChecks.entrySet().removeIf(entry -> entry.getValue().createdAt < cutoff);
-    }
-
     private static final class PendingCheck {
         private final GeoRestrictService.CheckResult result;
         private final long createdAt;
@@ -241,6 +231,10 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
         private PendingCheck(GeoRestrictService.CheckResult result, long createdAt) {
             this.result = result;
             this.createdAt = createdAt;
+        }
+
+        boolean isExpired(long cutoffMillis) {
+            return createdAt < cutoffMillis;
         }
     }
 

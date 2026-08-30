@@ -1,12 +1,3 @@
-/*
- * GeoRestrict - High-performance geographic access control.
- * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- */
 package zip.linuxaddict.georestrict.api;
 
 import org.junit.jupiter.api.AfterEach;
@@ -21,6 +12,7 @@ import zip.linuxaddict.georestrict.GeoRestrictService;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -131,5 +123,89 @@ class GeoRestrictAPITest {
 
         String isp = GeoRestrictAPI.getIsp("1.1.1.1").join();
         assertEquals("Google Cloud DataCenter", isp);
+    }
+
+    @Test
+    void nameAndFlagGettersReturnCachedValues() {
+        GeoResponse r = new GeoResponse();
+        r.ip = "8.8.4.4";
+        r.countryCode = "US";
+        r.countryName = "United States";
+        r.asn = "AS15169";
+        r.asName = "Google LLC";
+        r.isProxy = true;
+        r.isHosting = true;
+        r.isMobile = false;
+        cache.put("8.8.4.4", r, 1000);
+
+        assertEquals("United States", GeoRestrictAPI.getCountryName("8.8.4.4").join());
+        assertEquals("Google LLC", GeoRestrictAPI.getAsnName("8.8.4.4").join());
+        assertTrue(GeoRestrictAPI.isProxy("8.8.4.4").join());
+        assertTrue(GeoRestrictAPI.isHosting("8.8.4.4").join());
+        assertFalse(GeoRestrictAPI.isMobile("8.8.4.4").join());
+    }
+
+    @Test
+    void isBlockedMirrorsTheRuleDecision() {
+        assertFalse(GeoRestrictAPI.isBlocked("127.0.0.1", "tester").join());
+    }
+
+    @Test
+    void lookupAllBatchesCachedAndLocalLookupsInOrder() {
+        GeoResponse first = new GeoResponse();
+        first.ip = "8.8.4.4";
+        first.countryCode = "US";
+        cache.put("8.8.4.4", first, 1000);
+
+        GeoResponse second = new GeoResponse();
+        second.ip = "1.1.1.1";
+        second.countryCode = "AU";
+        cache.put("1.1.1.1", second, 1000);
+
+        Map<String, GeoResponse> results = GeoRestrictAPI.lookupAll(
+            Arrays.asList("10.0.0.5", " 8.8.4.4 ", null, "", "1.1.1.1")).join();
+
+        assertEquals(3, results.size());
+        assertIterableEquals(Arrays.asList("10.0.0.5", "8.8.4.4", "1.1.1.1"), results.keySet());
+        assertNull(results.get("10.0.0.5"));
+        assertEquals("US", results.get("8.8.4.4").countryCode);
+        assertEquals("AU", results.get("1.1.1.1").countryCode);
+    }
+
+    @Test
+    void lookupAllHandlesEmptyAndNullInput() {
+        assertTrue(GeoRestrictAPI.lookupAll(null).join().isEmpty());
+        assertTrue(GeoRestrictAPI.lookupAll(java.util.Collections.emptyList()).join().isEmpty());
+    }
+
+    @Test
+    void cachedCountryCodeHitsOnlyFreshOfflineData() {
+        GeoResponse r = new GeoResponse();
+        r.countryCode = "DE";
+        cache.put("203.0.113.7", r, 1000);
+
+        assertEquals("DE", GeoRestrictAPI.getCachedCountryCode("203.0.113.7"));
+        assertNull(GeoRestrictAPI.getCachedCountryCode("198.51.100.9"));
+    }
+
+    @Test
+    void cacheSizeAndPurgeRoundTrip() {
+        GeoResponse r = new GeoResponse();
+        r.countryCode = "US";
+        cache.put("8.8.8.8", r, 1000);
+        cache.put("8.8.4.4", r, 1000);
+        assertTrue(GeoRestrictAPI.getCacheSize() >= 2);
+
+        GeoRestrictAPI.purgeCache();
+        assertEquals(0, GeoRestrictAPI.getCacheSize());
+        assertNull(GeoRestrictAPI.getCachedResponse("8.8.8.8"));
+    }
+
+    @Test
+    void cacheHelpersStaySafeAfterUnregister() {
+        GeoRestrictAPI.unregister();
+        assertEquals(0, GeoRestrictAPI.getCacheSize());
+        assertNull(GeoRestrictAPI.getCachedCountryCode("8.8.8.8"));
+        GeoRestrictAPI.purgeCache();
     }
 }

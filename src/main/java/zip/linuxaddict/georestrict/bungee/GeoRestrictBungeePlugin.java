@@ -1,12 +1,3 @@
-/*
- * GeoRestrict - High-performance geographic access control.
- * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- */
 package zip.linuxaddict.georestrict.bungee;
 
 import net.md_5.bungee.api.CommandSender;
@@ -69,6 +60,7 @@ public class GeoRestrictBungeePlugin extends Plugin implements Listener {
         log.info(PluginInfo.FEEDBACK_MESSAGE);
     }
 
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void applyConfig(GeoConfig fresh, Runnable done) {
         this.config = fresh;
         service.setConfig(fresh);

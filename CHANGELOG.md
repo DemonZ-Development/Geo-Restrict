@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v2.0.2] - 2026-08-26
+
+### Added
+- **Broadened Developer API**: Ten new additive `GeoRestrictAPI` methods for third-party plugins (all existing methods unchanged).
+  - Field getters: `getCountryName`, `getAsnName`, `isProxy`, `isHosting`, `isMobile`.
+  - Rule helper: `isBlocked` (inverse of `isAllowed`).
+  - Batch lookups: `lookupAll(ips)` resolves addresses in parallel with insertion order preserved; failed lookups keep their key mapped to null.
+  - Offline cache access: `getCachedCountryCode`, `getCacheSize`, `purgeCache`.
+- **Private Status Dashboard**: Token-gated `GET /status` endpoint on the Cloudflare Worker.
+  - Renders an operator-only HTML dashboard (or JSON via `?format=json`) showing what is up, down or unconfigured.
+  - Live-probes every configured geolocation provider with latency, the fallback server health route (including MMDB release), and all cache tiers (Cache API, memory, KV).
+  - Hidden with 404 until a `STATUS_TOKENS` secret is set; wrong tokens get 401. Marked `noindex`, never cached, no CORS headers.
+
+### Removed
+- Removed legacy crawler-helper text files from the docs site; `robots.txt` now contains only standard crawler rules and the sitemap entry was dropped.
+
+### Changed
+- Aligned versions across the whole stack: plugin surfaces moved from v2.0.1 to v2.0.2, and the Worker gateway plus both Node packages moved from v2.0.0 to v2.0.2 (`GATEWAY_VERSION`, health payload and User-Agent included).
+
+---
+
 ## [v2.0.1] - 2026-07-25
 
 ### Added
@@ -30,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Cache Debounce Scheduling**: Replaced `ForkJoinPool` sleeping in cache save debouncing with a `ScheduledExecutorService`.
 - **Bukkit Pending-Check Pruning**: Replaced inline HashMap cleaning with a periodic 60s background task.
 - **Expanded VPN Keywords**: Added `datacamp` (DataCamp Limited AS62005 / Proton VPN free servers), `tzulo`, `leaseweb`, `m247`, `proton`, and `datacenter` to default `vpnKeywords`.
-- **AI Crawler Optimization**: Created `robots.txt`, `sitemap.xml`, `llms.txt`, and `llms-full.txt` on the documentation site.
+- **Crawler Optimization**: Created `robots.txt` and `sitemap.xml` on the documentation site.
 
 ---
 
