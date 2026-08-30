@@ -44,8 +44,9 @@ The startup is fail-closed: both MMDB files must exist and open successfully.
 Smoke tests:
 
 ```bash
-curl -H "X-GeoRestrict-Token: <token>" "http://127.0.0.1:8787/health"
-curl -H "X-GeoRestrict-Token: <token>" "http://127.0.0.1:8787/?ip=8.8.8.8"
+# Authorization header (Bearer or X-GeoRestrict-Token):
+curl -H "Authorization: Bearer <token>" "http://127.0.0.1:8787/health"
+curl -H "Authorization: Bearer <token>" "http://127.0.0.1:8787/?ip=8.8.8.8"
 ```
 
 A successful lookup reports `provider: "dbip-local"`.
