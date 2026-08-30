@@ -1,6 +1,6 @@
 # GeoRestrict local fallback
 
-This service is the last lookup path in GeoRestrict v2.0.0. The Cloudflare
+This service is the last lookup path in GeoRestrict v2.0.2. The Cloudflare
 Worker tries its external providers first. Only when every provider fails does
 it call this protected fallback server, which reads Country and ASN data from local MMDB files. A
 lookup does not make another geolocation API request.

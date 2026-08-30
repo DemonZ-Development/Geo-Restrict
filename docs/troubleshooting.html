@@ -94,14 +94,14 @@
             <div class="faq-item fade-in">
                 <div class="faq-question">The plugin isn't loading on Folia</div>
                 <div class="faq-answer">
-                    <p>Check the startup log for <code>GeoRestrict v2.0.0 starting...</code>. If it is missing, confirm that the jar is in <code>plugins/</code> and Java 17 or newer is in use. If the line appears before an error, keep the complete stack trace; the reflection-based Folia adapter may need an update when a fork changes scheduler methods.</p>
+                    <p>Check the startup log for <code>GeoRestrict v2.0.2 starting...</code>. If it is missing, confirm that the jar is in <code>plugins/</code> and Java 17 or newer is in use. If the line appears before an error, keep the complete stack trace; the reflection-based Folia adapter may need an update when a fork changes scheduler methods.</p>
                 </div>
             </div>
 
             <div class="faq-item fade-in">
                 <div class="faq-question">The cache file is huge</div>
                 <div class="faq-answer">
-                    <p>Run <code>/georestrict cachestats</code> first. The default <code>maxCacheEntries: 100000</code> cap prevents unbounded growth; the oldest entries are evicted after the cap. If the count is above your configured cap, confirm the running jar is v2.0.0 and that the config actually loaded. You can run <code>/georestrict purgecache</code> after saving a copy for diagnosis.</p>
+                    <p>Run <code>/georestrict cachestats</code> first. The default <code>maxCacheEntries: 100000</code> cap prevents unbounded growth; the oldest entries are evicted after the cap. If the count is above your configured cap, confirm the running jar is v2.0.2 and that the config actually loaded. You can run <code>/georestrict purgecache</code> after saving a copy for diagnosis.</p>
                 </div>
             </div>
 

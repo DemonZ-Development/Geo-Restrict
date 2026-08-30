@@ -46,7 +46,7 @@ const server = http.createServer((req, res) => {
     isHosting: rec.isHosting,
     isProxy: rec.isProxy,
     isMobile: false,
-    version: "2.0.0",
+    version: "2.0.2",
   }));
 });
 

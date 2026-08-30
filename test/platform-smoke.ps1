@@ -5,11 +5,11 @@ param([string]$JavaCommand = "java")
 $ErrorActionPreference = "Stop"
 
 $Root = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$PluginJar = Join-Path $Root "target\georestrict-2.0.0.jar"
+$PluginJar = Join-Path $Root "target\georestrict-2.0.2.jar"
 $SmokeRoot = Join-Path $Root ".smoke"
 $Downloads = Join-Path $SmokeRoot "downloads"
 $RunRoot = Join-Path $SmokeRoot "runtime"
-$UserAgent = "GeoRestrict-SmokeTests/2.0.0 (https://github.com/DemonZ-Development/Geo-Restrict)"
+$UserAgent = "GeoRestrict-SmokeTests/2.0.2 (https://github.com/DemonZ-Development/Geo-Restrict)"
 
 if (-not (Test-Path -LiteralPath $PluginJar)) {
     throw "Build the release jar first: mvn -B clean verify"
