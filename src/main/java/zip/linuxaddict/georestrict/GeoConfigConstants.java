@@ -1,6 +1,6 @@
 /*
  * GeoRestrict - High-performance geographic access control.
- * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+ * Copyright (C) 2026 Demonz Development (https://demonz.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ public final class GeoConfigConstants {
         "# ============================================\n" +
         "#        GeoRestrict Configuration\n" +
         "#     (c) Demonz Development 2026\n" +
-        "#   https://demonzdevelopment.online/\n" +
+        "#   https://demonz.org/\n" +
         "# ============================================\n" +
         "# Help and full configuration guide:\n" +
         "#   " + PluginInfo.DOCS_URL + "configuration\n" +

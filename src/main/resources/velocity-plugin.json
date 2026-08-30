@@ -5,5 +5,5 @@
   "description": "Geographic restriction plugin for Minecraft proxies",
   "authors": ["Demonz Development"],
   "main": "zip.linuxaddict.georestrict.velocity.GeoRestrictVelocityPlugin",
-  "url": "https://demonzdevelopment.online/"
+  "url": "https://demonz.org/"
 }

@@ -66,6 +66,6 @@ On a cache miss, the connecting IP goes to the configured lookup service for cou
 - [Terms and Conditions](https://georestrict-docs.pages.dev/terms)
 - [Discord support and feedback](https://discord.com/invite/GYsTt96ypf)
 - [Bug reports](https://github.com/DemonZ-Development/Geo-Restrict/issues)
-- [Demonz Development](https://demonzdevelopment.online/)
+- [Demonz Development](https://demonz.org/)
 
 GeoRestrict was originally created by [linuxaddict](https://modrinth.com/user/linuxaddict) and is now maintained by the Demonz Development open source community. Licensed under GPL-3.0.

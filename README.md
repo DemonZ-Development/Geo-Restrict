@@ -224,7 +224,7 @@ The integration and real platform startup harnesses are documented in [`test/REA
 
 ## Project history
 
-GeoRestrict was created by [linuxaddict](https://modrinth.com/user/linuxaddict) and is now maintained by the [Demonz Development](https://demonzdevelopment.online/) open-source community. Listening to users comes first: bring bugs, reports and honest feedback to our [Discord community](https://discord.com/invite/GYsTt96ypf) or the [issue tracker](https://github.com/DemonZ-Development/Geo-Restrict/issues).
+GeoRestrict was created by [linuxaddict](https://modrinth.com/user/linuxaddict) and is now maintained by the [Demonz Development](https://demonz.org/) open-source community. Listening to users comes first: bring bugs, reports and honest feedback to our [Discord community](https://discord.com/invite/GYsTt96ypf) or the [issue tracker](https://github.com/DemonZ-Development/Geo-Restrict/issues).
 
 Before running GeoRestrict for a public community, read the [Privacy Policy](https://georestrict-docs.pages.dev/privacy) and [Terms and Conditions](https://georestrict-docs.pages.dev/terms).
 

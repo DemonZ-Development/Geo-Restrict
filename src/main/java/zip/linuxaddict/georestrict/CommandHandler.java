@@ -1,6 +1,6 @@
 /*
  * GeoRestrict - High-performance geographic access control.
- * Copyright (C) 2026 Demonz Development (https://demonzdevelopment.online)
+ * Copyright (C) 2026 Demonz Development (https://demonz.org)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ public final class CommandHandler {
         if (args.length == 0) {
             sender.sendMessage(legacy("&b&lGeoRestrict &7v" + PluginInfo.VERSION));
             sender.sendMessage(legacy("&7By &bDemonz Development"));
-            sender.sendMessage(legacy("&7https://demonzdevelopment.online/"));
+            sender.sendMessage(legacy("&7https://demonz.org/"));
             return true;
         }
 

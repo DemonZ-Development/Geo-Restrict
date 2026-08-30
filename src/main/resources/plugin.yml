@@ -7,7 +7,7 @@ folia-supported: true
 load: STARTUP
 description: Geographic restriction plugin for Minecraft servers
 author: Demonz Development
-website: https://demonzdevelopment.online/
+website: https://demonz.org/
 commands:
   georestrict:
     description: Main GeoRestrict command
