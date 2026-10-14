@@ -44,3 +44,4 @@ dependency-reduced-pom.xml
 # Local release assembly
 dist/
 release-input/
+scripts/

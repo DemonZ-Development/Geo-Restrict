@@ -33,9 +33,8 @@ jobs:
         id: version
         env:
           RELEASE_TAG: ${{ inputs.release_tag || '' }}
-        run: python3 scripts/release.py version --tag "$RELEASE_TAG" --github-output "$GITHUB_OUTPUT"
-      - name: Test release packaging and source exports
-        run: python3 -m unittest discover -s scripts/tests -v
+        run: |
+          python3 -c "import xml.etree.ElementTree as ET, os; v = ET.parse('pom.xml').getroot().find('{*}version').text; open(os.environ['GITHUB_OUTPUT'], 'a').write(f'version={v}\n'); print(f'Version: {v}')"
 
   java-plugin:
     needs: metadata
@@ -114,12 +113,10 @@ jobs:
         run: cargo test --locked --manifest-path adapters/pumpkin/Cargo.toml --lib
       - name: Build native Pumpkin component
         run: cargo build --locked --release --target wasm32-wasip2 --manifest-path adapters/pumpkin/Cargo.toml
-      - name: Prepare native component and dependency notices
+      - name: Prepare native component
         run: |
           mkdir -p "$RUNNER_TEMP/pumpkin-artifacts"
-          cargo metadata --locked --filter-platform wasm32-wasip2 --format-version 1 --manifest-path adapters/pumpkin/Cargo.toml > "$RUNNER_TEMP/pumpkin-metadata.json"
           cp adapters/pumpkin/target/wasm32-wasip2/release/georestrict_pumpkin.wasm "$RUNNER_TEMP/pumpkin-artifacts/"
-          python3 scripts/release.py pumpkin-notices --metadata "$RUNNER_TEMP/pumpkin-metadata.json" --output "$RUNNER_TEMP/pumpkin-artifacts/pumpkin-notices.zip"
       - uses: actions/upload-artifact@v4
         with:
           name: release-pumpkin
