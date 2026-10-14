@@ -26,4 +26,5 @@ High-performance, affordable hosting for your Minecraft server. Premium hardware
 
 ### Beyond Minecraft & Multi-Platform
 - `DEMONZ.md` — DemonZ Development portal overview (Multi-loader, Pumpkin WASI, Standalone, Gateways)
+- `PUMPKIN.md` — Pumpkin server WASI component marketplace description (Markdown)
 - `STANDALONE.md` — Standalone daemon & generic proxy deployment (Markdown)
