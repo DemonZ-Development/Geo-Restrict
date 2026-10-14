@@ -1,0 +1,10 @@
+{
+  "loader": {"name": "java_plain", "version": "1.0"},
+  "license": "GPL-3.0-or-later",
+  "plugins": [{
+    "id": "georestrict", "name": "GeoRestrict", "version": "${project.version}",
+    "entrypoint": "zip.linuxaddict.georestrict.sponge.GeoRestrictSponge",
+    "description": "Country, ASN, VPN and local-player admission rules.",
+    "dependencies": [{"id": "spongeapi", "version": "[12.0.0,)", "load-order": "after", "optional": false}]
+  }]
+}

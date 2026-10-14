@@ -14,7 +14,7 @@ import java.util.List;
 
 public final class GeoConfigConstants {
 
-    public static final int CURRENT_VERSION = 5;
+    public static final int CURRENT_VERSION = 6;
     public static final String DEFAULT_GATEWAY_URL = "https://geoprotect.demonzdevelopment-e64.workers.dev/";
 
     public static final List<String> DEFAULT_VPN_KEYWORDS = Arrays.asList(
@@ -75,6 +75,13 @@ public final class GeoConfigConstants {
         "# Hard cap on cache size; oldest entries are dropped past this.\n" +
         "maxCacheEntries: 100000\n" +
         "\n" +
+        "# ----- Local player connections -----\n" +
+        "# Opt-in: block loopback, LAN, link-local and IPv6 unique-local IPs.\n" +
+        "# Leave false on backends that see a local proxy/Geyser IP.\n" +
+        "# Enable on the public-facing proxy, or forward real player IPs first.\n" +
+        "# Public player IPs and existing bypasses keep their normal behavior.\n" +
+        "blockLocalConnections: false\n" +
+        "\n" +
         "# ----- Country -----\n" +
         "countryMode: BLOCKLIST    # ALLOWLIST | BLOCKLIST | DISABLED\n" +
         "countries:\n" +
@@ -97,6 +104,7 @@ public final class GeoConfigConstants {
         "kickMessageAsn: \"Your ISP/ASN is not allowed on this server.\"\n" +
         "kickMessageVpn: \"VPN or proxy connections are not allowed.\"\n" +
         "kickMessageLookupFailure: \"Geo verification is temporarily unavailable. Please try again later.\"\n" +
+        "kickMessageLocalConnection: \"Local network connections are not allowed on this server.\"\n" +
         "\n" +
         "# ----- Cache & network -----\n" +
         "cacheTtlDays: 30\n" +

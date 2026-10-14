@@ -18,7 +18,7 @@
 
     <groupId>zip.linuxaddict.georestrict</groupId>
     <artifactId>georestrict-it</artifactId>
-    <version>2.0.2</version>
+    <version>2.1.0</version>
     <packaging>jar</packaging>
 
     <name>GeoRestrict Integration Tests</name>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>zip.linuxaddict.georestrict</groupId>
             <artifactId>georestrict</artifactId>
-            <version>2.0.2</version>
+            <version>2.1.0</version>
         </dependency>
 
         <dependency>
@@ -58,6 +58,43 @@
             <groupId>com.github.seeseemelk</groupId>
             <artifactId>MockBukkit-v1.20</artifactId>
             <version>3.93.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.waterfallmc</groupId>
+            <artifactId>waterfall-api</artifactId>
+            <version>1.20-R0.1-SNAPSHOT</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion><groupId>net.md-5</groupId><artifactId>brigadier</artifactId></exclusion>
+                <exclusion><groupId>io.github.waterfallmc</groupId><artifactId>waterfall-chat</artifactId></exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.github.waterfallmc</groupId>
+            <artifactId>waterfall-event</artifactId>
+            <version>1.20-R0.1-SNAPSHOT</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion><groupId>io.github.waterfallmc</groupId><artifactId>waterfall-chat</artifactId></exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-chat</artifactId>
+            <version>1.20-R0.2-deprecated+build.18</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.velocitypowered</groupId>
+            <artifactId>velocity-api</artifactId>
+            <version>3.2.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-serializer-legacy</artifactId>
+            <version>4.17.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

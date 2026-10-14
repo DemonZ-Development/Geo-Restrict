@@ -61,6 +61,7 @@
 
             <h3 class="fade-in">1. Plugin receives a login</h3>
             <p class="fade-in">The plugin listens to the platform's pre-login event. On Bukkit that's <code>AsyncPlayerPreLoginEvent</code>. On BungeeCord it's <code>LoginEvent</code>. On Velocity it's <code>LoginEvent</code> with the async continuation API. The event gives us the connection IP, the player's name, and (sometimes) their UUID. The plugin then submits the IP to its internal <code>GeoRestrictService.checkIp(...)</code> on a background thread.</p>
+            <p class="fade-in">Before geolocation, the v2.1.0 patch checks local player addresses. They remain allowed by default; <code>blockLocalConnections: true</code> or <code>LOCAL</code> in a country blocklist rejects them without a lookup or cache entry. Existing full bypasses still apply. Public player IPs continue to the cache and normal rules.</p>
 
             <h3 class="fade-in">2. Cache check</h3>
             <p class="fade-in">The cache is a <code>ConcurrentHashMap</code> in memory, mirrored to <code>geo_cache.json</code> on disk via a debounced async save (5s window). Saves are atomic: write to <code>.tmp</code>, then <code>Files.move(... ATOMIC_MOVE)</code>, with a non-atomic fallback for filesystems that don't support it.</p>

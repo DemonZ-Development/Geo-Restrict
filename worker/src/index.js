@@ -1,6 +1,4 @@
-const IPV4_PATTERN = /^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
-const IPV6_PATTERN = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1?$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^::(?:[0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,6}(?::[0-9a-fA-F]{1,4}){1,6}$/;
-const IPV4_MAPPED_PATTERN = /^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/i;
+import { isValidIp, isPrivateIp } from '../../vps-gateway/src/ip-address.js';
 const IP_API_FIELDS = 'status,message,query,country,countryCode,isp,org,as,proxy,hosting,mobile';
 const DEFAULT_PROVIDER_ORDER = ['ipinfo', 'ip-api'];
 const MAX_NUMBERED_VALUES = 20;
@@ -23,7 +21,7 @@ export default {
       const cacheTtlSeconds = getNumber(env.CACHE_TTL_SECONDS, 86400, 0, 604800);
       return json({
         ok: true,
-        version: env.GATEWAY_VERSION || '2.0.2',
+        version: env.GATEWAY_VERSION || '2.1.0',
         vpsConfigured: Boolean(String(env.VPS_GATEWAY_URL || '').trim()),
         providers: getProviderOrder(env),
         fallback: 'vps-local-mmdb',
@@ -124,7 +122,7 @@ async function buildStatusReport(env) {
     label: 'Worker gateway',
     status: 'up',
     critical: true,
-    detail: { version: env.GATEWAY_VERSION || '2.0.2' },
+    detail: { version: env.GATEWAY_VERSION || '2.1.0' },
   }];
 
   for (const provider of getProviderOrder(env)) {
@@ -141,7 +139,7 @@ async function buildStatusReport(env) {
   return {
     ok: true,
     scope: 'status',
-    version: env.GATEWAY_VERSION || '2.0.2',
+    version: env.GATEWAY_VERSION || '2.1.0',
     generatedAt: new Date().toISOString(),
     overall,
     summary: overall === 'operational' ? 'All systems operational'
@@ -511,7 +509,7 @@ async function fetchWithTimeout(url, env) {
   try {
     return await fetch(url, {
       signal: controller.signal,
-      headers: { 'User-Agent': 'GeoRestrict-Gateway/' + (env.GATEWAY_VERSION || '2.0.2') },
+      headers: { 'User-Agent': 'GeoRestrict-Gateway/' + (env.GATEWAY_VERSION || '2.1.0') },
     });
   } finally {
     clearTimeout(timer);
@@ -659,40 +657,6 @@ function getNumber(value, fallback, min, max) {
   const n = Number(value);
   if (!Number.isFinite(n)) return fallback;
   return Math.max(min, Math.min(max, Math.floor(n)));
-}
-
-function isValidIp(ip) {
-  if (typeof ip !== 'string' || ip.length === 0 || ip.length > 45) return false;
-  if (IPV4_PATTERN.test(ip)) return true;
-  if (IPV6_PATTERN.test(ip)) return true;
-  return false;
-}
-
-function isPrivateIp(ip) {
-  if (IPV4_PATTERN.test(ip)) {
-    const parts = ip.split('.').map(Number);
-    const [a, b, c] = parts;
-    if (a === 10 || a === 127 || a === 0) return true;
-    if (a === 172 && b >= 16 && b <= 31) return true;
-    if (a === 192 && b === 168) return true;
-    if (a === 169 && b === 254) return true;
-    if (a === 100 && b >= 64 && b <= 127) return true;
-    if (a === 192 && b === 0 && c === 0) return true;
-    if (a === 192 && b === 0 && c === 2) return true;
-    if (a === 198 && b === 18 && (c === 0 || c === 1)) return true;
-    if (a === 198 && b === 51 && c === 100) return true;
-    if (a === 203 && b === 0 && c === 113) return true;
-    if (a >= 224) return true;
-    return false;
-  }
-  const lower = ip.toLowerCase();
-  if (lower === '::' || lower === '::1') return true;
-  if (lower.startsWith('fe8') || lower.startsWith('fe9') || lower.startsWith('fea') || lower.startsWith('feb')) return true;
-  if (lower.startsWith('fc') || lower.startsWith('fd')) return true;
-  if (lower.startsWith('2001:db8')) return true;
-  const mapped = IPV4_MAPPED_PATTERN.exec(ip);
-  if (mapped) return isPrivateIp(mapped[1]);
-  return false;
 }
 
 function buildLocalResponse(ip) {

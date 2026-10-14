@@ -15,6 +15,7 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,7 @@ class BukkitKickIT {
     private static final Logger log = LoggerFactory.getLogger("BukkitKickIT");
     private static GeoRestrictBukkitPlugin plugin;
     private static MockGateway gw;
+    private static GeoConfig config;
 
     @BeforeAll
     static void setUp() throws Exception {
@@ -56,6 +58,7 @@ class BukkitKickIT {
         assertNotNull(plugin, "plugin should load under MockBukkit");
 
         GeoConfig cfg = new GeoConfig();
+        config = cfg;
         cfg.gatewayUrl = gw.baseUrl();
         cfg.countries = Arrays.asList("RU");
         cfg.countryMode = GeoConfig.RestrictionMode.BLOCKLIST;
@@ -74,6 +77,12 @@ class BukkitKickIT {
 
         setField(plugin, "service", svc);
         setField(plugin, "config", cfg);
+    }
+
+    @BeforeEach
+    void resetLocalPolicy() {
+        config.blockLocalConnections = false;
+        config.countries = Arrays.asList("RU");
     }
 
     @AfterAll
@@ -111,10 +120,13 @@ class BukkitKickIT {
     private PlayerLoginEvent mockLogin(UUID uuid, boolean bypass) {
         Player player = mock(Player.class);
         when(player.getUniqueId()).thenReturn(uuid);
+        when(player.getName()).thenReturn("tester");
         when(player.hasPermission("georestrict.bypass")).thenReturn(bypass);
 
         PlayerLoginEvent event = mock(PlayerLoginEvent.class);
         when(event.getPlayer()).thenReturn(player);
+        try { when(event.getAddress()).thenReturn(InetAddress.getByName("8.8.8.8")); }
+        catch (Exception error) { throw new AssertionError(error); }
         when(event.getResult()).thenReturn(PlayerLoginEvent.Result.ALLOWED);
         return event;
     }
@@ -167,6 +179,83 @@ class BukkitKickIT {
         plugin.onAsyncLogin(preLogin);
         plugin.onPlayerLogin(login);
 
+        verify(login, never()).disallow((PlayerLoginEvent.Result) any(), anyString());
+    }
+
+    @Test
+    void enabledLocalBlockingDisallowsLocalPlayerAtLogin() throws Exception {
+        config.blockLocalConnections = true;
+        UUID uuid = UUID.randomUUID();
+        AsyncPlayerPreLoginEvent preLogin = mockPreLogin("127.0.0.1", uuid);
+        PlayerLoginEvent login = mockLogin(uuid, false);
+        plugin.onAsyncLogin(preLogin);
+        plugin.onPlayerLogin(login);
+        verify(preLogin, never()).disallow((AsyncPlayerPreLoginEvent.Result) any(), anyString());
+        verify(login).disallow(PlayerLoginEvent.Result.KICK_OTHER, config.kickMessageLocalConnection);
+    }
+
+    @Test
+    void localCountryBlocklistDisallowsLanPlayer() throws Exception {
+        config.countries = Arrays.asList("LOCAL", "RU");
+        UUID uuid = UUID.randomUUID();
+        PlayerLoginEvent login = mockLogin(uuid, false);
+        plugin.onAsyncLogin(mockPreLogin("192.168.1.4", uuid));
+        plugin.onPlayerLogin(login);
+        verify(login).disallow(PlayerLoginEvent.Result.KICK_OTHER, config.kickMessageCountry);
+    }
+
+    @Test
+    void enabledLocalBlockingPreservesPublicJoins() throws Exception {
+        config.blockLocalConnections = true;
+        allowedCountryNotDisallowed();
+        blockedCountryDisallows();
+    }
+
+    @Test
+    void enabledLocalBlockingPreservesBypassAndOperatorAccess() throws Exception {
+        config.blockLocalConnections = true;
+        UUID bypassUuid = UUID.randomUUID();
+        PlayerLoginEvent bypassLogin = mockLogin(bypassUuid, true);
+        plugin.onAsyncLogin(mockPreLogin("::1", bypassUuid));
+        plugin.onPlayerLogin(bypassLogin);
+        verify(bypassLogin, never()).disallow((PlayerLoginEvent.Result) any(), anyString());
+
+        UUID operatorUuid = UUID.randomUUID();
+        PlayerLoginEvent operatorLogin = mockLogin(operatorUuid, false);
+        when(operatorLogin.getPlayer().isOp()).thenReturn(true);
+        plugin.onAsyncLogin(mockPreLogin("10.0.0.1", operatorUuid));
+        plugin.onPlayerLogin(operatorLogin);
+        verify(operatorLogin, never()).disallow((PlayerLoginEvent.Result) any(), anyString());
+    }
+
+    @Test
+    void localBlockingDoesNotOverwriteAnotherLoginDenial() throws Exception {
+        config.blockLocalConnections = true;
+        UUID uuid = UUID.randomUUID();
+        PlayerLoginEvent login = mockLogin(uuid, false);
+        when(login.getResult()).thenReturn(PlayerLoginEvent.Result.KICK_BANNED);
+        plugin.onAsyncLogin(mockPreLogin("127.0.0.1", uuid));
+        plugin.onPlayerLogin(login);
+        verify(login, never()).disallow((PlayerLoginEvent.Result) any(), anyString());
+    }
+
+    @Test
+    void offlineLocalLoginIsBlockedWhenServerSkipsAsyncEvent() throws Exception {
+        config.blockLocalConnections = true;
+        PlayerLoginEvent login = mockLogin(UUID.randomUUID(), false);
+        when(login.getAddress()).thenReturn(InetAddress.getByName("127.0.0.1"));
+        plugin.onPlayerLogin(login);
+        verify(login).disallow(PlayerLoginEvent.Result.KICK_OTHER, config.kickMessageLocalConnection);
+    }
+
+    @Test
+    void allowedAsyncPublicPlayerIsNotRecheckedAgainstLocalBackendAddress() throws Exception {
+        config.blockLocalConnections = true;
+        UUID uuid = UUID.randomUUID();
+        PlayerLoginEvent login = mockLogin(uuid, false);
+        when(login.getAddress()).thenReturn(InetAddress.getByName("127.0.0.1"));
+        plugin.onAsyncLogin(mockPreLogin("1.2.3.4", uuid));
+        plugin.onPlayerLogin(login);
         verify(login, never()).disallow((PlayerLoginEvent.Result) any(), anyString());
     }
 }

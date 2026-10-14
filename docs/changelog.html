@@ -43,7 +43,22 @@
             </header>
 
             <section class="changelog-version fade-in">
-                <h2>v2.0.2 <span class="changelog-tag tag-latest">Latest</span></h2>
+                <h2>v2.1.0 <span class="changelog-tag tag-latest">Latest</span></h2>
+                <p class="release-date">14 October 2026 · local player blocking &amp; native loader mods</p>
+                <ul class="changelog-list">
+                    <li class="added">Opt-in <code>blockLocalConnections</code> and a configurable local kick message, with automatic IPv4/IPv6 detection.</li>
+                    <li class="fixed"><code>LOCAL</code> in a country blocklist now rejects local players instead of always allowing them.</li>
+                    <li class="fixed">Worker and fallback literal parsing now handles expanded and mapped local IPv6 correctly.</li>
+                    <li class="fixed">Modrinth update queries are encoded correctly; Docker port binding and protected health checks are repaired.</li>
+                    <li class="added">Live admission and service checks cover eight server/proxy platforms, legacy and modern forwarding, optional addons and the fallback container.</li>
+                    <li class="changed">Schema v6 adds defaults while preserving operator values. Local blocking remains off unless explicitly configured.</li>
+                    <li class="fixed">A null Floodgate configuration section now receives defaults.</li>
+                </ul>
+                <p>Public joins and existing bypasses retain their rules. Enable local blocking at the public-facing proxy or after configuring trusted player IP forwarding; see <a href="configuration.html">configuration</a>.</p>
+            </section>
+
+            <section class="changelog-version fade-in">
+                <h2>v2.0.2</h2>
                 <p class="release-date">26 August 2026 · maintenance &amp; operator tooling</p>
                 <p>v2.0.2 is a maintenance patch for operators: a private status dashboard on the lookup gateway, tidier crawler rules, and one consistent version number across the plugin, gateway and services.</p>
 

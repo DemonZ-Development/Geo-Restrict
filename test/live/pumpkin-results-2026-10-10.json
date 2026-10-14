@@ -1,0 +1,721 @@
+{
+  "pluginVersion": "2.1.0",
+  "native": true,
+  "javaBridgeRequired": false,
+  "artifactSha256": "7423cbf4632fa888409e0a6b31b1178fd99270c1144ea3fa454d7b53f4ed37be",
+  "artifactBytes": 1111962,
+  "server": {
+    "tag": "0.2.0+26.3-26.51",
+    "downloadUrl": "https://github.com/Pumpkin-MC/Pumpkin/releases/download/0.2.0%2B26.3-26.51/pumpkin-X64-Linux",
+    "publishedDigest": "sha256:68c4416ca9fbfb3f2aeb6a8ce1de0e3fb02c5a85a53c8ba59a27941d7e43d8cd",
+    "sha256": "68c4416ca9fbfb3f2aeb6a8ce1de0e3fb02c5a85a53c8ba59a27941d7e43d8cd"
+  },
+  "rust": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "target": "wasm32-wasip2",
+  "javaProtocol": 777,
+  "bedrockProtocol": 2193,
+  "bedrockVersion": "1.26.51",
+  "authenticatedAccountCoverage": false,
+  "sourceSha256": {
+    "adapters/pumpkin/Cargo.toml": "43f60e5b439937f464b5620b14f1116c776c03c93dd45f6e616d6566445a4a18",
+    "adapters/pumpkin/Cargo.lock": "4c1a8566e8442d2bee609b01ffa5bbaf4f01e59610d4884d2e77da51f1dd69c3",
+    "adapters/pumpkin/src/defaults.json": "66ee272f79c16aedf71567c1d06f011bab1b275cee9a263751da539fbf8af872",
+    "adapters/pumpkin/src/discord-defaults.yml": "fa9ce4ec835148e52a2a88d19537710e6ec11872a831201191f9f28acc66dea1",
+    "adapters/pumpkin/src/http.rs": "0977b0d1851eccd0a6a3ac01ac5fa0a44795071b54f4cc8742db7802df1463ce",
+    "adapters/pumpkin/src/lib.rs": "5c7f69428d927ce77b5d5c2e17221cc0f99de9206f5989b693b6b864032dd79d",
+    "adapters/pumpkin/src/native.rs": "9251c7e708fd31d03088d0ac78d96a37b807391aec2a054afe29e11fc10beeec",
+    "adapters/pumpkin/src/policy.rs": "91765d9c65e16d99e1fa710a1c8e45a977beb4e87c216d0a42e571e974833097"
+  },
+  "unitTests": [
+    "policy::tests::config_defaults_normalization_and_invalid_input",
+    "policy::tests::country_asn_vpn_and_bedrock_policy",
+    "policy::tests::failed_incomplete_and_untrusted_gateway_data",
+    "policy::tests::local_flag_local_country_and_bypasses",
+    "policy::tests::local_literals_and_reserved_ranges_are_distinct",
+    "policy::tests::transport_socket_addresses_preserve_real_ips"
+  ],
+  "suites": [
+    {
+      "software": "pumpkin",
+      "pluginVersion": "2.1.0",
+      "serverRelease": "0.2.0+26.3-26.51",
+      "sha256": "7423cbf4632fa888409e0a6b31b1178fd99270c1144ea3fa454d7b53f4ed37be",
+      "native": true,
+      "javaBridgeRequired": false,
+      "authenticatedAccountCoverage": false,
+      "checks": [
+        {
+          "case": "native component loads without Java admission bridge",
+          "pass": true
+        },
+        {
+          "case": "native info command",
+          "pass": true
+        },
+        {
+          "case": "default local Java player reaches PLAY",
+          "pass": true,
+          "connection": {
+            "username": "PumpLive0",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "native pre-login local block",
+          "pass": true,
+          "connection": {
+            "username": "PumpLive1",
+            "joined": false,
+            "disconnect": "\u001e{\"text\":\"PUMPKIN_LOCAL_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "Java server-list status survives denial",
+          "pass": true
+        },
+        {
+          "case": "LOCAL country blocklist rejects loopback",
+          "pass": true,
+          "connection": {
+            "username": "PumpLive2",
+            "joined": false,
+            "disconnect": " {\"text\":\"PUMPKIN_COUNTRY_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "local flag works with country rules disabled",
+          "pass": true,
+          "connection": {
+            "username": "PumpLive3",
+            "joined": false,
+            "disconnect": "\u001e{\"text\":\"PUMPKIN_LOCAL_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "native reload restores Java joins",
+          "pass": true,
+          "connection": {
+            "username": "PumpLive4",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "native local check command",
+          "pass": true
+        },
+        {
+          "case": "native public lookup through real Worker and fallback",
+          "pass": true
+        },
+        {
+          "case": "native cached country rules reevaluate on reload",
+          "pass": true
+        },
+        {
+          "case": "native persistent cache clear",
+          "pass": true
+        },
+        {
+          "case": "native gateway failure closes admission",
+          "pass": true
+        },
+        {
+          "case": "native gateway failure respects fail-open",
+          "pass": true
+        },
+        {
+          "case": "native gateway recovery",
+          "pass": true
+        },
+        {
+          "case": "native Bedrock NetherNet advertisement",
+          "pass": true,
+          "connection": {
+            "username": "BedrockPing",
+            "joined": false,
+            "disconnect": null,
+            "error": null,
+            "authentication": "offline",
+            "webRtcBackend": "wrtc",
+            "transport": "nethernet",
+            "advertisement": {
+              "version": 7,
+              "motd": "A blazingly fast Pumpkin server!",
+              "protocol": 2193,
+              "gameVersion": "1.26.51",
+              "levelName": "world",
+              "gamemodeId": 0,
+              "playerCount": 0,
+              "playersMax": 1000,
+              "isEditorWorld": false,
+              "hardcore": false,
+              "acceptsOnlineAuth": true,
+              "acceptsSelfSignedAuth": true,
+              "nonce": "3184ab350662e3ee",
+              "connectionType": 4,
+              "unknown1": 4,
+              "unknown2": 8,
+              "raw": "07204120626c617a696e676c7920666173742050756d706b696e2073657276657221a22207312e32362e353105776f726c6400d00f0000000101103331383461623335303636326533656508",
+              "networkId": "10778894838755378828"
+            }
+          }
+        },
+        {
+          "case": "default native Bedrock player reaches START_GAME",
+          "pass": true,
+          "connection": {
+            "username": "PumpBed0",
+            "joined": true,
+            "disconnect": null,
+            "error": null,
+            "authentication": "offline",
+            "webRtcBackend": "wrtc",
+            "transport": "nethernet",
+            "advertisement": {
+              "version": 7,
+              "motd": "A blazingly fast Pumpkin server!",
+              "protocol": 2193,
+              "gameVersion": "1.26.51",
+              "levelName": "world",
+              "gamemodeId": 0,
+              "playerCount": 0,
+              "playersMax": 1000,
+              "isEditorWorld": false,
+              "hardcore": false,
+              "acceptsOnlineAuth": true,
+              "acceptsSelfSignedAuth": true,
+              "nonce": "3184ab350662e3ee",
+              "connectionType": 4,
+              "unknown1": 4,
+              "unknown2": 8,
+              "raw": "07204120626c617a696e676c7920666173742050756d706b696e2073657276657221a22207312e32362e353105776f726c6400d00f0000000101103331383461623335303636326533656508",
+              "networkId": "10778894838755378828"
+            },
+            "transportReason": "closed"
+          }
+        },
+        {
+          "case": "native Bedrock local admission denied",
+          "pass": true,
+          "connection": {
+            "username": "PumpBed1",
+            "joined": false,
+            "disconnect": "PUMPKIN_LOCAL_BLOCK",
+            "error": null,
+            "authentication": "offline",
+            "webRtcBackend": "wrtc",
+            "transport": "nethernet",
+            "advertisement": {
+              "version": 7,
+              "motd": "A blazingly fast Pumpkin server!",
+              "protocol": 2193,
+              "gameVersion": "1.26.51",
+              "levelName": "world",
+              "gamemodeId": 0,
+              "playerCount": 0,
+              "playersMax": 1000,
+              "isEditorWorld": false,
+              "hardcore": false,
+              "acceptsOnlineAuth": true,
+              "acceptsSelfSignedAuth": true,
+              "nonce": "3184ab350662e3ee",
+              "connectionType": 4,
+              "unknown1": 4,
+              "unknown2": 8,
+              "raw": "07204120626c617a696e676c7920666173742050756d706b696e2073657276657221a22207312e32362e353105776f726c6400d00f0000000101103331383461623335303636326533656508",
+              "networkId": "10778894838755378828"
+            },
+            "transportReason": "closed"
+          }
+        },
+        {
+          "case": "Bedrock discovery survives local denial",
+          "pass": true,
+          "connection": {
+            "username": "BedrockPing",
+            "joined": false,
+            "disconnect": null,
+            "error": null,
+            "authentication": "offline",
+            "webRtcBackend": "wrtc",
+            "transport": "nethernet",
+            "advertisement": {
+              "version": 7,
+              "motd": "A blazingly fast Pumpkin server!",
+              "protocol": 2193,
+              "gameVersion": "1.26.51",
+              "levelName": "world",
+              "gamemodeId": 0,
+              "playerCount": 0,
+              "playersMax": 1000,
+              "isEditorWorld": false,
+              "hardcore": false,
+              "acceptsOnlineAuth": true,
+              "acceptsSelfSignedAuth": true,
+              "nonce": "3184ab350662e3ee",
+              "connectionType": 4,
+              "unknown1": 4,
+              "unknown2": 8,
+              "raw": "07204120626c617a696e676c7920666173742050756d706b696e2073657276657221a22207312e32362e353105776f726c6400d00f0000000101103331383461623335303636326533656508",
+              "networkId": "10778894838755378828"
+            }
+          }
+        },
+        {
+          "case": "native Bedrock full bypass respects configuration",
+          "pass": true,
+          "connection": {
+            "username": "PumpBed2",
+            "joined": true,
+            "disconnect": null,
+            "error": null,
+            "authentication": "offline",
+            "webRtcBackend": "wrtc",
+            "transport": "nethernet",
+            "advertisement": {
+              "version": 7,
+              "motd": "A blazingly fast Pumpkin server!",
+              "protocol": 2193,
+              "gameVersion": "1.26.51",
+              "levelName": "world",
+              "gamemodeId": 0,
+              "playerCount": 0,
+              "playersMax": 1000,
+              "isEditorWorld": false,
+              "hardcore": false,
+              "acceptsOnlineAuth": true,
+              "acceptsSelfSignedAuth": true,
+              "nonce": "3184ab350662e3ee",
+              "connectionType": 4,
+              "unknown1": 4,
+              "unknown2": 8,
+              "raw": "07204120626c617a696e676c7920666173742050756d706b696e2073657276657221a22207312e32362e353105776f726c6400d00f0000000101103331383461623335303636326533656508",
+              "networkId": "10778894838755378828"
+            },
+            "transportReason": "closed"
+          }
+        },
+        {
+          "case": "Bedrock full bypass does not bypass Java denial",
+          "pass": true,
+          "connection": {
+            "username": "PumpJava9",
+            "joined": false,
+            "disconnect": "\u001e{\"text\":\"PUMPKIN_LOCAL_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "disabled Bedrock integration removes full bypass",
+          "pass": true,
+          "connection": {
+            "username": "PumpBed3",
+            "joined": false,
+            "disconnect": "PUMPKIN_LOCAL_BLOCK",
+            "error": null,
+            "authentication": "offline",
+            "webRtcBackend": "wrtc",
+            "transport": "nethernet",
+            "advertisement": {
+              "version": 7,
+              "motd": "A blazingly fast Pumpkin server!",
+              "protocol": 2193,
+              "gameVersion": "1.26.51",
+              "levelName": "world",
+              "gamemodeId": 0,
+              "playerCount": 0,
+              "playersMax": 1000,
+              "isEditorWorld": false,
+              "hardcore": false,
+              "acceptsOnlineAuth": true,
+              "acceptsSelfSignedAuth": true,
+              "nonce": "3184ab350662e3ee",
+              "connectionType": 4,
+              "unknown1": 4,
+              "unknown2": 8,
+              "raw": "07204120626c617a696e676c7920666173742050756d706b696e2073657276657221a22207312e32362e353105776f726c6400d00f0000000101103331383461623335303636326533656508",
+              "networkId": "10778894838755378828"
+            },
+            "transportReason": "closed"
+          }
+        },
+        {
+          "case": "native Bedrock joins restored by reload",
+          "pass": true,
+          "connection": {
+            "username": "PumpBed4",
+            "joined": true,
+            "disconnect": null,
+            "error": null,
+            "authentication": "offline",
+            "webRtcBackend": "wrtc",
+            "transport": "nethernet",
+            "advertisement": {
+              "version": 7,
+              "motd": "A blazingly fast Pumpkin server!",
+              "protocol": 2193,
+              "gameVersion": "1.26.51",
+              "levelName": "world",
+              "gamemodeId": 0,
+              "playerCount": 0,
+              "playersMax": 1000,
+              "isEditorWorld": false,
+              "hardcore": false,
+              "acceptsOnlineAuth": true,
+              "acceptsSelfSignedAuth": true,
+              "nonce": "3184ab350662e3ee",
+              "connectionType": 4,
+              "unknown1": 4,
+              "unknown2": 8,
+              "raw": "07204120626c617a696e676c7920666173742050756d706b696e2073657276657221a22207312e32362e353105776f726c6400d00f0000000101103331383461623335303636326533656508",
+              "networkId": "10778894838755378828"
+            },
+            "transportReason": "closed"
+          }
+        }
+      ],
+      "pass": true,
+      "suite": "live"
+    },
+    {
+      "software": "pumpkin",
+      "pluginVersion": "2.1.0",
+      "sha256": "7423cbf4632fa888409e0a6b31b1178fd99270c1144ea3fa454d7b53f4ed37be",
+      "checks": [
+        {
+          "case": "native HTTP preserves existing query parameters",
+          "pass": true
+        },
+        {
+          "case": "existing gateway query parameters retained",
+          "pass": true
+        },
+        {
+          "case": "native gateway credentials and user agent",
+          "pass": true,
+          "request": {
+            "ip": "8.8.8.8",
+            "authorization": "Bearer pumpkin-live-fixture",
+            "tokenHeader": "pumpkin-live-fixture",
+            "userAgent": "GeoRestrict/2.1.0 (Pumpkin)",
+            "query": {
+              "fixture": [
+                "native"
+              ],
+              "ip": [
+                "8.8.8.8"
+              ]
+            }
+          }
+        },
+        {
+          "case": "native check rejects hostnames without gateway requests",
+          "pass": true
+        },
+        {
+          "case": "native public IPv6 lookup",
+          "pass": true
+        },
+        {
+          "case": "IPv6 query arrives intact",
+          "pass": true
+        },
+        {
+          "case": "native country blocklist",
+          "pass": true
+        },
+        {
+          "case": "native country allowlist admits match",
+          "pass": true
+        },
+        {
+          "case": "native country allowlist denies mismatch",
+          "pass": true
+        },
+        {
+          "case": "native ASN blocklist",
+          "pass": true
+        },
+        {
+          "case": "native ASN allowlist admits match",
+          "pass": true
+        },
+        {
+          "case": "native ASN allowlist denies mismatch",
+          "pass": true
+        },
+        {
+          "case": "native VPN flag isVpn",
+          "pass": true
+        },
+        {
+          "case": "native VPN flag isHosting",
+          "pass": true
+        },
+        {
+          "case": "native VPN flag isProxy",
+          "pass": true
+        },
+        {
+          "case": "native VPN keyword",
+          "pass": true
+        },
+        {
+          "case": "native VPN disable restores result",
+          "pass": true
+        },
+        {
+          "case": "native persistent cache survives restart with failed gateway",
+          "pass": true
+        },
+        {
+          "case": "native uncached HTTP failure denies admission",
+          "pass": true
+        },
+        {
+          "case": "native uncached HTTP failure permits fail-open",
+          "pass": true
+        },
+        {
+          "case": "native malformed gateway response {}",
+          "pass": true
+        },
+        {
+          "case": "native malformed gateway response not-json",
+          "pass": true
+        },
+        {
+          "case": "native malformed gateway response {\"error\":\"unavailable\"}",
+          "pass": true
+        },
+        {
+          "case": "native malformed gateway response {\"countryCode\":null}",
+          "pass": true
+        },
+        {
+          "case": "native oversized gateway response bounded",
+          "pass": true
+        },
+        {
+          "case": "server status survives delayed native HTTP lookup",
+          "pass": true
+        },
+        {
+          "case": "native first-byte timeout terminates lookup",
+          "pass": true
+        },
+        {
+          "case": "native recovery after timeout",
+          "pass": true
+        },
+        {
+          "case": "native local denial reaches actual Java client",
+          "pass": true,
+          "connection": {
+            "username": "PumpWebhook",
+            "joined": false,
+            "disconnect": "\u001e{\"text\":\"PUMPKIN_LOCAL_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "native local decision makes no gateway request",
+          "pass": true
+        },
+        {
+          "case": "native webhook sends masked address",
+          "pass": true
+        },
+        {
+          "case": "invalid live configuration denies admission",
+          "pass": true,
+          "connection": {
+            "username": "PumpInvalid",
+            "joined": false,
+            "disconnect": "R{\"text\":\"GeoRestrict configuration is invalid. Contact the server administrator.\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "valid configuration restores admission",
+          "pass": true,
+          "connection": {
+            "username": "PumpRecover",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "native operator bypass survives local blocking",
+          "pass": true,
+          "connection": {
+            "username": "PumpRecover",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "ordinary player remains blocked beside operator bypass",
+          "pass": true,
+          "connection": {
+            "username": "PumpOrdinary",
+            "joined": false,
+            "disconnect": "\u001e{\"text\":\"PUMPKIN_LOCAL_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "actual Velocity protocol gap identified",
+          "pass": true,
+          "connection": {
+            "username": "PumpForward",
+            "joined": false,
+            "disconnect": "\n\b\u0000\u0005color\u0000\u0003red\t\u0000\u0005extra\n\u0000\u0000\u0000\u0001\t\u0000\u0004with\b\u0000\u0000\u0000\u0001\u0000\u000426.3\b\u0000\ttranslate\u0000&multiplayer.disconnect.outdated_client\u0000\b\u0000\u0004text\u0000\u001cUnable to connect to lobby: \u0000",
+            "error": null
+          }
+        },
+        {
+          "case": "signed forwarding public player survives local blocking",
+          "pass": true,
+          "connection": {
+            "username": "PumpForward",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "native event uses authenticated forwarded source IP",
+          "pass": true
+        },
+        {
+          "case": "invalid forwarding signature rejected before native lookup",
+          "pass": true,
+          "connection": {
+            "username": "PumpBadSign",
+            "joined": false,
+            "disconnect": "*{\"text\":\"Unable to verify player details\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "native country admission denies forwarded public client",
+          "pass": true,
+          "connection": {
+            "username": "PumpCountry",
+            "joined": false,
+            "disconnect": " {\"text\":\"PUMPKIN_COUNTRY_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "native local admission denies actual forwarded local source",
+          "pass": true,
+          "connection": {
+            "username": "PumpLocal",
+            "joined": false,
+            "disconnect": "\u001e{\"text\":\"PUMPKIN_LOCAL_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "status remains responsive during real forwarded login lookup",
+          "pass": true
+        },
+        {
+          "case": "delayed native public login completes admission",
+          "pass": true,
+          "connection": {
+            "username": "PumpDelayed",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        }
+      ],
+      "pass": true,
+      "authenticatedAccountCoverage": false,
+      "forwarding": "HMAC-signed Velocity modern wire fixture; actual Velocity 4.0.0-6 has a protocol compatibility gap",
+      "velocityProxyCompatibility": {
+        "pass": false,
+        "connection": {
+          "username": "PumpForward",
+          "joined": false,
+          "disconnect": "\n\b\u0000\u0005color\u0000\u0003red\t\u0000\u0005extra\n\u0000\u0000\u0000\u0001\t\u0000\u0004with\b\u0000\u0000\u0000\u0001\u0000\u000426.3\b\u0000\ttranslate\u0000&multiplayer.disconnect.outdated_client\u0000\b\u0000\u0004text\u0000\u001cUnable to connect to lobby: \u0000",
+          "error": null
+        },
+        "build": "4.0.0-6",
+        "clientProtocol": 776,
+        "backendProtocol": 777
+      },
+      "suite": "components"
+    },
+    {
+      "software": "pumpkin",
+      "pluginVersion": "2.1.0",
+      "sha256": "7423cbf4632fa888409e0a6b31b1178fd99270c1144ea3fa454d7b53f4ed37be",
+      "checks": [
+        {
+          "case": "first start generates schema 6 and opt-in local policy",
+          "pass": true
+        },
+        {
+          "case": "first start includes native Discord configuration",
+          "pass": true
+        },
+        {
+          "case": "generated configuration admits default Java connection",
+          "pass": true,
+          "connection": {
+            "username": "PumpGenerated",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "invalid startup configuration still registers admission handler",
+          "pass": true
+        },
+        {
+          "case": "invalid startup configuration rejects new admission",
+          "pass": true,
+          "connection": {
+            "username": "PumpBootBad",
+            "joined": false,
+            "disconnect": "R{\"text\":\"GeoRestrict configuration is invalid. Contact the server administrator.\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "invalid startup configuration preserves server-list status",
+          "pass": true
+        },
+        {
+          "case": "corrected startup configuration restores admission without restart",
+          "pass": true,
+          "connection": {
+            "username": "PumpBootFixed",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        }
+      ],
+      "pass": true,
+      "authenticatedAccountCoverage": false,
+      "suite": "lifecycle"
+    }
+  ],
+  "liveAssertions": 73,
+  "pass": true
+}

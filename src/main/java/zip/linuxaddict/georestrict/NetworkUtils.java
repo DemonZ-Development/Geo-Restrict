@@ -18,6 +18,28 @@ public final class NetworkUtils {
 
     private NetworkUtils() {}
 
+    public static boolean isLocalIp(String ip) {
+        if (ip == null) return false;
+        String value = ip.trim();
+        int zone = value.indexOf('%');
+        if (zone >= 0) {
+            if (value.indexOf(':') < 0 || !value.substring(zone + 1).matches("[A-Za-z0-9_.-]+")) {
+                return false;
+            }
+            value = value.substring(0, zone);
+        }
+        try {
+            InetAddress addr = parseIpLiteral(value);
+            if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()
+                    || addr.isLinkLocalAddress() || addr.isSiteLocalAddress()) {
+                return true;
+            }
+            return addr instanceof Inet6Address && (addr.getAddress()[0] & 0xFE) == 0xFC;
+        } catch (UnknownHostException ignored) {
+            return false;
+        }
+    }
+
     public static boolean isPrivateIp(String ip) {
         try {
             return isPrivateAddress(parseIpLiteral(ip));
@@ -52,7 +74,8 @@ public final class NetworkUtils {
         for (String part : parts) {
             if (part.isEmpty() || part.length() > 3) return false;
             for (int i = 0; i < part.length(); i++) {
-                if (!Character.isDigit(part.charAt(i))) return false;
+                char digit = part.charAt(i);
+                if (digit < '0' || digit > '9') return false;
             }
             if (Integer.parseInt(part) > 255) return false;
         }
@@ -94,15 +117,10 @@ public final class NetworkUtils {
         int second = b[1] & 0xFF;
         int third = b[2] & 0xFF;
         int fourth = b[3] & 0xFF;
-        // ULA fc00::/7
         if ((a & 0xFE) == 0xFC) return true;
-        // Link-local fe80::/10
         if (a == 0xFE && (second & 0xC0) == 0x80) return true;
-        // 2001:db8::/32 documentation
         if (a == 0x20 && second == 0x01 && third == 0x0d && fourth == 0xb8) return true;
-        // Teredo 2001::/32
         if (a == 0x20 && second == 0x01 && third == 0x00 && fourth == 0x00) return true;
-        // IPv4-mapped ::ffff:x.x.x.x -> recurse on the v4 part
         for (int i = 0; i < 10; i++) {
             if (b[i] != 0) return false;
         }

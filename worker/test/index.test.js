@@ -3,6 +3,21 @@ import test from 'node:test';
 
 import worker from '../src/index.js';
 
+test('expanded and mapped local IPv6 never reaches an upstream provider', async () => {
+  for (const ip of ['0:0:0:0:0:0:0:1', '::ffff:127.0.0.1', '0:0:0:0:0:ffff:7f00:1', 'ff02::1']) {
+    const response = await runWorker({}, async () => { throw new Error('unexpected lookup'); },
+      'https://worker.test/?ip=' + encodeURIComponent(ip));
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).countryCode, 'LOCAL');
+  }
+});
+
+test('invalid IPv6 compression is rejected before an upstream lookup', async () => {
+  const response = await runWorker({}, async () => { throw new Error('unexpected lookup'); },
+    'https://worker.test/?ip=1:2:3:4:5:6::7:8:9');
+  assert.equal(response.status, 400);
+});
+
 async function runWorker(env, fetchImpl, url = 'https://worker.test/?ip=8.8.8.8', options = {}) {
   const previousFetch = globalThis.fetch;
   const previousCaches = globalThis.caches;
@@ -36,7 +51,7 @@ test('health endpoint is public and does not perform an upstream lookup', async 
   assert.equal(fetched, false);
   assert.deepEqual(await response.json(), {
     ok: true,
-    version: '2.0.2',
+    version: '2.1.0',
     vpsConfigured: true,
     providers: ['ipinfo', 'ip-api'],
     fallback: 'vps-local-mmdb',
@@ -405,7 +420,7 @@ test('status JSON probes providers and the fallback server for token holders', a
   assert.equal(response.headers.get('X-Robots-Tag'), 'noindex, nofollow');
   const body = await response.json();
   assert.equal(body.ok, true);
-  assert.equal(body.version, '2.0.2');
+  assert.equal(body.version, '2.1.0');
   assert.equal(body.overall, 'operational');
   assert.deepEqual(
     body.components.map(component => component.id),

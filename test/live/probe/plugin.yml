@@ -1,0 +1,10 @@
+name: GeoRestrictLiveProbe
+version: '1'
+main: georestrict.live.BukkitProbe
+api-version: '1.20'
+folia-supported: true
+depend: [GeoRestrict]
+commands:
+  geoprobe:
+    description: Run isolated GeoRestrict API integration checks
+    permission: georestrict.admin

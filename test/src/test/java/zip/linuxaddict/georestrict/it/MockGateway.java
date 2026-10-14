@@ -18,16 +18,19 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class MockGateway implements AutoCloseable {
 
     private final HttpServer server;
     private final Map<String, String> responses = new HashMap<>();
     private final Gson gson = new Gson();
+    private final AtomicInteger requests = new AtomicInteger();
 
     public MockGateway() throws IOException {
         server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         server.createContext("/", exchange -> {
+            requests.incrementAndGet();
             String query = exchange.getRequestURI().getQuery();
             String ip = (query != null && query.startsWith("ip=")) ? query.substring(3) : "";
             String body = responses.getOrDefault(ip, "{\"error\":\"invalid ip\"}");
@@ -65,6 +68,10 @@ public final class MockGateway implements AutoCloseable {
 
     public String baseUrl() {
         return "http://127.0.0.1:" + server.getAddress().getPort() + "/";
+    }
+
+    public int requestCount() {
+        return requests.get();
     }
 
     @Override

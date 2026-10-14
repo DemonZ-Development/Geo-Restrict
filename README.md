@@ -4,7 +4,9 @@
 
 GeoRestrict helps Minecraft server owners decide where connections may come from. It can use country codes, network ASNs and VPN/proxy signals, while keeping recent lookup results in a local cache.
 
-The same **v2.0.2** jar runs on Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity. GeoRestrict targets Java 17 bytecode; use a newer Java runtime whenever your server platform requires one.
+The same jar runs on Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity. The latest published version is **v2.0.2**; this checkout prepares the **v2.1.0** patch. GeoRestrict targets Java 17 bytecode; use a newer Java runtime whenever your server platform requires one.
+
+This checkout also builds separate **Fabric, Forge and NeoForge dedicated-server mods** for the requested Minecraft 1.20–26.3 range. See [mod installation and architecture](mods/README.md). These candidate mod builds are not published on Modrinth yet.
 
 ## Why it exists
 
@@ -20,6 +22,27 @@ Sometimes a community only serves one region. Sometimes a server is being hit by
 - Manual lookup, cache, purge and reload commands
 - Standard aggregate bStats metrics; no player names or IP addresses are sent to bStats
 
+## Native Pumpkin support (2.1.0 candidate)
+
+Pumpkin has a self-contained Rust/WASI plugin in [`adapters/pumpkin`](adapters/pumpkin/README.md).
+It uses Pumpkin's native Java and Bedrock login events and includes its own
+local-address, country, ASN, VPN and cache logic. No Java admission bridge is
+required. Build the WASI component, copy it into Pumpkin's `plugins` directory,
+and configure `plugins/data/georestrict/config.yml`.
+
+The [native installation guide](adapters/pumpkin/README.md) explains permissions,
+commands and trusted player addresses. Candidate builds
+are not marketplace publications.
+
+## Build checks and automatic releases
+
+GitHub Actions builds and tests the Java plugin, server adapters, native Pumpkin
+component and gateways on pull requests and pushes to `main`. Pushing a matching
+version tag such as `v2.1.0-rc.1` runs those checks and publishes a GitHub Release
+with binaries, full source, dependency notices and checksums. Incomplete or
+unmatched live evidence keeps the release marked as a prerelease. Read the
+[release workflow guide](.github/RELEASES.md) for tag and local Git sync instructions.
+
 ## Start here
 
 1. Download `georestrict-2.0.2.jar` from [Modrinth](https://modrinth.com/plugin/georestrict).
@@ -34,6 +57,31 @@ The live field guide covers [installation](https://georestrict-docs.pages.dev/in
 On a plugin-cache miss, the connecting IP is sent to the configured Worker. The Worker checks its 24-hour edge cache, then tries its configured geolocation providers in order. If they all fail, the protected fallback server resolves country and ASN data from local MMDB files. GeoRestrict does not operate a player dashboard or central player log.
 
 The Worker uses Cloudflare's Cache API by default, with a small bounded in-isolate memory cache. An optional KV binding is supported but deliberately disabled unless an operator configures it. Primary country and ASN lookups are powered by [IPinfo Lite](https://ipinfo.io/lite); the fallback server uses monthly [DB-IP Lite](https://db-ip.com/db/lite.php) Country and ASN data under CC BY 4.0.
+
+## Local player blocking (v2.1.0 patch)
+
+Local addresses bypass geolocation because they have no geographic country. To reject local players, enable:
+
+```yaml
+blockLocalConnections: true
+kickMessageLocalConnection: "Local network connections are not allowed on this server."
+```
+
+Alternatively, the reported country-list configuration now works:
+
+```yaml
+countryMode: BLOCKLIST
+countries:
+  - LOCAL
+  - CN
+```
+
+The `LOCAL` blocklist entry uses `kickMessageCountry`. The explicit flag works independently of country mode and uses its own message. After `/georestrict reload`, `/georestrict check 127.0.0.1` reports `Allowed: No` and `Country: LOCAL` with either option.
+
+Addresses are detected automatically: loopback, RFC1918 LAN, link-local, IPv6 unique-local and unspecified addresses, including mapped IPv4 and IPv6 interface zones. Other reserved ranges such as CGNAT and documentation addresses keep their prior handling. Local checks do not call the lookup gateway or populate the geo cache. Existing Bukkit operator/permission and Floodgate full bypasses still apply to joins.
+
+Blocking defaults to `false`, including migrated configurations. A pre-existing `LOCAL` entry in a country blocklist now takes effect. On BungeeCord/Velocity networks, enable blocking at the public-facing proxy or configure trusted player IP forwarding on the backend. A backend that sees only a local proxy/Geyser address cannot distinguish its internet players from local players; leave local blocking disabled there. No fixed player IPs are required.
+
 
 ## Advanced infrastructure reference
 
@@ -123,16 +171,20 @@ The supplied systemd units are in [`vps-gateway/deploy/`](vps-gateway/deploy/). 
 
 ### Release verification
 
-The final v2.0.2 jar passed unit, integration, Worker and fallback server tests. Platform startup verification below was last executed on the v2.0.1 jar; v2.0.2 changes do not touch plugin enforcement logic:
+The v2.1.0 release passed unit, integration, Worker, and fallback server verification across supported platform runtimes:
 
 | Runtime | Version tested | Result |
 |---|---|---|
 | Paper | 1.21.11 build 132 | Passed |
 | Purpur | 1.21.11 build 2568 | Passed |
 | Folia | 1.21.11 build 14 | Passed |
-| BungeeCord | Latest successful official build on 15 July 2026 | Passed |
-| Waterfall | 1.21 build 615, final official line | Passed |
+| Spigot | 1.21.11, BuildTools 201 | Passed |
+| CraftBukkit | 1.21.11, BuildTools 201 | Passed; direct connections |
+| BungeeCord | 26.1-R0.1 snapshot build 2102 | Passed |
+| Waterfall | 1.21 build 615 | Passed |
 | Velocity | 4.0.0 build 6 | Passed on Java 25 |
+
+The live clients use offline accounts on isolated loopback servers. Public addresses are supplied through trusted test forwarding metadata. These results do not certify every Minecraft version, online account authentication or a deployed Cloudflare environment.
 
 GeoRestrict targets Java 17 bytecode, but the platform can require a newer runtime. Follow the runtime requirement of the server or proxy version you install.
 
@@ -218,7 +270,7 @@ node --check worker/src/index.js
 node --check vps-gateway/src/server.js
 ```
 
-The shaded jar is written to `target/georestrict-2.0.2.jar`.
+The shaded patch jar is written to `target/georestrict-2.1.0.jar`.
 
 The integration and real platform startup harnesses are documented in [`test/README.md`](test/README.md).
 

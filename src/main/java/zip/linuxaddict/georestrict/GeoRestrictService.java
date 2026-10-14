@@ -98,11 +98,22 @@ public class GeoRestrictService {
     }
 
     public CompletableFuture<CheckResult> checkIp(String ip, String playerName, java.util.UUID uuid, boolean bypass) {
-        return CompletableFuture.supplyAsync(() -> checkIpNow(ip, playerName, uuid, bypass), executor);
+        return CompletableFuture.supplyAsync(() -> checkIpNow(playerIp(ip, uuid), playerName, uuid, bypass), executor);
     }
 
     public CompletableFuture<GeoResponse> lookup(String ip) {
         return CompletableFuture.supplyAsync(() -> lookupNow(ip), executor);
+    }
+
+    public CheckResult checkLocalIp(String ip, String playerName, java.util.UUID uuid, boolean bypass) {
+        String resolved = playerIp(ip, uuid);
+        if (NetworkUtils.isValidPublicIp(resolved)) return null;
+        return checkIpNow(resolved, playerName, uuid, bypass);
+    }
+
+    private String playerIp(String ip, java.util.UUID uuid) {
+        return config.floodgate.enabled
+            ? zip.linuxaddict.georestrict.floodgate.GeyserHandler.playerIp(uuid, ip) : ip;
     }
 
     public GeoResponse lookupNow(String ip) {
@@ -129,10 +140,27 @@ public class GeoRestrictService {
         }
 
         boolean isBedrock = uuid != null && current.floodgate.enabled
-            && zip.linuxaddict.georestrict.floodgate.FloodgateHandler.isBedrockPlayer(uuid);
+            && (zip.linuxaddict.georestrict.floodgate.FloodgateHandler.isBedrockPlayer(uuid)
+                || zip.linuxaddict.georestrict.floodgate.GeyserHandler.isBedrockPlayer(uuid));
         if (isBedrock && current.floodgate.bypassGeorestrict) {
             logger.info("Floodgate Bedrock bypass granted to {} ({})", playerName, ip);
             return new CheckResult(true, null, null);
+        }
+
+        boolean localCountryBlocked = current.countryMode == GeoConfig.RestrictionMode.BLOCKLIST
+            && current.countries.contains("LOCAL");
+        if ((current.blockLocalConnections || localCountryBlocked) && NetworkUtils.isLocalIp(ip)) {
+            logger.info("Blocked local connection from {} ({})", playerName, ip);
+            GeoResponse local = new GeoResponse();
+            local.ip = ip;
+            local.countryCode = "LOCAL";
+            local.countryName = "Local Network";
+            local.provider = "local";
+            String reason = current.blockLocalConnections
+                ? current.kickMessageLocalConnection : current.kickMessageCountry;
+            CheckResult result = new CheckResult(false, reason, local);
+            logResultToDiscord(local, result, playerName, uuid);
+            return result;
         }
 
         if (!NetworkUtils.isValidPublicIp(ip)) {
@@ -332,6 +360,7 @@ public class GeoRestrictService {
                 String ip = current.discord.maskIp ? maskIp(info.ip) : info.ip;
                 zip.linuxaddict.georestrict.floodgate.FloodgateHandler.BedrockPlayerInfo bedrock =
                     zip.linuxaddict.georestrict.floodgate.FloodgateHandler.getBedrockInfo(uuid);
+                if (bedrock == null) bedrock = zip.linuxaddict.georestrict.floodgate.GeyserHandler.getBedrockInfo(uuid);
                 String xuid = bedrock != null ? bedrock.xuid : "N/A";
                 String deviceOs = bedrock != null ? bedrock.deviceOs : "N/A";
 

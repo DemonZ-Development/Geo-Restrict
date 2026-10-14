@@ -95,6 +95,9 @@ public final class ConfigLoader {
         if (isBlank(c.kickMessageAsn)) c.kickMessageAsn = "Your ISP/ASN is not allowed on this server.";
         if (isBlank(c.kickMessageVpn)) c.kickMessageVpn = "VPN or proxy connections are not allowed.";
         if (isBlank(c.kickMessageLookupFailure)) c.kickMessageLookupFailure = "Geo verification is temporarily unavailable.";
+        if (isBlank(c.kickMessageLocalConnection)) c.kickMessageLocalConnection = new GeoConfig().kickMessageLocalConnection;
+
+        if (c.floodgate == null) c.floodgate = new GeoConfig.FloodgateSettings();
 
         if (c.discord == null) c.discord = new GeoConfig.DiscordSettings();
         if (c.discord.webhook == null) c.discord.webhook = "";

@@ -13,8 +13,9 @@ canned geo JSON for `?ip=<ip>`, mirroring the JSON contract the plugin expects
 
 | Test class | What it verifies |
 |---|---|
-| `DecisionEngineIT` | The real `GeoRestrictService` decision engine: country block/allow lists, ASN block list, VPN/hosting flag + keyword detection, private-IP short-circuit, `bypass`, cache reuse, and fail-closed vs fail-open on lookup failure. |
-| `BukkitKickIT` | The real Bukkit pre-login lookup and login handler, loaded through MockBukkit. It verifies blocked, allowed, private-IP, and `georestrict.bypass` outcomes. |
+| `DecisionEngineIT` | The real rule engine: country/ASN/VPN rules, the reported `LOCAL` blocklist case, local IPv4/IPv6 blocking without gateway/cache use, unchanged public lookups, Floodgate/full bypasses, and failure policy. |
+| `BukkitKickIT` | Real Bukkit pre-login and login handlers through MockBukkit: public and local decisions, permission/operator bypasses, and preservation of another login denial. |
+| `ProxyLoginIT` | Real BungeeCord and Velocity login handlers with mocked platform events: local rejection, public joins, disabled-policy compatibility, and completed intents/continuations. |
 
 ## Run it
 
@@ -60,12 +61,8 @@ node dummy-gateway.js
 # set gatewayUrl: "http://<this-host>:8799/" in the server's config.yml
 ```
 
-## Known limitation
+## Live admission and service suites
 
-A *true socket kick* (a real player's connection being dropped mid-handshake)
-cannot be demonstrated in a local sandbox: a locally-run server only ever sees
-a **private** source IP, which the plugin intentionally bypasses before any
-lookup (`NetworkUtils.isValidPublicIp` short-circuit), and this box's public IP
-is not routable back to a locally-run server without firewall/port-forwarding
-admin. `BukkitKickIT` exercises the login decision that produces the kick on an
-internet-facing deployment.
+[`live/README.md`](live/README.md) documents real TCP Minecraft clients, the separately loaded API consumer, direct/legacy/modern forwarding, Geyser/Floodgate/ViaVersion, real workerd and MMDB HTTP checks. These complement the mocked handler suites above.
+
+Forwarded public addresses in the harness are synthetic trusted metadata on loopback; authenticated account joins and direct Internet-source connections need an appropriate staging environment.

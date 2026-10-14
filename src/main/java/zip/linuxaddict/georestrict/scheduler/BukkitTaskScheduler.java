@@ -13,10 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-/**
- * Standard Bukkit scheduler adapter.
- * Works on all Bukkit/Paper/Spigot versions 1.16+.
- */
 public class BukkitTaskScheduler implements TaskScheduler {
 
     @Override

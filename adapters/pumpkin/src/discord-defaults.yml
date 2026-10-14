@@ -1,0 +1,18 @@
+
+# Optional webhook. Local denials never send the address to the lookup gateway.
+discord:
+  webhook: ""
+  maskIp: true
+  logAllowed: false
+  logDenied: true
+  title: GeoRestrict
+  colorAllowed: 65280
+  colorDenied: 16711680
+  fields:
+    - { name: Player, value: "%player%", inline: true }
+    - { name: Status, value: "%status%", inline: true }
+    - { name: IP, value: "%ip%", inline: true }
+    - { name: Country, value: "%country%", inline: true }
+    - { name: ASN, value: "%asn%", inline: true }
+    - { name: ISP, value: "%isp%", inline: false }
+    - { name: Reason, value: "%reason%", inline: false }

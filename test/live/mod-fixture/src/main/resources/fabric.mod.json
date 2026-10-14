@@ -1,0 +1,1 @@
+{"schemaVersion":1,"id":"georestrict_live_fixture","version":"1.0.0","name":"GeoRestrict isolated live test fixture","environment":"server","entrypoints":{"server":["georestrict.live.FabricEntry"]},"mixins":["georestrict.live.mixins.json"],"depends":{"georestrict":"*"}}

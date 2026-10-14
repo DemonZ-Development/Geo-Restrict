@@ -1,6 +1,6 @@
 # GeoRestrict local fallback
 
-This service is the last lookup path in GeoRestrict v2.0.2. The Cloudflare
+This service is the last lookup path in GeoRestrict v2.1.0. The Cloudflare
 Worker tries its external providers first. Only when every provider fails does
 it call this protected fallback server, which reads Country and ASN data from local MMDB files. A
 lookup does not make another geolocation API request.
@@ -50,6 +50,18 @@ curl -H "Authorization: Bearer <token>" "http://127.0.0.1:8787/?ip=8.8.8.8"
 ```
 
 A successful lookup reports `provider: "dbip-local"`.
+
+## Docker
+
+The image uses Node 22 LTS, builds a validated MMDB snapshot and binds `0.0.0.0` inside the container so port publication works. Publish only on host loopback and keep the token enabled:
+
+```bash
+docker build -t georestrict-fallback:2.1.0 .
+docker run --rm -p 127.0.0.1:8787:8787 \
+  -e GATEWAY_TOKENS="$GATEWAY_TOKENS" georestrict-fallback:2.1.0
+```
+
+The Docker health probe accepts the same token formats as lookup requests, including JSON arrays and numbered variables. Behind a TLS inspection proxy, pass its public CA with `--secret id=proxy_ca,src=/path/to/ca.pem`; it is mounted only during network build steps and is not copied into the image. TLS verification stays enabled.
 
 ## Automatic database updates
 

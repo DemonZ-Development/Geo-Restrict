@@ -21,8 +21,8 @@ public class GeoConfig {
     public int lookupThreads = 4;
     public String gatewayUrl = GeoConfigConstants.DEFAULT_GATEWAY_URL;
     public String gatewayToken = "";
-    /** Retired key retained only so older YAML loads. The plugin never calls a provider directly. */
     public boolean blockOnLookupFailure = true;
+    public boolean blockLocalConnections = false;
     public int maxCacheEntries = 100_000;
 
     public RestrictionMode countryMode = RestrictionMode.BLOCKLIST;
@@ -38,6 +38,7 @@ public class GeoConfig {
     public String kickMessageAsn = "Your ISP/ASN is not allowed on this server.";
     public String kickMessageVpn = "VPN or proxy connections are not allowed.";
     public String kickMessageLookupFailure = "Geo verification is temporarily unavailable. Please try again later.";
+    public String kickMessageLocalConnection = "Local network connections are not allowed on this server.";
 
     public FloodgateSettings floodgate = new FloodgateSettings();
     public DiscordSettings discord = new DiscordSettings();

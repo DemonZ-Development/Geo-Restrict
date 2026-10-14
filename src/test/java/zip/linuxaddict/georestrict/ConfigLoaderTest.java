@@ -32,6 +32,7 @@ class ConfigLoaderTest {
         assertTrue(tmp.exists());
         assertTrue(tmp.length() > 0);
         assertEquals(GeoConfigConstants.CURRENT_VERSION, config.configVersion);
+        assertFalse(config.blockLocalConnections);
         String generated = Files.readString(tmp.toPath(), StandardCharsets.UTF_8);
         assertTrue(generated.contains("# change gatewayUrl, gatewayToken"));
         assertTrue(!generated.contains("directFallbackEnabled:"));
@@ -96,7 +97,7 @@ class ConfigLoaderTest {
     }
 
     @Test
-    void migratesV4ConfigToV5WithFloodgateDefaults() throws Exception {
+    void migratesV4ConfigWithFloodgateAndLocalDefaults() throws Exception {
         File tmp = File.createTempFile("geo-config-v4", ".yml");
         Files.writeString(tmp.toPath(),
             "configVersion: 4\n"
@@ -107,14 +108,48 @@ class ConfigLoaderTest {
 
         GeoConfig config = ConfigLoader.load(tmp);
 
-        assertEquals(5, config.configVersion);
+        assertEquals(GeoConfigConstants.CURRENT_VERSION, config.configVersion);
         assertTrue(config.floodgate.enabled);
         assertFalse(config.floodgate.bypassGeorestrict);
         assertFalse(config.floodgate.bypassVpnCheck);
 
         String migratedContent = Files.readString(tmp.toPath(), StandardCharsets.UTF_8);
-        assertTrue(migratedContent.contains("configVersion: 5"));
+        assertTrue(migratedContent.contains("configVersion: " + GeoConfigConstants.CURRENT_VERSION));
         assertTrue(migratedContent.contains("floodgate:"));
+        assertFalse(config.blockLocalConnections);
+        assertTrue(migratedContent.contains("blockLocalConnections: false"));
+        tmp.delete();
+    }
+
+    @Test
+    void migratesV5WithoutChangingRulesAndPreservesNewOverrides() throws Exception {
+        File tmp = File.createTempFile("geo-config-v5", ".yml");
+        Files.writeString(tmp.toPath(), "configVersion: 5\n"
+            + "countryMode: ALLOWLIST\ncountries: [US]\n"
+            + "gatewayUrl: https://example.test/\n"
+            + "blockLocalConnections: true\nkickMessageLocalConnection: No LAN joins\n",
+            StandardCharsets.UTF_8);
+        GeoConfig config = ConfigLoader.load(tmp);
+        GeoConfig reloaded = ConfigLoader.load(tmp);
+        assertEquals(GeoConfigConstants.CURRENT_VERSION, config.configVersion);
+        assertEquals(GeoConfig.RestrictionMode.ALLOWLIST, reloaded.countryMode);
+        assertEquals(java.util.List.of("US"), reloaded.countries);
+        assertEquals("https://example.test/", reloaded.gatewayUrl);
+        assertTrue(reloaded.blockLocalConnections);
+        assertEquals("No LAN joins", reloaded.kickMessageLocalConnection);
+        tmp.delete();
+    }
+
+    @Test
+    void normalizesEmptyLocalKickMessageAndNullFloodgateSettings() throws Exception {
+        File tmp = File.createTempFile("geo-config-local", ".yml");
+        Files.writeString(tmp.toPath(), "configVersion: " + GeoConfigConstants.CURRENT_VERSION
+            + "\nblockLocalConnections: true\nkickMessageLocalConnection: null\nfloodgate: null\n",
+            StandardCharsets.UTF_8);
+        GeoConfig config = ConfigLoader.load(tmp);
+        assertTrue(config.blockLocalConnections);
+        assertEquals(new GeoConfig().kickMessageLocalConnection, config.kickMessageLocalConnection);
+        assertNotNull(config.floodgate);
         tmp.delete();
     }
 }

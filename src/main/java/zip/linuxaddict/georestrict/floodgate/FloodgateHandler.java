@@ -12,17 +12,11 @@ package zip.linuxaddict.georestrict.floodgate;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
-/**
- * Reflection-based fail-safe helper for optional Geyser / Floodgate (Bedrock player) integration.
- */
 public final class FloodgateHandler {
     private static Boolean available = null;
 
     private FloodgateHandler() {}
 
-    /**
-     * Checks if Floodgate API is present on the server classpath.
-     */
     public static boolean isAvailable() {
         if (available == null) {
             try {
@@ -35,12 +29,6 @@ public final class FloodgateHandler {
         return available;
     }
 
-    /**
-     * Checks if a player UUID corresponds to a Floodgate Bedrock player.
-     *
-     * @param uuid player UUID
-     * @return true if player is a Bedrock player via Floodgate
-     */
     public static boolean isBedrockPlayer(UUID uuid) {
         if (uuid == null || !isAvailable()) return false;
         try {
@@ -57,12 +45,6 @@ public final class FloodgateHandler {
         }
     }
 
-    /**
-     * Obtains Bedrock player info (XUID and Device OS) for a given player UUID if available.
-     *
-     * @param uuid player UUID
-     * @return BedrockPlayerInfo object or null
-     */
     public static BedrockPlayerInfo getBedrockInfo(UUID uuid) {
         if (uuid == null || !isAvailable()) return null;
         try {

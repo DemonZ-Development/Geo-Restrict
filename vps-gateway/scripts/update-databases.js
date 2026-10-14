@@ -84,7 +84,7 @@ async function remoteExists(url) {
 
 async function downloadAndUnzip(url, destination) {
   const response = await fetch(url, {
-    headers: { 'User-Agent': 'GeoRestrict-MMDB-Updater/2.0.2' },
+    headers: { 'User-Agent': 'GeoRestrict-MMDB-Updater/2.1.0' },
     signal: AbortSignal.timeout(120000),
   });
   if (!response.ok || !response.body) {

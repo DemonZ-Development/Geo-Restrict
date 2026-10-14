@@ -1,4 +1,4 @@
-/* GeoRestrict local-MMDB fallback. Route: GET /?ip=<address>. */
+import { isValidIp, isPrivateIp } from './ip-address.js';
 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,9 +7,6 @@ import express from 'express';
 
 import { openGeoDatabase } from './geo-database.js';
 
-const IPV4_PATTERN = /^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)$/;
-const IPV6_PATTERN = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1?$|^(?:[0-9a-fA-F]{1,4}:){1,7}:$|^::(?:[0-9a-fA-F]{1,4}:){0,6}[0-9a-fA-F]{1,4}$|^(?:[0-9a-fA-F]{1,4}:){1,6}(?::[0-9a-fA-F]{1,4}){1,6}$/;
-const IPV4_MAPPED_PATTERN = /^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/i;
 const MAX_NUMBERED_VALUES = 20;
 
 export function createApp(database, env = process.env) {
@@ -81,13 +78,17 @@ export async function startServer(env = process.env) {
 }
 
 function isAuthorized(req, env) {
-  const tokens = collectValues(env, ['GATEWAY_TOKENS', 'GATEWAY_TOKEN'], 'GATEWAY_TOKEN', []);
+  const tokens = getGatewayTokens(env);
   if (!tokens.length) return true;
   const auth = req.headers.authorization || '';
   const bearer = auth.toLowerCase().startsWith('bearer ') ? auth.slice(7).trim() : '';
   const headerToken = req.headers['x-georestrict-token'] || '';
   const queryToken = req.query.token || '';
   return [bearer, headerToken, queryToken].some(candidate => tokens.includes(candidate));
+}
+
+export function getGatewayTokens(env = process.env) {
+  return collectValues(env, ['GATEWAY_TOKENS', 'GATEWAY_TOKEN'], 'GATEWAY_TOKEN', []);
 }
 
 function collectValues(env, multiNames, numberedPrefixes, defaults) {
@@ -122,34 +123,6 @@ function getNumber(value, fallback, min, max) {
   const number = Number(value);
   if (!Number.isFinite(number)) return fallback;
   return Math.max(min, Math.min(max, Math.floor(number)));
-}
-
-function isValidIp(ip) {
-  return typeof ip === 'string' && ip.length > 0 && ip.length <= 45
-    && (IPV4_PATTERN.test(ip) || IPV6_PATTERN.test(ip));
-}
-
-function isPrivateIp(ip) {
-  if (IPV4_PATTERN.test(ip)) {
-    const [a, b, c] = ip.split('.').map(Number);
-    if (a === 10 || a === 127 || a === 0) return true;
-    if (a === 172 && b >= 16 && b <= 31) return true;
-    if (a === 192 && b === 168) return true;
-    if (a === 169 && b === 254) return true;
-    if (a === 100 && b >= 64 && b <= 127) return true;
-    if (a === 192 && b === 0 && (c === 0 || c === 2)) return true;
-    if (a === 198 && b === 18 && (c === 0 || c === 1)) return true;
-    if (a === 198 && b === 51 && c === 100) return true;
-    if (a === 203 && b === 0 && c === 113) return true;
-    return a >= 224;
-  }
-  const lower = ip.toLowerCase();
-  if (lower === '::' || lower === '::1') return true;
-  if (lower.startsWith('fe8') || lower.startsWith('fe9') || lower.startsWith('fea') || lower.startsWith('feb')) return true;
-  if (lower.startsWith('fc') || lower.startsWith('fd')) return true;
-  if (lower.startsWith('2001:db8')) return true;
-  const mapped = IPV4_MAPPED_PATTERN.exec(ip);
-  return Boolean(mapped && isPrivateIp(mapped[1]));
 }
 
 function buildLocalResponse(ip) {

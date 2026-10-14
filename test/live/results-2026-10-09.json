@@ -1,0 +1,3469 @@
+{
+  "generatedAt": "2026-10-09T20:19:00.723862+00:00",
+  "candidate": {
+    "version": "2.0.3",
+    "path": "target/georestrict-2.0.3.jar",
+    "sha256": "763e602db03364a71ddbb7c6d309817bfaaa846803240a37afbc32d2398920b0",
+    "bytes": 852342,
+    "unreleased": true
+  },
+  "automatedTests": {
+    "pluginUnit": 51,
+    "pluginIntegration": 32,
+    "worker": 19,
+    "fallback": 6,
+    "pmd": "passed",
+    "dependencyAnalysis": "passed",
+    "workerProductionBundle": "dry-run passed"
+  },
+  "platformArtifacts": {
+    "floodgate": {
+      "name": "floodgate",
+      "path": ".smoke/downloads/floodgate-spigot.jar",
+      "sha256": "21570aff9ce17d6983928e8552777760e1ede5050026b04c686b0ae112e6fd7e",
+      "officialChecksumVerified": true,
+      "bytes": 11561096
+    },
+    "purpur": {
+      "name": "purpur",
+      "path": ".smoke/downloads/purpur-1.21.11-2568.jar",
+      "sha256": "ee199511bf0a970ee8459fe3a351703fec37293f00bc2de1c5cb746c7e4acc34",
+      "officialChecksumVerified": false,
+      "bytes": 57705084
+    },
+    "paper-legacy": {
+      "name": "paper-legacy",
+      "path": ".smoke/downloads/paper-1.21.1-133.jar",
+      "sha256": "39bd8c00b9e18de91dcabd3cc3dcfa5328685a53b7187a2f63280c22e2d287b9",
+      "officialChecksumVerified": true,
+      "bytes": 49394394
+    },
+    "folia": {
+      "name": "folia",
+      "path": ".smoke/downloads/folia-1.21.11-14.jar",
+      "sha256": "f52c408490a0225611e67907a3ca19f7e6da2c6bc899e715d5f46844e7103c39",
+      "officialChecksumVerified": true,
+      "bytes": 55082693
+    },
+    "jdk25": {
+      "name": "jdk25",
+      "path": ".smoke/downloads/OpenJDK25U-jdk_x64_linux_hotspot_25.0.4.1_1.tar.gz",
+      "sha256": "dbb698396d478e7fa2b1e50f4103324b2a99b90569ee27c33f2261f9215cf41e",
+      "officialChecksumVerified": true,
+      "bytes": 141329719
+    },
+    "geyser": {
+      "name": "geyser",
+      "path": ".smoke/downloads/Geyser-Spigot.jar",
+      "sha256": "bbe71a27a57ba136e9c25058e0d54ac5d7ed2367a70d7c185c7bd6369f3ad38f",
+      "officialChecksumVerified": true,
+      "bytes": 49945590
+    },
+    "velocity": {
+      "name": "velocity",
+      "path": ".smoke/downloads/velocity-4.0.0-6.jar",
+      "sha256": "4540289f48c83e305fc2f2c495a84d1f4d0b7f360830251e169dd5a208740e70",
+      "officialChecksumVerified": true,
+      "bytes": 18821048
+    },
+    "paper": {
+      "name": "paper",
+      "path": ".smoke/downloads/paper-1.21.11-132.jar",
+      "sha256": "5ffef465eeeb5f2a3c23a24419d97c51afd7dbb4923ff42df9a3f58bba1ccfba",
+      "officialChecksumVerified": true,
+      "bytes": 54846016
+    },
+    "buildtools": {
+      "name": "buildtools",
+      "path": ".smoke/downloads/BuildTools.jar",
+      "sha256": "81ed06f5ce5fb705b558bf9b3cc2c5c53cdd9742406c5338c452faa13a1e1c24",
+      "officialChecksumVerified": false,
+      "bytes": 3606247
+    },
+    "viaversion": {
+      "version": "5.12.1",
+      "sha256": "551265afd892e78bb869162e08b4fdd151c518e245fce60af36b0603ad695d76",
+      "officialChecksumVerified": true
+    },
+    "waterfall": {
+      "name": "waterfall",
+      "path": ".smoke/downloads/waterfall-1.21-615.jar",
+      "sha256": "5eda8bfd0691e5088701f87020c68964299586df0faba289a634122d282d598c",
+      "officialChecksumVerified": true,
+      "bytes": 27658469
+    },
+    "bungee": {
+      "name": "bungee",
+      "path": ".smoke/downloads/BungeeCord.jar",
+      "sha256": "0bf60ecf074978fa934a9ab65fd920f91112311f4d24b4c1ccd769ce74e8675d",
+      "officialChecksumVerified": false,
+      "bytes": 26175295
+    },
+    "spigot": {
+      "path": ".smoke/buildtools/spigot-1.21.11.jar",
+      "sha256": "95935984791c87daebdaa314ed49159eae7b4c44a99f7e7ba38677d4552e2f81",
+      "bytes": 84286284,
+      "builtWith": "BuildTools 201",
+      "officialChecksumVerified": false
+    },
+    "craftbukkit": {
+      "path": ".smoke/buildtools/craftbukkit-1.21.11.jar",
+      "sha256": "21fc81e74f25ba65483e98250f1a271e7fb67269b96d9d56152c525b100ef03a",
+      "bytes": 83960529,
+      "builtWith": "BuildTools 201",
+      "officialChecksumVerified": false
+    }
+  },
+  "liveSuites": {
+    "paper": {
+      "platform": "paper",
+      "kind": "server",
+      "minecraftVersion": "1.21.11",
+      "port": 25570,
+      "forwarding": "isolated synthetic legacy metadata",
+      "log": ".smoke/runtime/paper/console.log",
+      "checks": [
+        {
+          "case": "local join with default policy",
+          "pass": true,
+          "connection": {
+            "username": "Livepap0",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "local join blocked by explicit setting",
+          "pass": true,
+          "connection": {
+            "username": "Livepap1",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "server-list ping survives local blocking",
+          "pass": true
+        },
+        {
+          "case": "forwarded public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livepap3",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "cached public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livepap4",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry rejects local player",
+          "pass": true,
+          "connection": {
+            "username": "Livepap5",
+            "joined": false,
+            "disconnect": "\"LIVE_COUNTRY_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry preserves public player",
+          "pass": true,
+          "connection": {
+            "username": "Livepap6",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "public country rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livepap7",
+            "joined": false,
+            "disconnect": "\"LIVE_COUNTRY_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "public ASN rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livepap8",
+            "joined": false,
+            "disconnect": "\"LIVE_ASN_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "local block works with country rules disabled",
+          "pass": true,
+          "connection": {
+            "username": "Livepap9",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "local joins restored by reload",
+          "pass": true,
+          "connection": {
+            "username": "Livepap10",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "external plugin API and cache helpers",
+          "pass": true,
+          "api": {
+            "platform": "Bukkit",
+            "available": true,
+            "version": "2.0.3",
+            "serviceRegistered": true,
+            "floodgateAvailable": false,
+            "countryCode": "US",
+            "countryName": "United States",
+            "asn": "AS15169",
+            "isp": "Google LLC",
+            "asnName": "Google LLC",
+            "vpn": true,
+            "hosting": false,
+            "proxy": false,
+            "mobile": false,
+            "allowed": true,
+            "blocked": false,
+            "lookup": {
+              "ip": "8.8.8.8",
+              "countryCode": "US",
+              "countryName": "United States",
+              "asn": "AS15169",
+              "asName": "Google LLC",
+              "provider": "dbip-local",
+              "isVpn": false,
+              "isHosting": false,
+              "isProxy": false,
+              "isMobile": false
+            },
+            "batch": {
+              "8.8.8.8": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              },
+              "1.1.1.1": {
+                "ip": "1.1.1.1",
+                "countryCode": "AU",
+                "countryName": "Australia",
+                "asn": "AS13335",
+                "asName": "Cloudflare, Inc.",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "check": {
+              "allowed": true,
+              "info": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "localBypass": {
+              "allowed": true
+            },
+            "cachedCountry": "US",
+            "cachedResponse": true,
+            "cacheSize": 2,
+            "purgedCacheSize": 0
+          }
+        },
+        {
+          "case": "cache stats command",
+          "pass": true
+        },
+        {
+          "case": "gateway failure rejects when fail-closed",
+          "pass": true,
+          "connection": {
+            "username": "Livepap13",
+            "joined": false,
+            "disconnect": "\"LIVE_LOOKUP_FAILURE\"",
+            "error": null
+          }
+        },
+        {
+          "case": "gateway failure allows when fail-open",
+          "pass": true,
+          "connection": {
+            "username": "Livepap14",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "lookup recovers after gateway restoration",
+          "pass": true,
+          "connection": {
+            "username": "Livepap15",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "persisted cache permits join with gateway offline after restart",
+          "pass": true,
+          "connection": {
+            "username": "Livepap16",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        }
+      ],
+      "pass": true,
+      "exitCode": 0
+    },
+    "purpur": {
+      "platform": "purpur",
+      "kind": "server",
+      "minecraftVersion": "1.21.11",
+      "port": 25571,
+      "forwarding": "isolated synthetic legacy metadata",
+      "log": ".smoke/runtime/purpur/console.log",
+      "checks": [
+        {
+          "case": "local join with default policy",
+          "pass": true,
+          "connection": {
+            "username": "Livepur0",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "local join blocked by explicit setting",
+          "pass": true,
+          "connection": {
+            "username": "Livepur1",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "server-list ping survives local blocking",
+          "pass": true
+        },
+        {
+          "case": "forwarded public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livepur3",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "cached public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livepur4",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry rejects local player",
+          "pass": true,
+          "connection": {
+            "username": "Livepur5",
+            "joined": false,
+            "disconnect": "\"LIVE_COUNTRY_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry preserves public player",
+          "pass": true,
+          "connection": {
+            "username": "Livepur6",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "public country rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livepur7",
+            "joined": false,
+            "disconnect": "\"LIVE_COUNTRY_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "public ASN rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livepur8",
+            "joined": false,
+            "disconnect": "\"LIVE_ASN_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "local block works with country rules disabled",
+          "pass": true,
+          "connection": {
+            "username": "Livepur9",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "local joins restored by reload",
+          "pass": true,
+          "connection": {
+            "username": "Livepur10",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "external plugin API and cache helpers",
+          "pass": true,
+          "api": {
+            "platform": "Bukkit",
+            "available": true,
+            "version": "2.0.3",
+            "serviceRegistered": true,
+            "floodgateAvailable": false,
+            "countryCode": "US",
+            "countryName": "United States",
+            "asn": "AS15169",
+            "isp": "Google LLC",
+            "asnName": "Google LLC",
+            "vpn": true,
+            "hosting": false,
+            "proxy": false,
+            "mobile": false,
+            "allowed": true,
+            "blocked": false,
+            "lookup": {
+              "ip": "8.8.8.8",
+              "countryCode": "US",
+              "countryName": "United States",
+              "asn": "AS15169",
+              "asName": "Google LLC",
+              "provider": "dbip-local",
+              "isVpn": false,
+              "isHosting": false,
+              "isProxy": false,
+              "isMobile": false
+            },
+            "batch": {
+              "8.8.8.8": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              },
+              "1.1.1.1": {
+                "ip": "1.1.1.1",
+                "countryCode": "AU",
+                "countryName": "Australia",
+                "asn": "AS13335",
+                "asName": "Cloudflare, Inc.",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "check": {
+              "allowed": true,
+              "info": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "localBypass": {
+              "allowed": true
+            },
+            "cachedCountry": "US",
+            "cachedResponse": true,
+            "cacheSize": 2,
+            "purgedCacheSize": 0
+          }
+        },
+        {
+          "case": "cache stats command",
+          "pass": true
+        },
+        {
+          "case": "gateway failure rejects when fail-closed",
+          "pass": true,
+          "connection": {
+            "username": "Livepur13",
+            "joined": false,
+            "disconnect": "\"LIVE_LOOKUP_FAILURE\"",
+            "error": null
+          }
+        },
+        {
+          "case": "gateway failure allows when fail-open",
+          "pass": true,
+          "connection": {
+            "username": "Livepur14",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "lookup recovers after gateway restoration",
+          "pass": true,
+          "connection": {
+            "username": "Livepur15",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "persisted cache permits join with gateway offline after restart",
+          "pass": true,
+          "connection": {
+            "username": "Livepur16",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        }
+      ],
+      "pass": true,
+      "exitCode": 0
+    },
+    "folia": {
+      "platform": "folia",
+      "kind": "server",
+      "minecraftVersion": "1.21.11",
+      "port": 25572,
+      "forwarding": "isolated synthetic legacy metadata",
+      "log": ".smoke/runtime/folia/console.log",
+      "checks": [
+        {
+          "case": "local join with default policy",
+          "pass": true,
+          "connection": {
+            "username": "Livefol0",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "local join blocked by explicit setting",
+          "pass": true,
+          "connection": {
+            "username": "Livefol1",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "server-list ping survives local blocking",
+          "pass": true
+        },
+        {
+          "case": "forwarded public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livefol3",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "cached public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livefol4",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry rejects local player",
+          "pass": true,
+          "connection": {
+            "username": "Livefol5",
+            "joined": false,
+            "disconnect": "\"LIVE_COUNTRY_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry preserves public player",
+          "pass": true,
+          "connection": {
+            "username": "Livefol6",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "public country rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livefol7",
+            "joined": false,
+            "disconnect": "\"LIVE_COUNTRY_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "public ASN rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livefol8",
+            "joined": false,
+            "disconnect": "\"LIVE_ASN_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "local block works with country rules disabled",
+          "pass": true,
+          "connection": {
+            "username": "Livefol9",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "local joins restored by reload",
+          "pass": true,
+          "connection": {
+            "username": "Livefol10",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "external plugin API and cache helpers",
+          "pass": true,
+          "api": {
+            "platform": "Bukkit",
+            "available": true,
+            "version": "2.0.3",
+            "serviceRegistered": true,
+            "floodgateAvailable": false,
+            "countryCode": "US",
+            "countryName": "United States",
+            "asn": "AS15169",
+            "isp": "Google LLC",
+            "asnName": "Google LLC",
+            "vpn": true,
+            "hosting": false,
+            "proxy": false,
+            "mobile": false,
+            "allowed": true,
+            "blocked": false,
+            "lookup": {
+              "ip": "8.8.8.8",
+              "countryCode": "US",
+              "countryName": "United States",
+              "asn": "AS15169",
+              "asName": "Google LLC",
+              "provider": "dbip-local",
+              "isVpn": false,
+              "isHosting": false,
+              "isProxy": false,
+              "isMobile": false
+            },
+            "batch": {
+              "8.8.8.8": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              },
+              "1.1.1.1": {
+                "ip": "1.1.1.1",
+                "countryCode": "AU",
+                "countryName": "Australia",
+                "asn": "AS13335",
+                "asName": "Cloudflare, Inc.",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "check": {
+              "allowed": true,
+              "info": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "localBypass": {
+              "allowed": true
+            },
+            "cachedCountry": "US",
+            "cachedResponse": true,
+            "cacheSize": 2,
+            "purgedCacheSize": 0
+          }
+        },
+        {
+          "case": "cache stats command",
+          "pass": true
+        },
+        {
+          "case": "gateway failure rejects when fail-closed",
+          "pass": true,
+          "connection": {
+            "username": "Livefol13",
+            "joined": false,
+            "disconnect": "\"LIVE_LOOKUP_FAILURE\"",
+            "error": null
+          }
+        },
+        {
+          "case": "gateway failure allows when fail-open",
+          "pass": true,
+          "connection": {
+            "username": "Livefol14",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "lookup recovers after gateway restoration",
+          "pass": true,
+          "connection": {
+            "username": "Livefol15",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "persisted cache permits join with gateway offline after restart",
+          "pass": true,
+          "connection": {
+            "username": "Livefol16",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        }
+      ],
+      "pass": true,
+      "exitCode": 0
+    },
+    "spigot": {
+      "platform": "spigot",
+      "kind": "server",
+      "minecraftVersion": "1.21.11",
+      "port": 25573,
+      "forwarding": "isolated synthetic legacy metadata",
+      "log": ".smoke/runtime/spigot/console.log",
+      "checks": [
+        {
+          "case": "local join with default policy",
+          "pass": true,
+          "connection": {
+            "username": "Livespi0",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "local join blocked by explicit setting",
+          "pass": true,
+          "connection": {
+            "username": "Livespi1",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "server-list ping survives local blocking",
+          "pass": true
+        },
+        {
+          "case": "forwarded public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livespi3",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "cached public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livespi4",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry rejects local player",
+          "pass": true,
+          "connection": {
+            "username": "Livespi5",
+            "joined": false,
+            "disconnect": "\"LIVE_COUNTRY_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry preserves public player",
+          "pass": true,
+          "connection": {
+            "username": "Livespi6",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "public country rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livespi7",
+            "joined": false,
+            "disconnect": "\"LIVE_COUNTRY_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "public ASN rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livespi8",
+            "joined": false,
+            "disconnect": "\"LIVE_ASN_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "local block works with country rules disabled",
+          "pass": true,
+          "connection": {
+            "username": "Livespi9",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "local joins restored by reload",
+          "pass": true,
+          "connection": {
+            "username": "Livespi10",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "external plugin API and cache helpers",
+          "pass": true,
+          "api": {
+            "platform": "Bukkit",
+            "available": true,
+            "version": "2.0.3",
+            "serviceRegistered": true,
+            "floodgateAvailable": false,
+            "countryCode": "US",
+            "countryName": "United States",
+            "asn": "AS15169",
+            "isp": "Google LLC",
+            "asnName": "Google LLC",
+            "vpn": true,
+            "hosting": false,
+            "proxy": false,
+            "mobile": false,
+            "allowed": true,
+            "blocked": false,
+            "lookup": {
+              "ip": "8.8.8.8",
+              "countryCode": "US",
+              "countryName": "United States",
+              "asn": "AS15169",
+              "asName": "Google LLC",
+              "provider": "dbip-local",
+              "isVpn": false,
+              "isHosting": false,
+              "isProxy": false,
+              "isMobile": false
+            },
+            "batch": {
+              "8.8.8.8": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              },
+              "1.1.1.1": {
+                "ip": "1.1.1.1",
+                "countryCode": "AU",
+                "countryName": "Australia",
+                "asn": "AS13335",
+                "asName": "Cloudflare, Inc.",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "check": {
+              "allowed": true,
+              "info": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "localBypass": {
+              "allowed": true
+            },
+            "cachedCountry": "US",
+            "cachedResponse": true,
+            "cacheSize": 2,
+            "purgedCacheSize": 0
+          }
+        },
+        {
+          "case": "cache stats command",
+          "pass": true
+        },
+        {
+          "case": "gateway failure rejects when fail-closed",
+          "pass": true,
+          "connection": {
+            "username": "Livespi13",
+            "joined": false,
+            "disconnect": "\"LIVE_LOOKUP_FAILURE\"",
+            "error": null
+          }
+        },
+        {
+          "case": "gateway failure allows when fail-open",
+          "pass": true,
+          "connection": {
+            "username": "Livespi14",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "lookup recovers after gateway restoration",
+          "pass": true,
+          "connection": {
+            "username": "Livespi15",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "persisted cache permits join with gateway offline after restart",
+          "pass": true,
+          "connection": {
+            "username": "Livespi16",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        }
+      ],
+      "pass": true,
+      "exitCode": 0
+    },
+    "craftbukkit": {
+      "platform": "craftbukkit",
+      "kind": "server",
+      "minecraftVersion": "1.21.11",
+      "port": 25577,
+      "forwarding": "not supported by CraftBukkit",
+      "log": ".smoke/runtime/craftbukkit/console.log",
+      "checks": [
+        {
+          "case": "local join with default policy",
+          "pass": true,
+          "connection": {
+            "username": "Livecra0",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "local join blocked by explicit setting",
+          "pass": true,
+          "connection": {
+            "username": "Livecra1",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "server-list ping survives local blocking",
+          "pass": true
+        },
+        {
+          "case": "LOCAL country entry rejects local player",
+          "pass": true,
+          "connection": {
+            "username": "Livecra3",
+            "joined": false,
+            "disconnect": "\"LIVE_COUNTRY_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "local block works with country rules disabled",
+          "pass": true,
+          "connection": {
+            "username": "Livecra4",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "local joins restored by reload",
+          "pass": true,
+          "connection": {
+            "username": "Livecra5",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "external plugin API and cache helpers",
+          "pass": true,
+          "api": {
+            "platform": "Bukkit",
+            "available": true,
+            "version": "2.0.3",
+            "serviceRegistered": true,
+            "floodgateAvailable": false,
+            "countryCode": "US",
+            "countryName": "United States",
+            "asn": "AS15169",
+            "isp": "Google LLC",
+            "asnName": "Google LLC",
+            "vpn": true,
+            "hosting": false,
+            "proxy": false,
+            "mobile": false,
+            "allowed": true,
+            "blocked": false,
+            "lookup": {
+              "ip": "8.8.8.8",
+              "countryCode": "US",
+              "countryName": "United States",
+              "asn": "AS15169",
+              "asName": "Google LLC",
+              "provider": "dbip-local",
+              "isVpn": false,
+              "isHosting": false,
+              "isProxy": false,
+              "isMobile": false
+            },
+            "batch": {
+              "8.8.8.8": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              },
+              "1.1.1.1": {
+                "ip": "1.1.1.1",
+                "countryCode": "AU",
+                "countryName": "Australia",
+                "asn": "AS13335",
+                "asName": "Cloudflare, Inc.",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "check": {
+              "allowed": true,
+              "info": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "localBypass": {
+              "allowed": true
+            },
+            "cachedCountry": "US",
+            "cachedResponse": true,
+            "cacheSize": 2,
+            "purgedCacheSize": 0
+          }
+        },
+        {
+          "case": "cache stats command",
+          "pass": true
+        },
+        {
+          "case": "operator bypass preserves local access",
+          "pass": true,
+          "connection": {
+            "username": "LivecraOp",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "live schema v5 migration",
+          "pass": true
+        },
+        {
+          "case": "local access survives migration",
+          "pass": true,
+          "connection": {
+            "username": "Livecra10",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        }
+      ],
+      "pass": true,
+      "exitCode": 0
+    },
+    "bungee": {
+      "platform": "bungee",
+      "kind": "bungee",
+      "minecraftVersion": "1.21.1",
+      "port": 25574,
+      "forwarding": "isolated HAProxy PROXY v1 + legacy backend",
+      "log": ".smoke/runtime/bungee/console.log",
+      "checks": [
+        {
+          "case": "local join with default policy",
+          "pass": true,
+          "connection": {
+            "username": "Livebun0",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "local join blocked by explicit setting",
+          "pass": true,
+          "connection": {
+            "username": "Livebun1",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_LOCAL_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "server-list ping survives local blocking",
+          "pass": true
+        },
+        {
+          "case": "forwarded public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livebun3",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "cached public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livebun4",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry rejects local player",
+          "pass": true,
+          "connection": {
+            "username": "Livebun5",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_COUNTRY_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry preserves public player",
+          "pass": true,
+          "connection": {
+            "username": "Livebun6",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "public country rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livebun7",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_COUNTRY_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "public ASN rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livebun8",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_ASN_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "local block works with country rules disabled",
+          "pass": true,
+          "connection": {
+            "username": "Livebun9",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_LOCAL_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "local joins restored by reload",
+          "pass": true,
+          "connection": {
+            "username": "Livebun10",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "external plugin API and cache helpers",
+          "pass": true,
+          "api": {
+            "platform": "Bungee",
+            "available": true,
+            "version": "2.0.3",
+            "serviceRegistered": true,
+            "floodgateAvailable": false,
+            "countryCode": "US",
+            "countryName": "United States",
+            "asn": "AS15169",
+            "isp": "Google LLC",
+            "asnName": "Google LLC",
+            "vpn": true,
+            "hosting": false,
+            "proxy": false,
+            "mobile": false,
+            "allowed": true,
+            "blocked": false,
+            "lookup": {
+              "ip": "8.8.8.8",
+              "countryCode": "US",
+              "countryName": "United States",
+              "asn": "AS15169",
+              "asName": "Google LLC",
+              "provider": "dbip-local",
+              "isVpn": false,
+              "isHosting": false,
+              "isProxy": false,
+              "isMobile": false
+            },
+            "batch": {
+              "8.8.8.8": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              },
+              "1.1.1.1": {
+                "ip": "1.1.1.1",
+                "countryCode": "AU",
+                "countryName": "Australia",
+                "asn": "AS13335",
+                "asName": "Cloudflare, Inc.",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "check": {
+              "allowed": true,
+              "info": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "localBypass": {
+              "allowed": true
+            },
+            "cachedCountry": "US",
+            "cachedResponse": true,
+            "cacheSize": 2,
+            "purgedCacheSize": 0
+          }
+        },
+        {
+          "case": "cache stats command",
+          "pass": true
+        },
+        {
+          "case": "gateway failure rejects when fail-closed",
+          "pass": true,
+          "connection": {
+            "username": "Livebun13",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_LOOKUP_FAILURE\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "gateway failure allows when fail-open",
+          "pass": true,
+          "connection": {
+            "username": "Livebun14",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "lookup recovers after gateway restoration",
+          "pass": true,
+          "connection": {
+            "username": "Livebun15",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "persisted cache permits join with gateway offline after restart",
+          "pass": true,
+          "connection": {
+            "username": "Livebun16",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        }
+      ],
+      "pass": true,
+      "exitCode": 0
+    },
+    "waterfall": {
+      "platform": "waterfall",
+      "kind": "bungee",
+      "minecraftVersion": "1.21.1",
+      "port": 25575,
+      "forwarding": "isolated HAProxy PROXY v1 + legacy backend",
+      "log": ".smoke/runtime/waterfall/console.log",
+      "checks": [
+        {
+          "case": "local join with default policy",
+          "pass": true,
+          "connection": {
+            "username": "Livewat0",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "local join blocked by explicit setting",
+          "pass": true,
+          "connection": {
+            "username": "Livewat1",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_LOCAL_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "server-list ping survives local blocking",
+          "pass": true
+        },
+        {
+          "case": "forwarded public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livewat3",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "cached public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livewat4",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry rejects local player",
+          "pass": true,
+          "connection": {
+            "username": "Livewat5",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_COUNTRY_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry preserves public player",
+          "pass": true,
+          "connection": {
+            "username": "Livewat6",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "public country rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livewat7",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_COUNTRY_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "public ASN rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livewat8",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_ASN_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "local block works with country rules disabled",
+          "pass": true,
+          "connection": {
+            "username": "Livewat9",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_LOCAL_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "local joins restored by reload",
+          "pass": true,
+          "connection": {
+            "username": "Livewat10",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "external plugin API and cache helpers",
+          "pass": true,
+          "api": {
+            "platform": "Bungee",
+            "available": true,
+            "version": "2.0.3",
+            "serviceRegistered": true,
+            "floodgateAvailable": false,
+            "countryCode": "US",
+            "countryName": "United States",
+            "asn": "AS15169",
+            "isp": "Google LLC",
+            "asnName": "Google LLC",
+            "vpn": true,
+            "hosting": false,
+            "proxy": false,
+            "mobile": false,
+            "allowed": true,
+            "blocked": false,
+            "lookup": {
+              "ip": "8.8.8.8",
+              "countryCode": "US",
+              "countryName": "United States",
+              "asn": "AS15169",
+              "asName": "Google LLC",
+              "provider": "dbip-local",
+              "isVpn": false,
+              "isHosting": false,
+              "isProxy": false,
+              "isMobile": false
+            },
+            "batch": {
+              "8.8.8.8": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              },
+              "1.1.1.1": {
+                "ip": "1.1.1.1",
+                "countryCode": "AU",
+                "countryName": "Australia",
+                "asn": "AS13335",
+                "asName": "Cloudflare, Inc.",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "check": {
+              "allowed": true,
+              "info": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "localBypass": {
+              "allowed": true
+            },
+            "cachedCountry": "US",
+            "cachedResponse": true,
+            "cacheSize": 2,
+            "purgedCacheSize": 0
+          }
+        },
+        {
+          "case": "cache stats command",
+          "pass": true
+        },
+        {
+          "case": "gateway failure rejects when fail-closed",
+          "pass": true,
+          "connection": {
+            "username": "Livewat13",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_LOOKUP_FAILURE\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "gateway failure allows when fail-open",
+          "pass": true,
+          "connection": {
+            "username": "Livewat14",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "lookup recovers after gateway restoration",
+          "pass": true,
+          "connection": {
+            "username": "Livewat15",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "persisted cache permits join with gateway offline after restart",
+          "pass": true,
+          "connection": {
+            "username": "Livewat16",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        }
+      ],
+      "pass": true,
+      "exitCode": 0
+    },
+    "velocity": {
+      "platform": "velocity",
+      "kind": "velocity",
+      "minecraftVersion": "1.21.1",
+      "port": 25576,
+      "forwarding": "isolated HAProxy PROXY v1 + legacy backend",
+      "log": ".smoke/runtime/velocity/console.log",
+      "checks": [
+        {
+          "case": "local join with default policy",
+          "pass": true,
+          "connection": {
+            "username": "Livevel0",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "local join blocked by explicit setting",
+          "pass": true,
+          "connection": {
+            "username": "Livevel1",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_LOCAL_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "server-list ping survives local blocking",
+          "pass": true
+        },
+        {
+          "case": "forwarded public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livevel3",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "cached public player still joins",
+          "pass": true,
+          "connection": {
+            "username": "Livevel4",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry rejects local player",
+          "pass": true,
+          "connection": {
+            "username": "Livevel5",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_COUNTRY_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "LOCAL country entry preserves public player",
+          "pass": true,
+          "connection": {
+            "username": "Livevel6",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "public country rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livevel7",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_COUNTRY_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "public ASN rule still rejects",
+          "pass": true,
+          "connection": {
+            "username": "Livevel8",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_ASN_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "local block works with country rules disabled",
+          "pass": true,
+          "connection": {
+            "username": "Livevel9",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_LOCAL_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "local joins restored by reload",
+          "pass": true,
+          "connection": {
+            "username": "Livevel10",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "external plugin API and cache helpers",
+          "pass": true,
+          "api": {
+            "platform": "Velocity",
+            "available": true,
+            "version": "2.0.3",
+            "serviceRegistered": true,
+            "floodgateAvailable": false,
+            "countryCode": "US",
+            "countryName": "United States",
+            "asn": "AS15169",
+            "isp": "Google LLC",
+            "asnName": "Google LLC",
+            "vpn": true,
+            "hosting": false,
+            "proxy": false,
+            "mobile": false,
+            "allowed": true,
+            "blocked": false,
+            "lookup": {
+              "ip": "8.8.8.8",
+              "countryCode": "US",
+              "countryName": "United States",
+              "asn": "AS15169",
+              "asName": "Google LLC",
+              "provider": "dbip-local",
+              "isVpn": false,
+              "isHosting": false,
+              "isProxy": false,
+              "isMobile": false
+            },
+            "batch": {
+              "8.8.8.8": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              },
+              "1.1.1.1": {
+                "ip": "1.1.1.1",
+                "countryCode": "AU",
+                "countryName": "Australia",
+                "asn": "AS13335",
+                "asName": "Cloudflare, Inc.",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "check": {
+              "allowed": true,
+              "info": {
+                "ip": "8.8.8.8",
+                "countryCode": "US",
+                "countryName": "United States",
+                "asn": "AS15169",
+                "asName": "Google LLC",
+                "provider": "dbip-local",
+                "isVpn": false,
+                "isHosting": false,
+                "isProxy": false,
+                "isMobile": false
+              }
+            },
+            "localBypass": {
+              "allowed": true
+            },
+            "cachedCountry": "US",
+            "cachedResponse": true,
+            "cacheSize": 2,
+            "purgedCacheSize": 0
+          }
+        },
+        {
+          "case": "cache stats command",
+          "pass": true
+        },
+        {
+          "case": "gateway failure rejects when fail-closed",
+          "pass": true,
+          "connection": {
+            "username": "Livevel13",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_LOOKUP_FAILURE\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "gateway failure allows when fail-open",
+          "pass": true,
+          "connection": {
+            "username": "Livevel14",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "lookup recovers after gateway restoration",
+          "pass": true,
+          "connection": {
+            "username": "Livevel15",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "persisted cache permits join with gateway offline after restart",
+          "pass": true,
+          "connection": {
+            "username": "Livevel16",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        }
+      ],
+      "pass": true,
+      "exitCode": 0
+    },
+    "velocity-modern": {
+      "suite": "velocity-modern",
+      "checks": [
+        {
+          "case": "modern forwarding allows default local join",
+          "pass": true,
+          "connection": {
+            "username": "Modern0",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "backend sees forwarded public address over signed modern forwarding",
+          "pass": true,
+          "connection": {
+            "username": "Modern1",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "backend rejects forwarded local address",
+          "pass": true,
+          "connection": {
+            "username": "Modern2",
+            "joined": false,
+            "disconnect": {
+              "type": "compound",
+              "value": {
+                "color": {
+                  "type": "string",
+                  "value": "red"
+                },
+                "text": {
+                  "type": "string",
+                  "value": "Unable to connect to lobby: LIVE_LOCAL_BLOCK"
+                }
+              }
+            },
+            "error": null
+          }
+        },
+        {
+          "case": "proxy rejects local player",
+          "pass": true,
+          "connection": {
+            "username": "Modern3",
+            "joined": false,
+            "disconnect": "{\"text\":\"LIVE_LOCAL_BLOCK\"}",
+            "error": null
+          }
+        },
+        {
+          "case": "proxy still permits public join through modern backend",
+          "pass": true,
+          "connection": {
+            "username": "Modern4",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "proxy ping remains available",
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    "paper-admission": {
+      "suite": "paper-admission",
+      "checks": [
+        {
+          "case": "live forwarded local literal 10.0.0.1",
+          "pass": true,
+          "connection": {
+            "username": "Rule0",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "live forwarded local literal 172.16.0.1",
+          "pass": true,
+          "connection": {
+            "username": "Rule1",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "live forwarded local literal 192.168.1.1",
+          "pass": true,
+          "connection": {
+            "username": "Rule2",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "live forwarded local literal 169.254.1.1",
+          "pass": true,
+          "connection": {
+            "username": "Rule3",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "live forwarded local literal ::1",
+          "pass": true,
+          "connection": {
+            "username": "Rule4",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "live forwarded local literal 0:0:0:0:0:0:0:1",
+          "pass": true,
+          "connection": {
+            "username": "Rule5",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "live forwarded local literal fc00::1",
+          "pass": true,
+          "connection": {
+            "username": "Rule6",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "live forwarded local literal fe80::1",
+          "pass": true,
+          "connection": {
+            "username": "Rule7",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "live forwarded local literal ::ffff:127.0.0.1",
+          "pass": true,
+          "connection": {
+            "username": "Rule8",
+            "joined": false,
+            "disconnect": "\"LIVE_LOCAL_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "georestrict check 127.0.0.1",
+          "pass": true
+        },
+        {
+          "case": "georestrict check 8.8.8.8",
+          "pass": true
+        },
+        {
+          "case": "georestrict",
+          "pass": true
+        },
+        {
+          "case": "georestrict invalid",
+          "pass": true
+        },
+        {
+          "case": "georestrict check",
+          "pass": true
+        },
+        {
+          "case": "country allowlist admits US",
+          "pass": true,
+          "connection": {
+            "username": "Rule14",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "country allowlist denies AU",
+          "pass": true,
+          "connection": {
+            "username": "Rule15",
+            "joined": false,
+            "disconnect": "\"LIVE_COUNTRY_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "ASN allowlist admits listed network",
+          "pass": true,
+          "connection": {
+            "username": "Rule16",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "ASN allowlist denies unlisted network",
+          "pass": true,
+          "connection": {
+            "username": "Rule17",
+            "joined": false,
+            "disconnect": "\"LIVE_ASN_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "VPN ISP keyword rejects hosting ASN",
+          "pass": true,
+          "connection": {
+            "username": "Rule18",
+            "joined": false,
+            "disconnect": "\"LIVE_VPN_BLOCK\"",
+            "error": null
+          }
+        },
+        {
+          "case": "VPN rule can be disabled by live reload",
+          "pass": true,
+          "connection": {
+            "username": "Rule19",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "16 simultaneous real player joins",
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    "geyser-floodgate": {
+      "suite": "geyser-floodgate",
+      "checks": [
+        {
+          "case": "real Geyser, Floodgate and ViaVersion enabled",
+          "pass": true
+        },
+        {
+          "case": "real Bedrock RakNet ping receives Geyser advertisement",
+          "pass": true,
+          "advertisement": "MCPE;\"A Minecraft Server\";2193;26.52;0;40;15653343085264853920;Another Geyser server.;Survival;1;19132;19132;"
+        },
+        {
+          "case": "Java joins with all addons installed",
+          "pass": true,
+          "connection": {
+            "username": "AddonJava",
+            "joined": true,
+            "disconnect": null,
+            "error": null
+          }
+        },
+        {
+          "case": "GeoRestrict detects the real Floodgate API",
+          "pass": true
+        },
+        {
+          "case": "Floodgate bypass settings do not exempt a Java player",
+          "pass": true
+        },
+        {
+          "case": "local denial webhook includes LOCAL, reason and masked IP",
+          "pass": true,
+          "fields": {
+            "IP": "127.0.x.x",
+            "Country": "LOCAL",
+            "Reason": "LIVE_LOCAL_BLOCK"
+          }
+        },
+        {
+          "case": "Java access restored with addons",
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    "services": {
+      "suite": "services",
+      "providerEndpoints": "local HTTP fixtures",
+      "database": "real DB-IP Lite MMDB",
+      "checks": [
+        {
+          "case": "http://127.0.0.1:19081 health",
+          "pass": true,
+          "response": {
+            "ok": true,
+            "version": "2.0.3",
+            "vpsConfigured": true,
+            "providers": [
+              "ipinfo",
+              "ip-api"
+            ],
+            "fallback": "vps-local-mmdb",
+            "cache": {
+              "ttlSeconds": 86400,
+              "cacheApi": true,
+              "memory": true,
+              "kv": false
+            }
+          }
+        },
+        {
+          "case": "http://127.0.0.1:19081 local 127.0.0.1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 local 10.2.3.4",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 local 169.254.1.1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 local 172.31.255.255",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 local 192.168.1.2",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 local ::1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 local 0:0:0:0:0:0:0:1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 local fc00::1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 local fe80::1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 local ::ffff:127.0.0.1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 local 0:0:0:0:0:ffff:7f00:1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 local ::ffff:10.0.0.1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 local ff02::1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 invalid 1:2:3:4:5:6::7:8:9",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 invalid 127.00.0.1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 invalid example.com",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 invalid 999.1.1.1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 invalid :::1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19081 real MMDB 8.8.8.8",
+          "pass": true,
+          "response": {
+            "ip": "8.8.8.8",
+            "countryCode": "US",
+            "countryName": "United States",
+            "asn": "AS15169",
+            "asName": "Google LLC",
+            "isVpn": false,
+            "isHosting": false,
+            "isProxy": false,
+            "isMobile": false,
+            "provider": "dbip-local"
+          }
+        },
+        {
+          "case": "http://127.0.0.1:19081 real MMDB 1.1.1.1",
+          "pass": true,
+          "response": {
+            "ip": "1.1.1.1",
+            "countryCode": "AU",
+            "countryName": "Australia",
+            "asn": "AS13335",
+            "asName": "Cloudflare, Inc.",
+            "isVpn": false,
+            "isHosting": false,
+            "isProxy": false,
+            "isMobile": false,
+            "provider": "dbip-local"
+          }
+        },
+        {
+          "case": "http://127.0.0.1:19081 real public IPv6 MMDB",
+          "pass": true,
+          "response": {
+            "ip": "2606:4700:4700::1111",
+            "countryCode": "CA",
+            "countryName": "Canada",
+            "asn": "AS13335",
+            "asName": "Cloudflare, Inc.",
+            "isVpn": false,
+            "isHosting": false,
+            "isProxy": false,
+            "isMobile": false,
+            "provider": "dbip-local"
+          }
+        },
+        {
+          "case": "http://127.0.0.1:19082 health",
+          "pass": true,
+          "response": {
+            "ok": true,
+            "uptime": 469.792360019,
+            "database": {
+              "ready": true,
+              "source": "DB-IP Lite",
+              "release": "2026-10",
+              "updatedAt": "2026-10-09T18:14:36.495Z",
+              "countryBytes": 8348509,
+              "asnBytes": 9566363,
+              "networkSignals": false
+            }
+          }
+        },
+        {
+          "case": "http://127.0.0.1:19082 local 127.0.0.1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 local 10.2.3.4",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 local 169.254.1.1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 local 172.31.255.255",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 local 192.168.1.2",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 local ::1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 local 0:0:0:0:0:0:0:1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 local fc00::1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 local fe80::1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 local ::ffff:127.0.0.1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 local 0:0:0:0:0:ffff:7f00:1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 local ::ffff:10.0.0.1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 local ff02::1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 invalid 1:2:3:4:5:6::7:8:9",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 invalid 127.00.0.1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 invalid example.com",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 invalid 999.1.1.1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 invalid :::1",
+          "pass": true
+        },
+        {
+          "case": "http://127.0.0.1:19082 real MMDB 8.8.8.8",
+          "pass": true,
+          "response": {
+            "ip": "8.8.8.8",
+            "countryCode": "US",
+            "countryName": "United States",
+            "asn": "AS15169",
+            "asName": "Google LLC",
+            "isVpn": false,
+            "isHosting": false,
+            "isProxy": false,
+            "isMobile": false,
+            "networkSignalsAvailable": false,
+            "provider": "dbip-local"
+          }
+        },
+        {
+          "case": "http://127.0.0.1:19082 real MMDB 1.1.1.1",
+          "pass": true,
+          "response": {
+            "ip": "1.1.1.1",
+            "countryCode": "AU",
+            "countryName": "Australia",
+            "asn": "AS13335",
+            "asName": "Cloudflare, Inc.",
+            "isVpn": false,
+            "isHosting": false,
+            "isProxy": false,
+            "isMobile": false,
+            "networkSignalsAvailable": false,
+            "provider": "dbip-local"
+          }
+        },
+        {
+          "case": "http://127.0.0.1:19082 real public IPv6 MMDB",
+          "pass": true,
+          "response": {
+            "ip": "2606:4700:4700::1111",
+            "countryCode": "CA",
+            "countryName": "Canada",
+            "asn": "AS13335",
+            "asName": "Cloudflare, Inc.",
+            "isVpn": false,
+            "isHosting": false,
+            "isProxy": false,
+            "isMobile": false,
+            "networkSignalsAvailable": false,
+            "provider": "dbip-local"
+          }
+        },
+        {
+          "case": "fallback protects /health",
+          "pass": true
+        },
+        {
+          "case": "fallback protects /?ip=8.8.8.8",
+          "pass": true
+        },
+        {
+          "case": "fallback accepts query token",
+          "pass": true
+        },
+        {
+          "case": "fallback accepts custom-header token",
+          "pass": true
+        },
+        {
+          "case": "private status rejects missing token",
+          "pass": true
+        },
+        {
+          "case": "real status reports fallback/cache",
+          "pass": true,
+          "response": {
+            "ok": true,
+            "scope": "status",
+            "version": "2.0.3",
+            "generatedAt": "2026-10-09T19:58:23.428Z",
+            "overall": "operational",
+            "summary": "All systems operational",
+            "components": [
+              {
+                "id": "gateway",
+                "label": "Worker gateway",
+                "status": "up",
+                "critical": true,
+                "detail": {
+                  "version": "2.0.3"
+                }
+              },
+              {
+                "id": "provider:ipinfo",
+                "label": "IPinfo Lite",
+                "critical": true,
+                "status": "not_configured",
+                "detail": {}
+              },
+              {
+                "id": "provider:ip-api",
+                "label": "IP-API Pro",
+                "critical": true,
+                "status": "not_configured",
+                "detail": {}
+              },
+              {
+                "id": "fallback",
+                "label": "Fallback server (local MMDB)",
+                "critical": false,
+                "status": "up",
+                "latencyMs": 1,
+                "detail": {
+                  "databaseRelease": "2026-10"
+                }
+              },
+              {
+                "id": "cache-edge",
+                "label": "Edge cache (Cache API)",
+                "status": "up",
+                "critical": false,
+                "detail": {
+                  "ttlSeconds": 86400
+                }
+              },
+              {
+                "id": "cache-memory",
+                "label": "Memory cache",
+                "status": "up",
+                "critical": false,
+                "detail": {
+                  "maxEntries": 5000,
+                  "entries": 3
+                }
+              },
+              {
+                "id": "cache-kv",
+                "label": "KV cache",
+                "status": "not_configured",
+                "critical": false,
+                "detail": {}
+              }
+            ]
+          }
+        },
+        {
+          "case": "private status HTML omits token",
+          "pass": true
+        },
+        {
+          "case": "Worker CORS preflight",
+          "pass": true
+        },
+        {
+          "case": "Worker rejects unsupported methods",
+          "pass": true
+        },
+        {
+          "case": "48 concurrent real Worker/MMDB HTTP lookups",
+          "pass": true
+        },
+        {
+          "case": "configured Worker rejects missing/wrong token",
+          "pass": true
+        },
+        {
+          "case": "configured Worker rejects missing/wrong token",
+          "pass": true
+        },
+        {
+          "case": "real HTTP IPinfo fixture normalizes country/ASN",
+          "pass": true,
+          "response": {
+            "ip": "8.8.4.4",
+            "countryCode": "US",
+            "countryName": "United States",
+            "asn": "AS15169",
+            "asName": "Fixture ISP",
+            "isVpn": false,
+            "isHosting": false,
+            "isProxy": false,
+            "isMobile": false,
+            "provider": "ipinfo"
+          }
+        },
+        {
+          "case": "Cache API/KV serve repeat lookup without provider HTTP",
+          "pass": true
+        },
+        {
+          "case": "real HTTP failover from IPinfo to IP-API fixture",
+          "pass": true,
+          "response": {
+            "ip": "9.9.9.9",
+            "countryCode": "GB",
+            "countryName": "United Kingdom",
+            "asn": "AS64500",
+            "asName": "Fixture ISP",
+            "isVpn": true,
+            "isHosting": true,
+            "isProxy": true,
+            "isMobile": false,
+            "provider": "ip-api"
+          }
+        },
+        {
+          "case": "both HTTP providers fail over to real MMDB",
+          "pass": true,
+          "response": {
+            "ip": "1.0.0.1",
+            "countryCode": "AU",
+            "countryName": "Australia",
+            "asn": "AS13335",
+            "asName": "Cloudflare, Inc.",
+            "isVpn": false,
+            "isHosting": false,
+            "isProxy": false,
+            "isMobile": false,
+            "provider": "dbip-local"
+          }
+        },
+        {
+          "case": "HTTP provider timeout resumes failover",
+          "pass": true
+        },
+        {
+          "case": "private status reports provider degradation and KV binding",
+          "pass": true,
+          "response": {
+            "ok": true,
+            "scope": "status",
+            "version": "2.0.3",
+            "generatedAt": "2026-10-09T19:58:25.885Z",
+            "overall": "degraded",
+            "summary": "Partial degradation",
+            "components": [
+              {
+                "id": "gateway",
+                "label": "Worker gateway",
+                "status": "up",
+                "critical": true,
+                "detail": {
+                  "version": "2.0.3"
+                }
+              },
+              {
+                "id": "provider:ipinfo",
+                "label": "IPinfo Lite",
+                "critical": true,
+                "status": "down",
+                "latencyMs": 252,
+                "detail": {}
+              },
+              {
+                "id": "provider:ip-api",
+                "label": "IP-API Pro",
+                "critical": true,
+                "status": "up",
+                "latencyMs": 1,
+                "detail": {
+                  "countryCode": "GB",
+                  "probeIp": "1.1.1.1"
+                }
+              },
+              {
+                "id": "fallback",
+                "label": "Fallback server (local MMDB)",
+                "critical": false,
+                "status": "up",
+                "latencyMs": 2,
+                "detail": {
+                  "databaseRelease": "2026-10"
+                }
+              },
+              {
+                "id": "cache-edge",
+                "label": "Edge cache (Cache API)",
+                "status": "up",
+                "critical": false,
+                "detail": {
+                  "ttlSeconds": 86400
+                }
+              },
+              {
+                "id": "cache-memory",
+                "label": "Memory cache",
+                "status": "not_configured",
+                "critical": false,
+                "detail": {}
+              },
+              {
+                "id": "cache-kv",
+                "label": "KV cache",
+                "status": "up",
+                "critical": false,
+                "detail": {}
+              }
+            ]
+          }
+        }
+      ],
+      "pass": true
+    },
+    "docker": {
+      "suite": "Docker",
+      "image": "sha256:c3fba8cd031a563b48c6a0a36b4465220301ec89675d3526fc8e6949e3cdefd7",
+      "checks": [
+        {
+          "case": "protected Docker healthcheck reaches healthy",
+          "pass": true
+        },
+        {
+          "case": "Docker port mapping reaches protected service",
+          "pass": true
+        },
+        {
+          "case": "container returns real MMDB country and ASN",
+          "pass": true,
+          "response": {
+            "ip": "8.8.8.8",
+            "countryCode": "US",
+            "countryName": "United States",
+            "asn": "AS15169",
+            "asName": "Google LLC",
+            "isVpn": false,
+            "isHosting": false,
+            "isProxy": false,
+            "isMobile": false,
+            "networkSignalsAvailable": false,
+            "provider": "dbip-local"
+          }
+        },
+        {
+          "case": "database survives container restart",
+          "pass": true
+        }
+      ],
+      "pass": true
+    },
+    "database": {
+      "suite": "database updater",
+      "checks": [
+        {
+          "case": "corrupt replacement MMDB is rejected",
+          "pass": true
+        },
+        {
+          "case": "both installed MMDB files remain unchanged",
+          "pass": true
+        },
+        {
+          "case": "failed update leaves no partial files",
+          "pass": true
+        }
+      ],
+      "hashes": {
+        "dbip-asn-lite.mmdb": "4384bfcfb594391bc4e0ab37751f44661eaf7cadbeee28a90a6b82dc935fec4c",
+        "dbip-country-lite.mmdb": "dbd70ccfa2a13627eaf4913d19920a1a229f1b3c5439ac01c509995b6364202a"
+      },
+      "pass": true
+    },
+    "docs": {
+      "suite": "docs HTTP",
+      "checks": [
+        {
+          "case": "docs HTTP changelog.html",
+          "pass": true
+        },
+        {
+          "case": "changelog.html local asset/link assets/georestrict-icon-v2.png?rev=20260715a",
+          "pass": true
+        },
+        {
+          "case": "changelog.html local asset/link changelog.html",
+          "pass": true
+        },
+        {
+          "case": "changelog.html local asset/link commands.html",
+          "pass": true
+        },
+        {
+          "case": "changelog.html local asset/link configuration.html",
+          "pass": true
+        },
+        {
+          "case": "changelog.html local asset/link faq.html",
+          "pass": true
+        },
+        {
+          "case": "changelog.html local asset/link how-it-works.html",
+          "pass": true
+        },
+        {
+          "case": "changelog.html local asset/link index.html",
+          "pass": true
+        },
+        {
+          "case": "changelog.html local asset/link installation.html",
+          "pass": true
+        },
+        {
+          "case": "changelog.html local asset/link privacy.html",
+          "pass": true
+        },
+        {
+          "case": "changelog.html local asset/link script.js?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "changelog.html local asset/link styles.css?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "changelog.html local asset/link terms.html",
+          "pass": true
+        },
+        {
+          "case": "changelog.html local asset/link troubleshooting.html",
+          "pass": true
+        },
+        {
+          "case": "docs HTTP commands.html",
+          "pass": true
+        },
+        {
+          "case": "commands.html local asset/link assets/georestrict-icon-v2.png?rev=20260715a",
+          "pass": true
+        },
+        {
+          "case": "commands.html local asset/link changelog.html",
+          "pass": true
+        },
+        {
+          "case": "commands.html local asset/link commands.html",
+          "pass": true
+        },
+        {
+          "case": "commands.html local asset/link configuration.html",
+          "pass": true
+        },
+        {
+          "case": "commands.html local asset/link faq.html",
+          "pass": true
+        },
+        {
+          "case": "commands.html local asset/link how-it-works.html",
+          "pass": true
+        },
+        {
+          "case": "commands.html local asset/link index.html",
+          "pass": true
+        },
+        {
+          "case": "commands.html local asset/link installation.html",
+          "pass": true
+        },
+        {
+          "case": "commands.html local asset/link privacy.html",
+          "pass": true
+        },
+        {
+          "case": "commands.html local asset/link script.js?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "commands.html local asset/link styles.css?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "commands.html local asset/link terms.html",
+          "pass": true
+        },
+        {
+          "case": "commands.html local asset/link troubleshooting.html",
+          "pass": true
+        },
+        {
+          "case": "docs HTTP configuration.html",
+          "pass": true
+        },
+        {
+          "case": "configuration.html local asset/link assets/georestrict-icon-v2.png?rev=20260715a",
+          "pass": true
+        },
+        {
+          "case": "configuration.html local asset/link changelog.html",
+          "pass": true
+        },
+        {
+          "case": "configuration.html local asset/link commands.html",
+          "pass": true
+        },
+        {
+          "case": "configuration.html local asset/link configuration.html",
+          "pass": true
+        },
+        {
+          "case": "configuration.html local asset/link faq.html",
+          "pass": true
+        },
+        {
+          "case": "configuration.html local asset/link how-it-works.html",
+          "pass": true
+        },
+        {
+          "case": "configuration.html local asset/link index.html",
+          "pass": true
+        },
+        {
+          "case": "configuration.html local asset/link installation.html",
+          "pass": true
+        },
+        {
+          "case": "configuration.html local asset/link privacy.html",
+          "pass": true
+        },
+        {
+          "case": "configuration.html local asset/link script.js?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "configuration.html local asset/link styles.css?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "configuration.html local asset/link terms.html",
+          "pass": true
+        },
+        {
+          "case": "configuration.html local asset/link troubleshooting.html",
+          "pass": true
+        },
+        {
+          "case": "docs HTTP faq.html",
+          "pass": true
+        },
+        {
+          "case": "faq.html local asset/link assets/georestrict-icon-v2.png?rev=20260715a",
+          "pass": true
+        },
+        {
+          "case": "faq.html local asset/link changelog.html",
+          "pass": true
+        },
+        {
+          "case": "faq.html local asset/link commands.html",
+          "pass": true
+        },
+        {
+          "case": "faq.html local asset/link configuration.html",
+          "pass": true
+        },
+        {
+          "case": "faq.html local asset/link faq.html",
+          "pass": true
+        },
+        {
+          "case": "faq.html local asset/link how-it-works.html",
+          "pass": true
+        },
+        {
+          "case": "faq.html local asset/link index.html",
+          "pass": true
+        },
+        {
+          "case": "faq.html local asset/link installation.html",
+          "pass": true
+        },
+        {
+          "case": "faq.html local asset/link privacy.html",
+          "pass": true
+        },
+        {
+          "case": "faq.html local asset/link script.js?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "faq.html local asset/link styles.css?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "faq.html local asset/link terms.html",
+          "pass": true
+        },
+        {
+          "case": "faq.html local asset/link troubleshooting.html",
+          "pass": true
+        },
+        {
+          "case": "docs HTTP how-it-works.html",
+          "pass": true
+        },
+        {
+          "case": "how-it-works.html local asset/link assets/georestrict-icon-v2.png?rev=20260715a",
+          "pass": true
+        },
+        {
+          "case": "how-it-works.html local asset/link changelog.html",
+          "pass": true
+        },
+        {
+          "case": "how-it-works.html local asset/link commands.html",
+          "pass": true
+        },
+        {
+          "case": "how-it-works.html local asset/link configuration.html",
+          "pass": true
+        },
+        {
+          "case": "how-it-works.html local asset/link faq.html",
+          "pass": true
+        },
+        {
+          "case": "how-it-works.html local asset/link how-it-works.html",
+          "pass": true
+        },
+        {
+          "case": "how-it-works.html local asset/link index.html",
+          "pass": true
+        },
+        {
+          "case": "how-it-works.html local asset/link installation.html",
+          "pass": true
+        },
+        {
+          "case": "how-it-works.html local asset/link privacy.html",
+          "pass": true
+        },
+        {
+          "case": "how-it-works.html local asset/link script.js?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "how-it-works.html local asset/link styles.css?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "how-it-works.html local asset/link terms.html",
+          "pass": true
+        },
+        {
+          "case": "how-it-works.html local asset/link troubleshooting.html",
+          "pass": true
+        },
+        {
+          "case": "docs HTTP index.html",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link assets/georestrict-banner.png?rev=20260714g",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link assets/georestrict-icon-v2.png?rev=20260715a",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link changelog.html",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link commands.html",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link configuration.html",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link faq.html",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link how-it-works.html",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link index.html",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link installation.html",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link privacy.html",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link script.js?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link styles.css?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link terms.html",
+          "pass": true
+        },
+        {
+          "case": "index.html local asset/link troubleshooting.html",
+          "pass": true
+        },
+        {
+          "case": "docs HTTP installation.html",
+          "pass": true
+        },
+        {
+          "case": "installation.html local asset/link assets/georestrict-icon-v2.png?rev=20260715a",
+          "pass": true
+        },
+        {
+          "case": "installation.html local asset/link changelog.html",
+          "pass": true
+        },
+        {
+          "case": "installation.html local asset/link commands.html",
+          "pass": true
+        },
+        {
+          "case": "installation.html local asset/link configuration.html",
+          "pass": true
+        },
+        {
+          "case": "installation.html local asset/link faq.html",
+          "pass": true
+        },
+        {
+          "case": "installation.html local asset/link how-it-works.html",
+          "pass": true
+        },
+        {
+          "case": "installation.html local asset/link index.html",
+          "pass": true
+        },
+        {
+          "case": "installation.html local asset/link installation.html",
+          "pass": true
+        },
+        {
+          "case": "installation.html local asset/link privacy.html",
+          "pass": true
+        },
+        {
+          "case": "installation.html local asset/link script.js?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "installation.html local asset/link styles.css?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "installation.html local asset/link terms.html",
+          "pass": true
+        },
+        {
+          "case": "installation.html local asset/link troubleshooting.html",
+          "pass": true
+        },
+        {
+          "case": "docs HTTP privacy.html",
+          "pass": true
+        },
+        {
+          "case": "privacy.html local asset/link assets/georestrict-icon-v2.png?rev=20260715a",
+          "pass": true
+        },
+        {
+          "case": "privacy.html local asset/link changelog.html",
+          "pass": true
+        },
+        {
+          "case": "privacy.html local asset/link commands.html",
+          "pass": true
+        },
+        {
+          "case": "privacy.html local asset/link configuration.html",
+          "pass": true
+        },
+        {
+          "case": "privacy.html local asset/link faq.html",
+          "pass": true
+        },
+        {
+          "case": "privacy.html local asset/link how-it-works.html",
+          "pass": true
+        },
+        {
+          "case": "privacy.html local asset/link index.html",
+          "pass": true
+        },
+        {
+          "case": "privacy.html local asset/link installation.html",
+          "pass": true
+        },
+        {
+          "case": "privacy.html local asset/link privacy.html",
+          "pass": true
+        },
+        {
+          "case": "privacy.html local asset/link script.js?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "privacy.html local asset/link styles.css?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "privacy.html local asset/link terms.html",
+          "pass": true
+        },
+        {
+          "case": "privacy.html local asset/link troubleshooting.html",
+          "pass": true
+        },
+        {
+          "case": "docs HTTP terms.html",
+          "pass": true
+        },
+        {
+          "case": "terms.html local asset/link assets/georestrict-icon-v2.png?rev=20260715a",
+          "pass": true
+        },
+        {
+          "case": "terms.html local asset/link changelog.html",
+          "pass": true
+        },
+        {
+          "case": "terms.html local asset/link commands.html",
+          "pass": true
+        },
+        {
+          "case": "terms.html local asset/link configuration.html",
+          "pass": true
+        },
+        {
+          "case": "terms.html local asset/link faq.html",
+          "pass": true
+        },
+        {
+          "case": "terms.html local asset/link how-it-works.html",
+          "pass": true
+        },
+        {
+          "case": "terms.html local asset/link index.html",
+          "pass": true
+        },
+        {
+          "case": "terms.html local asset/link installation.html",
+          "pass": true
+        },
+        {
+          "case": "terms.html local asset/link privacy.html",
+          "pass": true
+        },
+        {
+          "case": "terms.html local asset/link script.js?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "terms.html local asset/link styles.css?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "terms.html local asset/link terms.html",
+          "pass": true
+        },
+        {
+          "case": "terms.html local asset/link troubleshooting.html",
+          "pass": true
+        },
+        {
+          "case": "docs HTTP troubleshooting.html",
+          "pass": true
+        },
+        {
+          "case": "troubleshooting.html local asset/link assets/georestrict-icon-v2.png?rev=20260715a",
+          "pass": true
+        },
+        {
+          "case": "troubleshooting.html local asset/link changelog.html",
+          "pass": true
+        },
+        {
+          "case": "troubleshooting.html local asset/link commands.html",
+          "pass": true
+        },
+        {
+          "case": "troubleshooting.html local asset/link configuration.html",
+          "pass": true
+        },
+        {
+          "case": "troubleshooting.html local asset/link faq.html",
+          "pass": true
+        },
+        {
+          "case": "troubleshooting.html local asset/link how-it-works.html",
+          "pass": true
+        },
+        {
+          "case": "troubleshooting.html local asset/link index.html",
+          "pass": true
+        },
+        {
+          "case": "troubleshooting.html local asset/link installation.html",
+          "pass": true
+        },
+        {
+          "case": "troubleshooting.html local asset/link privacy.html",
+          "pass": true
+        },
+        {
+          "case": "troubleshooting.html local asset/link script.js?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "troubleshooting.html local asset/link styles.css?rev=20260714h",
+          "pass": true
+        },
+        {
+          "case": "troubleshooting.html local asset/link terms.html",
+          "pass": true
+        },
+        {
+          "case": "troubleshooting.html local asset/link troubleshooting.html",
+          "pass": true
+        }
+      ],
+      "pass": true
+    }
+  },
+  "updateChecker": {
+    "latest": "2.0.2",
+    "suite": "real Modrinth update lookup",
+    "pass": true
+  },
+  "systemd": {
+    "adaptedUnitSyntax": "passed",
+    "serviceExecution": "not tested; PID 1 is not systemd"
+  },
+  "limits": [
+    "offline loopback clients with synthetic trusted public-address forwarding",
+    "no authenticated Java or Bedrock accounts",
+    "workerd/local KV; no Cloudflare production deployment",
+    "HTTP provider fixtures; no paid-provider credentials",
+    "local webhook capture; no real Discord message",
+    "docs HTTP/links; no browser visual QA",
+    "listed versions only; concurrency checks are not a capacity benchmark"
+  ]
+}

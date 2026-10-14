@@ -80,6 +80,14 @@
             </div>
 
             <div class="faq-item fade-in">
+                <div class="faq-question">Why does 127.0.0.1 stay allowed when I block LOCAL?</div>
+                <div class="faq-answer">
+                    <p>In v2.0.2, local addresses skip country rules, so adding <code>LOCAL</code> has no effect. The upcoming v2.1.0 patch fixes that blocklist entry and adds <code>blockLocalConnections: true</code> as an independent option. Reload and check the address again.</p>
+                    <p>The check command evaluates the address without player permissions. Bukkit operators and players with <code>georestrict.bypass</code> can still join. On a backend that sees only a local proxy/Geyser IP, configure trusted player IP forwarding or enable blocking on the public-facing proxy to preserve remote joins.</p>
+                </div>
+            </div>
+
+            <div class="faq-item fade-in">
                 <div class="faq-question">My proxy-installed plugin isn't blocking anyone</div>
                 <div class="faq-answer">
                     <p>Check which jar is where. If you put the plugin on the backend Bukkit server and your players connect through Bungee/Velocity, the connection arrives at the backend with the proxy's IP — the proxy is the one seeing the player's actual IP at the network edge. Either:</p>

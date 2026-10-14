@@ -1,0 +1,55 @@
+name: Release version tag
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    uses: ./.github/workflows/build.yml
+    with:
+      release_tag: ${{ github.ref_name }}
+
+  publish:
+    needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: release-input
+      - name: Assemble release assets, source, notices and checksums
+        run: python3 scripts/release.py bundle --tag "$RELEASE_TAG" --artifacts release-input --output dist
+      - name: Stage assets and publish the completed release
+        env:
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          existing=$(gh release list --limit 100 --json tagName,isDraft --jq ".[] | select(.tagName == \"$RELEASE_TAG\") | .isDraft")
+          if [ "$existing" = "false" ]; then
+            echo "::notice::This tag already has a published release; its assets will not be overwritten."
+            exit 0
+          fi
+          prerelease=$(python3 -c 'import json; print(str(json.load(open("dist/release-manifest.json"))["prerelease"]).lower())')
+          if [ -z "$existing" ]; then
+            gh release create "$RELEASE_TAG" --verify-tag --draft --title "GeoRestrict $RELEASE_TAG" --notes-file dist/RELEASE_NOTES.md
+          fi
+          mapfile -t assets < <(find dist -maxdepth 1 -type f ! -name RELEASE_NOTES.md -print | sort)
+          gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber
+          gh release edit "$RELEASE_TAG" --draft=false --prerelease="$prerelease" --notes-file dist/RELEASE_NOTES.md

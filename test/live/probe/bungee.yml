@@ -1,0 +1,4 @@
+name: GeoRestrictLiveProbe
+version: '1'
+main: georestrict.live.BungeeProbe
+depends: [GeoRestrict]

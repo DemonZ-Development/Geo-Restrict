@@ -179,11 +179,7 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
         try {
             connectionCount.incrementAndGet();
             GeoRestrictService.CheckResult result = service.checkIp(ip, name, uuid, false).join();
-            if (!result.allowed) {
-                pendingChecks.put(uuid, new PendingCheck(result, System.currentTimeMillis()));
-            } else {
-                pendingChecks.remove(uuid);
-            }
+            pendingChecks.put(uuid, new PendingCheck(result, System.currentTimeMillis()));
         } catch (Exception e) {
             log.error("Lookup failed during login for {}", name, e);
             if (config.blockOnLookupFailure) {
@@ -197,10 +193,15 @@ public class GeoRestrictBukkitPlugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) {
         PendingCheck pending = pendingChecks.remove(event.getPlayer().getUniqueId());
-        if (pending == null || event.getResult() != PlayerLoginEvent.Result.ALLOWED) return;
+        if (event.getResult() != PlayerLoginEvent.Result.ALLOWED) return;
         if (event.getPlayer().isOp() || event.getPlayer().hasPermission("georestrict.bypass")) return;
 
-        String reason = pending.result.reason == null ? "Connection rejected." : pending.result.reason;
+        GeoRestrictService.CheckResult result = pending == null
+            ? service.checkLocalIp(event.getAddress().getHostAddress(), event.getPlayer().getName(),
+                event.getPlayer().getUniqueId(), false)
+            : pending.result;
+        if (result == null || result.allowed) return;
+        String reason = result.reason == null ? "Connection rejected." : result.reason;
         event.disallow(PlayerLoginEvent.Result.KICK_OTHER, reason);
     }
 

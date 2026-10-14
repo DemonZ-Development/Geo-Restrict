@@ -23,6 +23,8 @@ import java.io.File;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DecisionEngineIT {
@@ -124,6 +126,58 @@ class DecisionEngineIT {
     @Test
     void privateIpRangeAllowed() {
         assertTrue(check("10.0.0.5").allowed);
+    }
+
+    @Test
+    void localBlockingNeverCallsGatewayOrPopulatesCache() {
+        config.blockLocalConnections = true;
+        config.blockOnLookupFailure = false;
+        for (String ip : new String[]{"127.0.0.1", "192.168.1.1", "::1", "fd00::1",
+                "fe80::1%eth0", "::ffff:192.168.1.1"}) {
+            CheckResult result = check(ip);
+            assertFalse(result.allowed, ip);
+            assertEquals(config.kickMessageLocalConnection, result.reason);
+            assertEquals("LOCAL", result.info.countryCode);
+            assertNull(svc.lookup(ip).join());
+        }
+        assertEquals(0, gw.requestCount());
+        assertEquals(0, cache.getStats().entryCount);
+    }
+
+    @Test
+    void localBlockingPreservesPublicJoinsAndOutboundLocalGatewayAccess() {
+        config.blockLocalConnections = true;
+        assertTrue(check("1.2.3.4").allowed);
+        assertFalse(check("5.6.7.8").allowed);
+        assertFalse(check("80.1.1.7").allowed);
+        assertTrue(check("1.2.3.4").allowed);
+        assertEquals(3, gw.requestCount(), "cached joins must still reuse their result");
+    }
+
+    @Test
+    void localCountryEntryReproducesAndFixesReportedCommandResult() {
+        config.countries = Arrays.asList("LOCAL", "CN");
+        assertFalse(check("127.0.0.1").allowed);
+        assertFalse(check("10.0.0.5").allowed);
+        assertTrue(check("1.2.3.4").allowed);
+        assertFalse(check("45.1.1.9").allowed);
+        assertTrue(svc.checkIp("127.0.0.1", "tester", true).join().allowed);
+        assertEquals(2, gw.requestCount());
+    }
+
+    @Test
+    void localBlockingPreservesFloodgateFullBypassButNotVpnOnlyBypass() {
+        config.blockLocalConnections = true;
+        java.util.UUID uuid = java.util.UUID.randomUUID();
+        org.geysermc.floodgate.api.FloodgateApi.getInstance().addPlayer(uuid);
+        try {
+            config.floodgate.bypassVpnCheck = true;
+            assertFalse(svc.checkIp("127.0.0.1", "tester", uuid).join().allowed);
+            config.floodgate.bypassGeorestrict = true;
+            assertTrue(svc.checkIp("127.0.0.1", "tester", uuid).join().allowed);
+        } finally {
+            org.geysermc.floodgate.api.FloodgateApi.getInstance().removePlayer(uuid);
+        }
     }
 
     @Test

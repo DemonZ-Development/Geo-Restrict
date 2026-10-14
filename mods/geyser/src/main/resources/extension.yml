@@ -1,0 +1,6 @@
+id: georestrict
+name: GeoRestrict
+main: zip.linuxaddict.georestrict.geyser.GeoRestrictGeyser
+api: 2.9.0
+version: ${project.version}
+authors: [Demonz Development]

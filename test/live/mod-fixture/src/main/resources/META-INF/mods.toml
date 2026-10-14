@@ -1,0 +1,17 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="GPL-3.0-or-later"
+[[mods]]
+modId="georestrict_live_fixture"
+version="1.0.0"
+displayName="GeoRestrict isolated live test fixture"
+displayTest="IGNORE_ALL_VERSION"
+[[dependencies.georestrict_live_fixture]]
+modId="georestrict"
+mandatory=true
+type="required"
+versionRange="[2.1.0,)"
+ordering="AFTER"
+side="SERVER"
+[[mixins]]
+config="georestrict.live.mixins.json"

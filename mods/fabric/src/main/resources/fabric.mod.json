@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "georestrict",
+  "version": "${project.version}",
+  "name": "GeoRestrict",
+  "description": "Server-side country, ASN, VPN and local-player access rules.",
+  "authors": [
+    "Demonz Development"
+  ],
+  "license": "GPL-3.0-or-later",
+  "environment": "server",
+  "entrypoints": {
+    "server": [
+      "zip.linuxaddict.georestrict.mod.fabric.GeoRestrictFabric"
+    ]
+  },
+  "mixins": [
+    "georestrict.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "minecraft": ">=1.20 <=26.3",
+    "java": ">=17"
+  }
+}

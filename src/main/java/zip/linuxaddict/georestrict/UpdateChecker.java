@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 public class UpdateChecker {
 
     private static final String MODRINTH_API =
-        "https://api.modrinth.com/v2/project/%s/version?loaders=[\"paper\",\"bukkit\",\"spigot\"]";
+        "https://api.modrinth.com/v2/project/%s/version?loaders=%%5B%%22paper%%22%%2C%%22bukkit%%22%%2C%%22spigot%%22%%5D";
 
     private final String currentVersion;
     private final String projectSlug;

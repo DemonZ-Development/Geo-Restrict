@@ -16,10 +16,6 @@ import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-/**
- * Folia scheduler adapter. Loaded via reflection (see GeoRestrictBukkitPlugin#createScheduler)
- * so this class is never touched on non-Folia servers, avoiding NoClassDefFoundError.
- */
 public class FoliaTaskScheduler implements TaskScheduler {
 
     @Override

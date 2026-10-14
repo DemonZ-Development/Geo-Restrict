@@ -1,0 +1,151 @@
+name: Build and test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      release_tag:
+        type: string
+        required: false
+        default: ''
+    outputs:
+      version:
+        description: Validated source version
+        value: ${{ jobs.metadata.outputs.version }}
+
+permissions:
+  contents: read
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate release versions and tag
+        id: version
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || '' }}
+        run: python3 scripts/release.py version --tag "$RELEASE_TAG" --github-output "$GITHUB_OUTPUT"
+      - name: Test release packaging and source exports
+        run: python3 -m unittest discover -s scripts/tests -v
+
+  java-plugin:
+    needs: metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: |
+            pom.xml
+            test/pom.xml
+      - name: Build plugin, run unit tests and static checks
+        run: mvn -B --no-transfer-progress clean install
+      - name: Run admission integration tests
+        run: mvn -B --no-transfer-progress -f test/pom.xml clean test
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-java-plugin
+          if-no-files-found: error
+          path: target/georestrict-${{ needs.metadata.outputs.version }}.jar
+
+  server-adapters:
+    needs: metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: 'mods/**/pom.xml'
+      - name: Build all server adapters
+        run: mvn -B --no-transfer-progress -f mods/pom.xml clean verify
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-server-adapters
+          if-no-files-found: error
+          path: |
+            mods/fabric/target/georestrict-fabric-${{ needs.metadata.outputs.version }}.jar
+            mods/forge/target/georestrict-forge-${{ needs.metadata.outputs.version }}.jar
+            mods/neoforge/target/georestrict-neoforge-${{ needs.metadata.outputs.version }}.jar
+            mods/sponge/target/georestrict-sponge-${{ needs.metadata.outputs.version }}.jar
+            mods/geyser/target/georestrict-geyser-${{ needs.metadata.outputs.version }}.jar
+            mods/standalone/target/georestrict-standalone-${{ needs.metadata.outputs.version }}.jar
+
+  java17-compatibility:
+    needs: metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: 'mods/**/pom.xml'
+      - name: Verify adapters with Java 17 APIs
+        run: mvn -B --no-transfer-progress -f mods/pom.xml -pl fabric,forge,neoforge,standalone -am clean verify
+
+  pumpkin:
+    needs: metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-wasip2
+          components: rustfmt
+      - name: Check source formatting
+        run: cargo fmt --manifest-path adapters/pumpkin/Cargo.toml --check
+      - name: Test native admission rules
+        run: cargo test --locked --manifest-path adapters/pumpkin/Cargo.toml --lib
+      - name: Build native Pumpkin component
+        run: cargo build --locked --release --target wasm32-wasip2 --manifest-path adapters/pumpkin/Cargo.toml
+      - name: Prepare native component and dependency notices
+        run: |
+          mkdir -p "$RUNNER_TEMP/pumpkin-artifacts"
+          cargo metadata --locked --filter-platform wasm32-wasip2 --format-version 1 --manifest-path adapters/pumpkin/Cargo.toml > "$RUNNER_TEMP/pumpkin-metadata.json"
+          cp adapters/pumpkin/target/wasm32-wasip2/release/georestrict_pumpkin.wasm "$RUNNER_TEMP/pumpkin-artifacts/"
+          python3 scripts/release.py pumpkin-notices --metadata "$RUNNER_TEMP/pumpkin-metadata.json" --output "$RUNNER_TEMP/pumpkin-artifacts/pumpkin-notices.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-pumpkin
+          if-no-files-found: error
+          path: ${{ runner.temp }}/pumpkin-artifacts/
+
+  gateways:
+    needs: metadata
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        directory: [worker, vps-gateway]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: ${{ matrix.directory }}/package-lock.json
+      - name: Install locked dependencies
+        working-directory: ${{ matrix.directory }}
+        run: npm ci
+      - name: Check syntax
+        working-directory: ${{ matrix.directory }}
+        run: npm run check
+      - name: Run gateway tests
+        working-directory: ${{ matrix.directory }}
+        run: npm test

@@ -59,7 +59,7 @@
             </div>
 
             <h2 class="fade-in">The full file</h2>
-            <p class="fade-in">This is what gets written the first time the plugin runs.</p>
+            <p class="fade-in">This is what the upcoming v2.1.0 patch writes on first run (schema v6).</p>
             <div class="code-block-wrapper fade-in">
                 <span class="code-label">plugins/GeoRestrict/config.yml</span>
 <pre><code><span class="syn-cmt"># Full help: https://georestrict-docs.pages.dev/configuration</span>
@@ -68,7 +68,7 @@
 <span class="syn-cmt"># and understand the lookup path. A wrong value can block joins.</span>
 
 <span class="syn-cmt"># Schema version. Bumped by us when the file layout changes.</span>
-<span class="syn-key">configVersion:</span> <span class="syn-num">5</span>
+<span class="syn-key">configVersion:</span> <span class="syn-num">6</span>
 
 <span class="syn-cmt"># ---- Lookup gateway (most servers should leave this unchanged) ----</span>
 <span class="syn-key">gatewayUrl:</span> <span class="syn-str">"https://geoprotect.demonzdevelopment-e64.workers.dev/"</span>
@@ -76,6 +76,9 @@
 <span class="syn-key">blockOnLookupFailure:</span> <span class="syn-bool">true</span>
 <span class="syn-key">lookupThreads:</span> <span class="syn-num">4</span>
 <span class="syn-key">maxCacheEntries:</span> <span class="syn-num">100000</span>
+
+<span class="syn-cmt"># ---- Local player connections (opt-in) ----</span>
+<span class="syn-key">blockLocalConnections:</span> <span class="syn-bool">false</span>
 
 <span class="syn-cmt"># ---- Country ----</span>
 <span class="syn-key">countryMode:</span> <span class="syn-str">BLOCKLIST</span>      <span class="syn-cmt"># ALLOWLIST | BLOCKLIST | DISABLED</span>
@@ -112,6 +115,7 @@
 <span class="syn-key">kickMessageAsn:</span> <span class="syn-str">"Your ISP/ASN is not allowed on this server."</span>
 <span class="syn-key">kickMessageVpn:</span> <span class="syn-str">"VPN or proxy connections are not allowed."</span>
 <span class="syn-key">kickMessageLookupFailure:</span> <span class="syn-str">"Geo verification is temporarily unavailable. Please try again later."</span>
+<span class="syn-key">kickMessageLocalConnection:</span> <span class="syn-str">"Local network connections are not allowed on this server."</span>
 
 <span class="syn-cmt"># ---- Cache &amp; network ----</span>
 <span class="syn-key">cacheTtlDays:</span> <span class="syn-num">30</span>
@@ -152,14 +156,15 @@
                         <tr><th>Key</th><th>Type</th><th>Default</th><th>Notes</th></tr>
                     </thead>
                     <tbody>
-                        <tr><td><code>configVersion</code></td><td>int</td><td><code>5</code></td><td>Schema version. Bumped when file layout changes. Don't edit.</td></tr>
+                        <tr><td><code>configVersion</code></td><td>int</td><td><code>6</code></td><td>Schema version. Bumped when file layout changes. Don't edit.</td></tr>
                         <tr><td><code>gatewayUrl</code></td><td>URL</td><td>public Worker</td><td>Where lookups go. Leave this unchanged unless you operate another compatible Worker.</td></tr>
                         <tr><td><code>gatewayToken</code></td><td>string</td><td><code>""</code></td><td>Bearer token for a private Worker. Keep it empty for the public Worker and never publish a real token.</td></tr>
                         <tr><td><code>blockOnLookupFailure</code></td><td>bool</td><td><code>true</code></td><td>When every lookup path fails, block. <em>Recommended</em>. Flip to <code>false</code> if you prefer fail-open.</td></tr>
-                        <tr><td><code>lookupThreads</code></td><td>int 1–32</td><td><code>4</code></td><td>Background threads for HTTP calls and webhook delivery.</td></tr>
+                        <tr><td><code>blockLocalConnections</code></td><td>bool</td><td><code>false</code></td><td>Reject loopback/LAN player IPs before geolocation. Enable at the public-facing proxy or on a backend receiving real forwarded player IPs.</td></tr>
+                        <tr><td><code>lookupThreads</code></td><td>int 1–32</td><td><code>4</code></td><td>Background lookup threads. Changing this setting requires a restart.</td></tr>
                         <tr><td><code>maxCacheEntries</code></td><td>int</td><td><code>100000</code></td><td>Hard cap. Oldest entries are evicted past this. <code>0</code> = no cap.</td></tr>
                         <tr><td><code>countryMode</code></td><td>enum</td><td><code>BLOCKLIST</code></td><td>ALLOWLIST / BLOCKLIST / DISABLED.</td></tr>
-                        <tr><td><code>countries</code></td><td>list</td><td>CN, RU, KP, IR</td><td>ISO-3166 alpha-2. Case is normalized.</td></tr>
+                        <tr><td><code>countries</code></td><td>list</td><td>CN, RU, KP, IR</td><td>ISO-3166 alpha-2. Case is normalized. In BLOCKLIST mode, <code>LOCAL</code> also rejects loopback/LAN players in v2.1.0.</td></tr>
                         <tr><td><code>asnMode</code></td><td>enum</td><td><code>DISABLED</code></td><td>ALLOWLIST / BLOCKLIST / DISABLED. Auto-disables if <code>asns</code> is empty.</td></tr>
                         <tr><td><code>asns</code></td><td>list</td><td><code>[]</code></td><td>AS numbers, e.g. <code>AS16276</code>. With or without prefix is fine.</td></tr>
                         <tr><td><code>vpnCheckEnabled</code></td><td>bool</td><td><code>true</code></td><td>Enable ISP keyword + boolean flag checks.</td></tr>
@@ -168,11 +173,12 @@
                         <tr><td><code>kickMessageAsn</code></td><td>string</td><td>—</td><td>Shown to players blocked by ASN.</td></tr>
                         <tr><td><code>kickMessageVpn</code></td><td>string</td><td>—</td><td>Shown to players blocked by VPN/hosting detection.</td></tr>
                         <tr><td><code>kickMessageLookupFailure</code></td><td>string</td><td>—</td><td>Shown when <code>blockOnLookupFailure: true</code> and lookup failed.</td></tr>
+                        <tr><td><code>kickMessageLocalConnection</code></td><td>string</td><td>—</td><td>Shown when the explicit local-blocking flag rejects a player. A <code>LOCAL</code> country block uses <code>kickMessageCountry</code>.</td></tr>
                         <tr><td><code>cacheTtlDays</code></td><td>int 1–365</td><td><code>30</code></td><td>How long a cached lookup is trusted.</td></tr>
                         <tr><td><code>updateCheck</code></td><td>bool</td><td><code>true</code></td><td>Hits Modrinth every 6h, logs when a new version is out.</td></tr>
                         <tr><td><code>connectionTimeoutMs</code></td><td>int</td><td><code>3000</code></td><td>HTTP timeout for the plugin's Worker request.</td></tr>
                         <tr><td><code>floodgate.enabled</code></td><td>bool</td><td><code>true</code></td><td>Auto-detect Floodgate Bedrock players if Floodgate is installed.</td></tr>
-                        <tr><td><code>floodgate.bypassGeorestrict</code></td><td>bool</td><td><code>false</code></td><td>Bypass all country, ASN, and VPN rules for Floodgate Bedrock players.</td></tr>
+                        <tr><td><code>floodgate.bypassGeorestrict</code></td><td>bool</td><td><code>false</code></td><td>Bypass country, ASN, VPN and local-connection rules for Floodgate Bedrock players.</td></tr>
                         <tr><td><code>floodgate.bypassVpnCheck</code></td><td>bool</td><td><code>false</code></td><td>Bypass only VPN/hosting keyword checks for Floodgate Bedrock players.</td></tr>
                         <tr><td><code>discord.webhook</code></td><td>URL</td><td><code>""</code></td><td>Empty = no notifications. Use a private webhook URL.</td></tr>
                         <tr><td><code>discord.maskIp</code></td><td>bool</td><td><code>true</code></td><td>Show <code>1.2.x.x</code> instead of the full IPv4.</td></tr>
@@ -227,6 +233,11 @@
 }
 </code></pre>
             </div>
+
+            <h2 class="fade-in">Blocking local players</h2>
+            <p class="fade-in">In v2.1.0, set <code>blockLocalConnections: true</code>, or add <code>LOCAL</code> to a country <code>BLOCKLIST</code>. Reload, then run <code>/georestrict check 127.0.0.1</code>: it should report <code>Allowed: No</code> and <code>Country: LOCAL</code>. Addresses are detected automatically; no fixed player IP list is required.</p>
+            <p class="fade-in">The rule covers loopback, LAN, link-local, IPv6 unique-local and unspecified addresses, including mapped IPv4 and scoped IPv6. Other reserved ranges retain their previous behavior. Local rejection uses no geolocation request or geo-cache entry; public players keep their normal rules. Bukkit operators, permission bypasses and Floodgate full bypasses still apply to joins.</p>
+            <p class="fade-in">On a proxy network, enable blocking on the public-facing BungeeCord/Velocity instance, or configure trusted player IP forwarding before enabling it on the backend. Keep both local-denial options off on a backend that only sees a local proxy/Geyser IP, since it cannot distinguish remote players from local ones. Existing <code>LOCAL</code> blocklist entries start taking effect after upgrading.</p>
 
             <h2 class="fade-in">Migrating old configs</h2>
             <p class="fade-in">If your <code>configVersion</code> is older than the bundled one, the plugin merges the bundled defaults into your file on next load. Your values win. New keys are added in-place rather than appended at the bottom of the file. The result is re-written and <code>configVersion</code> is bumped. A log line tells you it happened.</p>

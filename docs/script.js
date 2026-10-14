@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initBStatsMetrics();
 });
 
-/* ---------- Code-drawn interface icons ---------- */
 function initIcons() {
   const svgNamespace = 'http://www.w3.org/2000/svg';
   const iconNamePattern = /^[a-z-]+$/;
@@ -41,7 +40,6 @@ function initIcons() {
   });
 }
 
-/* ---------- Shared Brand ---------- */
 function initBrand() {
   document.querySelectorAll('.sidebar-logo').forEach(brand => {
     if (brand.querySelector('img')) return;
@@ -50,7 +48,6 @@ function initBrand() {
   document.querySelector('.sidebar')?.setAttribute('aria-label', 'Documentation');
 }
 
-/* ---------- Sidebar Toggle (Mobile) ---------- */
 function initSidebar() {
   const hamburger = document.querySelector('.hamburger');
   const sidebar = document.querySelector('.sidebar');
@@ -81,7 +78,6 @@ function initSidebar() {
   hamburger.addEventListener('click', toggleSidebar);
   if (overlay) overlay.addEventListener('click', toggleSidebar);
 
-  // Close on nav link click (mobile)
   sidebar.querySelectorAll('.sidebar-nav a').forEach(link => {
     link.addEventListener('click', () => {
       if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
@@ -102,7 +98,6 @@ function initSidebar() {
   });
 }
 
-/* ---------- Active Page Highlight ---------- */
 function initActiveNav() {
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
   document.querySelectorAll('.sidebar-nav a').forEach(link => {
@@ -115,7 +110,6 @@ function initActiveNav() {
   });
 }
 
-/* ---------- Scroll Animations ---------- */
 function initScrollAnimations() {
   const elements = document.querySelectorAll('.fade-in');
   if (!elements.length) return;
@@ -140,7 +134,6 @@ function initScrollAnimations() {
   elements.forEach(el => observer.observe(el));
 }
 
-/* ---------- Copy to Clipboard ---------- */
 function initCopyButtons() {
   document.querySelectorAll('.code-block-wrapper').forEach(wrapper => {
     const pre = wrapper.querySelector('pre');
@@ -164,7 +157,6 @@ function initCopyButtons() {
           btn.classList.remove('copied');
         }, 2000);
       }).catch(() => {
-        // Fallback
         const ta = document.createElement('textarea');
         ta.value = text;
         ta.style.position = 'fixed';
@@ -184,7 +176,6 @@ function initCopyButtons() {
   });
 }
 
-/* ---------- FAQ Accordion ---------- */
 function initFaqAccordion() {
   document.querySelectorAll('.faq-question').forEach((question, index) => {
     const answer = question.parentElement.querySelector('.faq-answer');
@@ -203,7 +194,6 @@ function initFaqAccordion() {
       const item = question.parentElement;
       const isOpen = item.classList.contains('open');
 
-      // Close all others
       document.querySelectorAll('.faq-item.open').forEach(openItem => {
         if (openItem !== item) {
           openItem.classList.remove('open');
@@ -216,7 +206,6 @@ function initFaqAccordion() {
         }
       });
 
-      // Toggle current
       item.classList.toggle('open', !isOpen);
       question.setAttribute('aria-expanded', String(!isOpen));
       if (answer) {
@@ -235,7 +224,6 @@ function initFaqAccordion() {
   });
 }
 
-/* ---------- bStats Live Indicator ---------- */
 async function initBStatsMetrics() {
   const container = document.getElementById('bstats-live-metrics');
   if (!container) return;
@@ -263,7 +251,6 @@ async function initBStatsMetrics() {
         }
       }
     } catch (e) {
-      // Ignore network errors on metrics lookup
     }
   }
 

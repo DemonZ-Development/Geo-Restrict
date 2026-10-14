@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v2.1.0] - 2026-10-14
+
+### Added
+- Self-contained native Pumpkin Rust/WASI plugin for Java and Bedrock admission, with local blocking, country/ASN/VPN rules, persistent caching and native commands.
+- Optional Geyser integration resolves the trusted Bedrock socket address and reuses existing Bedrock bypass settings.
+- Additional server adapter candidates for Sponge, Geyser standalone and generic Java gateway deployments; live compatibility is reported separately.
+- Separate Fabric, Forge and NeoForge dedicated-server mod artifacts sharing the existing rule engine, cache and public API, with asynchronous native login hooks, native permission checks and Brigadier commands.
+- A resumable Minecraft 1.20–26.3 release/software inventory and real dedicated-server matrix, recording exact loader builds and upstream gaps.
+- Opt-in `blockLocalConnections` and `kickMessageLocalConnection` settings. Loopback, LAN, link-local and IPv6 unique-local player addresses are rejected before geolocation; no fixed IP list is needed.
+- Config schema v6 migration adds the new settings with blocking disabled by default and preserves existing values.
+- Regression coverage for public joins, local rejection, mapped/scoped IPv6, bypasses, reload and gateway/cache isolation.
+- Repeatable live platform, forwarding, API, addon and HTTP service harnesses with a versioned coverage report.
+
+### Fixed
+- Local blocking now also covers older offline CraftBukkit releases that omit asynchronous pre-login events, without making HTTP requests on the server thread. Successful asynchronous decisions are retained to prevent rechecking a forwarded public player against its proxy's local address.
+- Non-ASCII IPv4 digits are rejected before Java's address resolver, preventing malformed IP text from causing DNS requests.
+- `LOCAL` in a country `BLOCKLIST` now rejects local player addresses, including `127.0.0.1`. Previously, all non-public IPs skipped country evaluation. This form uses `kickMessageCountry`; the explicit flag uses `kickMessageLocalConnection`.
+- A null `floodgate` config section now receives defaults instead of throwing during player checks.
+- Worker and fallback expanded/mapped IPv6 handling now classifies local addresses correctly and rejects malformed compression before querying providers.
+- Modrinth update lookups now percent-encode their query instead of receiving HTTP 400.
+- Docker now binds container interfaces and authenticates its health probe with the configured token formats; the base image uses Node 22 LTS.
+
+### Compatibility
+- Existing server and proxy login hooks, Bukkit operator/permission bypasses, and Floodgate full bypass remain intact. Public IPs keep their country, ASN and VPN rules.
+- Install on the public-facing proxy or configure trusted player IP forwarding before enabling local blocking on a backend that sees only a local proxy/Geyser address. Other reserved ranges retain their existing behavior.
+- Worker and fallback packages are now v2.1.0 and share strict IPv4/IPv6 literal parsing.
+
+---
+
 ## [v2.0.2] - 2026-08-26
 
 ### Added
