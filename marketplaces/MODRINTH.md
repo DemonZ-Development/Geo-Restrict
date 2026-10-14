@@ -17,19 +17,20 @@ High-performance, affordable hosting for your Minecraft server. Premium hardware
 - Country allowlists and blocklists
 - ASN rules for individual ISPs and hosting networks
 - Configurable VPN, proxy and hosting detection
+- Local connection blocking (`blockLocalConnections`) for loopback, LAN, and link-local joins
 - Geyser / Floodgate (Bedrock) integration with custom bypass options
-- Developer API (`GeoRestrictAPI`) for Paper, BungeeCord, and Velocity (Geo-Routing, VPN queries, ASN lookups)
-- One v2.0.2 jar for Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity
+- Developer API (`GeoRestrictAPI`) for Paper, Velocity, BungeeCord, and mod loaders
+- Native multi-loader support: Paper, Folia, Velocity, Fabric, Forge, NeoForge, and Sponge
 - Local, bounded cache with atomic saves and automatic expiry cleanup
 - Clear behavior when the lookup service is temporarily unavailable
 - Discord block notifications with IP masking enabled by default
 - `/georestrict check`, `cachestats`, `purgecache` and `reload`
-- `georestrict.bypass` on servers compatible with Bukkit
+- `georestrict.bypass` on compatible backend servers
 
 ## Start small
 
-1. Put `georestrict-2.0.2.jar` in the server or proxy `plugins/` folder.
-2. Restart once to create `plugins/GeoRestrict/config.yml`.
+1. Put `georestrict-2.1.0.jar` (or your loader's dedicated mod jar) in `plugins/` or `mods/`.
+2. Restart once to create the configuration file.
 3. Pick `BLOCKLIST` or `ALLOWLIST` and add two letter country codes.
 4. Run `/georestrict reload`.
 5. Use `/georestrict check <ip>` to confirm the result before inviting everyone back.
@@ -38,7 +39,7 @@ You do not need to enable every feature on day one. Country rules are enough for
 
 ## When a lookup fails
 
-v2.0.2 blocks by default when the cache is empty and the lookup service is unavailable. The player receives your `kickMessageLookupFailure`. Set `blockOnLookupFailure: false` if keeping the server reachable during an outage matters more than strict filtering.
+v2.1.0 blocks by default when the cache is empty and the lookup service is unavailable. The player receives your `kickMessageLookupFailure`. Set `blockOnLookupFailure: false` if keeping the server reachable during an outage matters more than strict filtering.
 
 ## Live Statistics
 

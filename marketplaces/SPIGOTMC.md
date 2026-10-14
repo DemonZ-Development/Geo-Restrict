@@ -30,7 +30,7 @@ One jar supports Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and
 
 ## Install in four steps
 
-1. Put `georestrict-2.0.2.jar` in `plugins/`.
+1. Put `georestrict-2.1.0.jar` in `plugins/`.
 2. Restart once.
 3. Edit `plugins/GeoRestrict/config.yml`.
 4. Run `/georestrict reload` and verify with `/georestrict check <ip>`.

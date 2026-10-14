@@ -16,9 +16,14 @@ High-performance, affordable hosting for your Minecraft server. Premium hardware
 
 ## File Directory
 
+### Minecraft Marketplaces
 - `MODRINTH.md` — Modrinth project description (Markdown)
 - `HANGAR.md` — Paper Hangar project description (Markdown)
 - `SPIGOTMC.md` — SpigotMC resource description (BBCode/Markdown compatible)
 - `BUILTBYBIT.md` — BuiltByBit resource overview (Markdown)
 - `POLYMART.md` — Polymart resource details (Markdown)
 - `CURSEFORGE.md` — CurseForge project page (Markdown)
+
+### Beyond Minecraft & Multi-Platform
+- `DEMONZ.md` — DemonZ Development portal overview (Multi-loader, Pumpkin WASI, Standalone, Gateways)
+- `STANDALONE.md` — Standalone daemon & generic proxy deployment (Markdown)

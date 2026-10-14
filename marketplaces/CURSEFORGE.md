@@ -22,11 +22,11 @@ High-performance, affordable hosting for your Minecraft server. Premium hardware
 - Clear behavior when the lookup service is temporarily unavailable
 - Commands for lookup checks, cache management and reloads
 
-One v2.0.2 jar supports Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity. GeoRestrict targets Java 17 bytecode, while the server itself may require a newer Java runtime.
+One universal v2.1.0 jar supports Bukkit, Spigot, Paper, Purpur, Folia, BungeeCord, Waterfall and Velocity, alongside dedicated mod jars for Fabric, Forge, NeoForge, and Sponge. GeoRestrict targets Java 17 bytecode, while the server itself may require a newer Java runtime.
 
 ## First setup
 
-Place the jar in `plugins/`, restart, and edit `plugins/GeoRestrict/config.yml`. Start with a short list of countries and test it with `/georestrict check <ip>`. Add ASN or VPN rules later if you have a clear reason for them.
+Place the jar in `plugins/` or `mods/`, restart, and edit the configuration file. Start with a short list of countries and test it with `/georestrict check <ip>`. Add ASN or VPN rules later if you have a clear reason for them.
 
 By default, GeoRestrict blocks a new connection when the cache is empty and every lookup path is unavailable. You can change that with `blockOnLookupFailure: false`.
 

@@ -17,9 +17,10 @@ High-performance, affordable hosting for your Minecraft server. Premium hardware
 - you need a temporary VPN rule during an attack; or
 - you want the same policy at the proxy and backend without maintaining separate builds.
 
-## v2.0.2 highlights
+## v2.1.0 highlights
 
 - One jar targeting Java 17 bytecode for Paper, Folia, Velocity and the wider Bukkit and Bungee ecosystem
+- Opt-in local connection blocking (`blockLocalConnections`) before geolocation lookups
 - Country and ASN allowlist and blocklist modes
 - Provider proxy flags plus editable ISP keyword matching
 - Geyser / Floodgate Bedrock integration with custom bypass settings
